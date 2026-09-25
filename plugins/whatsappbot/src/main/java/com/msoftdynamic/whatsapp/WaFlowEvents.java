@@ -106,6 +106,19 @@ public final class WaFlowEvents {
             }
             JsonNode g = WaUtil.JSON.readTree(request.getParameter("graph"));
             WaFlowBuilder.Check c = WaFlowBuilder.validate(delegator, flow.getString("tenantId"), flow.getString("flowId"), g);
+            // turning off the "belongs to this WhatsApp number" check exposes invoices/orders by number: owners only
+            boolean owner = w.admin || "WA_OWNER".equals(WaUtil.getTenantRole(delegator, flow.getString("tenantId"), w.userLogin.getString("userLoginId")));
+            if (!owner) {
+                for (JsonNode n : g.path("nodes")) {
+                    if ("zoho".equals(n.path("type").asText()) && n.path("config").path("verify").isBoolean() && !n.path("config").path("verify").asBoolean()) {
+                        GenericValue old = EntityQuery.use(delegator).from("WaFlowNode").where("flowId", flow.getString("flowId"), "nodeId", n.path("id").asText()).queryOne();
+                        String oldCfg = old == null ? "" : String.valueOf(old.getString("actionConfig"));
+                        if (!oldCfg.contains("\"verify\":false")) {
+                            c.errors.add("Step " + n.path("id").asText() + ": only the workspace owner can turn off the 'belongs to this WhatsApp number' check.");
+                        }
+                    }
+                }
+            }
             ObjectNode out = WaUtil.JSON.createObjectNode();
             out.set("errors", WaUtil.JSON.valueToTree(c.errors));
             out.set("warnings", WaUtil.JSON.valueToTree(c.warnings));
@@ -144,8 +157,9 @@ public final class WaFlowEvents {
             if (UtilValidate.isNotEmpty(cg) && "edit".equals(request.getParameter("mode"))) {
                 current = WaUtil.JSON.readTree(cg);
             }
-            WaFlowAi.Result r = WaFlowAi.generate((Delegator) request.getAttribute("delegator"), flow.getString("tenantId"), request.getParameter("description"),
-                    tenantName((Delegator) request.getAttribute("delegator"), flow.getString("tenantId")), current);
+            Delegator dl = (Delegator) request.getAttribute("delegator");
+            WaFlowAi.Result r = WaFlowAi.generate(dl, flow.getString("tenantId"), request.getParameter("description"),
+                    tenantName(dl, flow.getString("tenantId")), current, zohoApps(dl, flow.getString("tenantId")));
             if (r.error != null) {
                 return error(response, 200, r.error);
             }
@@ -178,7 +192,7 @@ public final class WaFlowEvents {
         try {
             ObjectNode g;
             if ("ai".equals(mode)) {
-                WaFlowAi.Result r = WaFlowAi.generate(delegator, tenantId, request.getParameter("description"), business, null);
+                WaFlowAi.Result r = WaFlowAi.generate(delegator, tenantId, request.getParameter("description"), business, null, zohoApps(delegator, tenantId));
                 if (r.error != null) {
                     return fail(request, r.error);
                 }
@@ -367,6 +381,13 @@ public final class WaFlowEvents {
         nodes.addObject().put("id", "AGENT").put("type", "handoff")
             .put("text", "Thanks! A team member will reply here shortly.").putArray("options");
         return g;
+    }
+
+    @SuppressWarnings("unchecked")
+    static java.util.Set<String> zohoApps(Delegator delegator, String tenantId) {
+        Map<String, Object> z = WaZohoEvents.summary(delegator, tenantId);
+        return Boolean.TRUE.equals(z.get("connected")) && !"ERROR".equals(z.get("status"))
+                ? new java.util.LinkedHashSet<>((List<String>) z.get("apps")) : java.util.Collections.emptySet();
     }
 
     private static String tenantName(Delegator delegator, String tenantId) {

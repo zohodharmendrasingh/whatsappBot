@@ -19,6 +19,18 @@
   var G = b64json('fbGraph');
   var TEMPLATES = b64json('fbTemplates');
   var OTHER_FLOWS = b64json('fbFlows');
+  var ZOHO = b64json('fbZoho');
+  URLS.meta = root.dataset.metaUrl; URLS.settings = root.dataset.settingsUrl;
+  var ZAPPS = { crm: 'Zoho CRM', books: 'Zoho Books', inventory: 'Zoho Inventory', people: 'Zoho People' };
+  function zAction(id) { return ZOHO.catalog.filter(function (a) { return a.id === id; })[0]; }
+  function zApp(n) { var a = zAction((n.config || {}).action); return a ? a.app : ((n.config || {}).app || 'crm'); }
+  function zConnected(app) { return ZOHO.apps.indexOf(app) >= 0; }
+  var Z_SAMPLE = { crmId: '5123000000123', crmName: 'Ravi Kumar', crmEmail: 'ravi@example.com', crmPhone: '+91 98123 45678', crmOwner: 'Priya', crmAction: 'created',
+    invoiceNumber: 'INV-00042', invoiceStatus: 'Overdue', invoiceTotal: '₹12,500.00', invoiceBalance: '₹2,500.00', invoiceDueDate: '10 Oct 2026', invoiceLink: 'https://books.zoho.in/portal/...', customerName: 'Ravi Traders',
+    balanceDue: '₹2,500.00', unpaidCount: '1', unpaidInvoices: '• INV-00042 — ₹2,500.00, due 10 Oct 2026',
+    itemName: 'Gold Chain 22K', itemSku: 'GC-22', itemRate: '₹58,000.00', itemStock: '4 in stock', itemList: '• Gold Chain 22K (GC-22) — ₹58,000.00, 4 in stock',
+    orderNumber: 'SO-00017', orderStatus: 'Confirmed', orderShipped: 'Shipped', orderInvoiced: 'Invoiced', orderTotal: '₹21,000.00', orderDate: '20 Sep 2026',
+    employeeName: 'Anita Sharma', leaveBalances: '• Casual Leave: 5 days\n• Sick Leave: 3 days', leaveRequestId: '4123000000999' };
 
   // ------------------------------------------------------------------ step types
   var TYPES = {
@@ -29,7 +41,8 @@
     image:   { icon: '🖼️', name: 'Image',         hint: 'Send a picture with caption', color: '#db2777', next: true },
     handoff: { icon: '🙋', name: 'Talk to agent', hint: 'Hand the chat to your team', color: '#ea580c', end: true },
     end:     { icon: '🏁', name: 'End',           hint: 'Final message, chat ends', color: '#475569', end: true },
-    goto:    { icon: '↪️', name: 'Go to flow',    hint: 'Jump to another bot flow', color: '#7c3aed', end: true }
+    goto:    { icon: '↪️', name: 'Go to flow',    hint: 'Jump to another bot flow', color: '#7c3aed', end: true },
+    zoho:    { icon: 'Z',  name: 'Zoho',          hint: 'Read or save data in your Zoho account', color: '#dc2626', zoho: true }
   };
   var LIM = { buttons: 3, rows: 10, btnLabel: 20, rowLabel: 24, rowDesc: 72, header: 60, footer: 60, listBtn: 20, body: 1024, text: 4096 };
   var ANSWER_CHECKS = [
@@ -51,6 +64,7 @@
     return { id: n.id, type: TYPES[n.type] ? n.type : 'text', text: n.text || '', header: n.header || '', footer: n.footer || '',
       buttonLabel: n.buttonLabel || '', mediaUrl: n.mediaUrl || '', saveAs: n.saveAs || '', validation: n.validation || '',
       next: n.next || '', targetFlowId: n.targetFlowId || '', x: typeof n.x === 'number' ? n.x : null, y: typeof n.y === 'number' ? n.y : null,
+      config: n.config ? JSON.parse(JSON.stringify(n.config)) : {}, failNext: n.failNext || '',
       options: (n.options || []).map(function (o) { return { label: o.label || '', description: o.description || '', keywords: o.keywords || '', target: o.target || '' }; }) };
   }
   function snapshot() { return JSON.stringify({ meta: meta, graph: graph }); }
@@ -75,7 +89,7 @@
   }
   function node(id) { for (var i = 0; i < graph.nodes.length; i++) { if (graph.nodes[i].id === id) { return graph.nodes[i]; } } return null; }
   function newId(type) {
-    var base = { text: 'MESSAGE', buttons: 'BUTTONS', list: 'MENU', ask: 'QUESTION', image: 'IMAGE', handoff: 'AGENT', end: 'END', goto: 'GOTO' }[type] || 'STEP';
+    var base = { text: 'MESSAGE', buttons: 'BUTTONS', list: 'MENU', ask: 'QUESTION', image: 'IMAGE', handoff: 'AGENT', end: 'END', goto: 'GOTO', zoho: 'ZOHO' }[type] || 'STEP';
     for (var i = 1; ; i++) { if (!node(base + '_' + i)) { return base + '_' + i; } }
   }
 
@@ -144,7 +158,11 @@
     if (n.type === 'image') {
       body.push(h('div', { class: 'fb-n-img', text: n.mediaUrl ? '🖼️ ' + preview(n.mediaUrl.replace(/^https:\/\//, ''), 34) : '🖼️ No image yet' }));
     }
-    if (n.type === 'goto') {
+    if (n.type === 'zoho') {
+      var za = zAction(n.config.action);
+      body.push(h('div', { class: 'fb-n-text', text: za ? za.label + (n.config.module ? ' · ' + n.config.module : '') : 'Choose an action' }));
+      if (!zConnected(zApp(n))) { body.push(h('div', { class: 'fb-n-warn', text: '⚠ ' + ZAPPS[zApp(n)] + ' not connected' })); }
+    } else if (n.type === 'goto') {
       var f = OTHER_FLOWS.filter(function (x) { return x.id === n.targetFlowId; })[0];
       body.push(h('div', { class: 'fb-n-text', text: '→ ' + (f ? f.name : 'choose a flow') }));
     } else if (n.text || n.type !== 'image') {
@@ -154,7 +172,13 @@
       body.push(h('div', { class: 'fb-n-save', text: '💾 saves answer as ' + (n.saveAs || n.id) }));
     }
     var outs = [];
-    if (t.choice) {
+    if (n.type === 'zoho') {
+      var zc = zAction(n.config.action) || { ok: 'Done', fail: 'Failed' };
+      outs.push(h('div', { class: 'fb-n-opt fb-n-ok' }, [h('span', { text: '✓ ' + zc.ok }),
+        h('i', { class: 'fb-port out' + (n.next ? ' on' : ''), 'data-node': n.id, 'data-opt': 'next', title: 'Drag to connect' })]));
+      outs.push(h('div', { class: 'fb-n-opt fb-n-fail' }, [h('span', { text: '✗ ' + zc.fail }),
+        h('i', { class: 'fb-port out fail' + (n.failNext ? ' on' : ''), 'data-node': n.id, 'data-opt': 'fail', title: 'Drag to connect' })]));
+    } else if (t.choice) {
       n.options.forEach(function (o, i) {
         outs.push(h('div', { class: 'fb-n-opt' }, [
           h('span', { text: o.label || '(no text)' }),
@@ -172,7 +196,8 @@
       'data-id': n.id, style: 'left:' + (n.x || 0) + 'px;top:' + (n.y || 0) + 'px;--c:' + t.color }, [
       h('i', { class: 'fb-port in', title: 'Incoming' }),
       h('div', { class: 'fb-n-head' }, [
-        h('span', { class: 'fb-n-ico', text: t.icon }), h('span', { class: 'fb-n-type', text: t.name }),
+        n.type === 'zoho' ? h('span', { class: 'fb-zlogo fb-z-' + zApp(n), text: 'Z' }) : h('span', { class: 'fb-n-ico', text: t.icon }),
+        h('span', { class: 'fb-n-type', text: n.type === 'zoho' ? ZAPPS[zApp(n)] : t.name }),
         isStart ? h('span', { class: 'fb-n-start', text: 'START' }) : null,
         h('span', { class: 'fb-n-id', text: n.id })
       ]),
@@ -201,7 +226,8 @@
     graph.nodes.forEach(function (n) {
       var links = [];
       if (TYPES[n.type].choice) { n.options.forEach(function (o, i) { if (o.target) { links.push({ opt: i, to: o.target }); } }); }
-      else if (TYPES[n.type].next && n.next) { links.push({ opt: 'next', to: n.next }); }
+      else if ((TYPES[n.type].next || n.type === 'zoho') && n.next) { links.push({ opt: 'next', to: n.next }); }
+      if (n.type === 'zoho' && n.failNext) { links.push({ opt: 'fail', to: n.failNext, fail: true }); }
       links.forEach(function (l) {
         var from = world.querySelector('.fb-port.out[data-node="' + n.id + '"][data-opt="' + l.opt + '"]');
         var toEl = world.querySelector('.fb-node[data-id="' + l.to + '"] .fb-port.in');
@@ -213,7 +239,7 @@
         hit.setAttribute('d', d); hit.setAttribute('class', 'fb-edge-hit');
         hit.addEventListener('pointerdown', function (e) { e.stopPropagation(); sel = { kind: 'edge', from: n.id, opt: l.opt }; drawEdges(); renderPanel(); markSel(); });
         var p = document.createElementNS(NS, 'path');
-        p.setAttribute('d', d); p.setAttribute('class', 'fb-edge' + (isSel ? ' sel' : ''));
+        p.setAttribute('d', d); p.setAttribute('class', 'fb-edge' + (isSel ? ' sel' : '') + (l.fail ? ' fail' : ''));
         p.setAttribute('marker-end', isSel ? 'url(#fbArrowSel)' : 'url(#fbArrow)');
         svg.appendChild(p); svg.appendChild(hit);
       });
@@ -249,6 +275,7 @@
   function targets(n) {
     if (!n) { return []; }
     if (TYPES[n.type].choice) { return n.options.map(function (o) { return o.target; }).filter(Boolean); }
+    if (n.type === 'zoho') { return [n.next, n.failNext].filter(Boolean); }
     return TYPES[n.type].next && n.next ? [n.next] : [];
   }
   function fit() {
@@ -333,7 +360,7 @@
   function connect(from, opt, to) {
     change(function () {
       var n = node(from);
-      if (opt === 'next') { n.next = to; } else { n.options[+opt].target = to; }
+      if (opt === 'next') { n.next = to; } else if (opt === 'fail') { n.failNext = to; } else { n.options[+opt].target = to; }
     }, { keepPanel: false });
   }
 
@@ -342,15 +369,38 @@
     closeQuick();
     var w = toWorld(cx, cy);
     var menu = h('div', { class: 'fb-quick', id: 'fbQuick', style: 'left:' + (cx - canvas.getBoundingClientRect().left) + 'px;top:' + (cy - canvas.getBoundingClientRect().top) + 'px' },
-      [h('div', { class: 'fb-quick-t', text: 'Add a step here' })].concat(Object.keys(TYPES).filter(function (k) { return k !== 'goto' || OTHER_FLOWS.length; }).map(function (k) {
+      [h('div', { class: 'fb-quick-t', text: 'Add a step here' })].concat(Object.keys(TYPES).filter(function (k) { return k !== 'zoho' && (k !== 'goto' || OTHER_FLOWS.length); }).map(function (k) {
         return h('button', { type: 'button', onclick: function () { closeQuick(); addNode(k, w.x, w.y - 20, from, opt); } }, [TYPES[k].icon + ' ' + TYPES[k].name]);
+      })).concat(Object.keys(ZAPPS).map(function (a) {
+        return h('button', { type: 'button', onclick: function () { closeQuick(); addNode('zoho', w.x, w.y - 20, from, opt, a); } }, [h('span', { class: 'fb-zlogo sm fb-z-' + a, text: 'Z' }), ' ' + ZAPPS[a]]);
       })));
     canvas.appendChild(menu);
   }
   function closeQuick() { var q = document.getElementById('fbQuick'); if (q) { q.remove(); } }
   document.addEventListener('pointerdown', function (e) { if (!e.target.closest('#fbQuick')) { closeQuick(); } }, true);
 
-  function defaults(type) {
+  function zDefaults(app) {
+    return {
+      crm: { action: 'crm_upsert', module: 'Leads', dupField: 'Mobile', fields: [{ field: 'Last_Name', value: '{{name}}' }, { field: 'Mobile', value: '{{whatsapp}}' }, { field: 'Lead_Source', value: 'WhatsApp' }] },
+      books: { action: 'books_balance' },
+      inventory: { action: 'inv_stock', query: '{{item}}' },
+      people: { action: 'people_balance' }
+    }[app] || { action: 'crm_find', module: 'Contacts', matchBy: 'whatsapp' };
+  }
+  function zActionDefaults(action) {
+    return {
+      crm_find: { action: 'crm_find', module: 'Contacts', matchBy: 'whatsapp' },
+      crm_upsert: zDefaults('crm'),
+      books_invoice: { action: 'books_invoice', number: '{{invoiceNo}}', verify: true },
+      books_balance: { action: 'books_balance' },
+      inv_stock: { action: 'inv_stock', query: '{{item}}' },
+      inv_order: { action: 'inv_order', number: '{{orderNo}}', verify: true },
+      people_balance: { action: 'people_balance' },
+      people_apply: { action: 'people_apply', leaveType: '{{leaveType}}', from: '{{fromDate}}', to: '{{toDate}}', reason: '{{reason}}' }
+    }[action];
+  }
+  function defaults(type, app) {
+    if (type === 'zoho') { return { config: zDefaults(app || 'crm') }; }
     return {
       text: { text: 'Type your message here' },
       buttons: { text: 'Please choose an option:', options: [{ label: 'Option 1', description: '', keywords: '', target: '' }, { label: 'Option 2', description: '', keywords: '', target: '' }] },
@@ -362,13 +412,13 @@
       goto: { targetFlowId: OTHER_FLOWS.length ? OTHER_FLOWS[0].id : '' }
     }[type];
   }
-  function addNode(type, x, y, from, opt) {
+  function addNode(type, x, y, from, opt, app) {
     var id = newId(type);
     change(function () {
-      var n = normNode(Object.assign({ id: id, type: type, x: Math.round(x), y: Math.round(y) }, defaults(type)));
+      var n = normNode(Object.assign({ id: id, type: type, x: Math.round(x), y: Math.round(y) }, defaults(type, app)));
       graph.nodes.push(n);
       if (!graph.startNodeId || !node(graph.startNodeId)) { graph.startNodeId = id; }
-      if (from) { var f = node(from); if (opt === 'next') { f.next = id; } else { f.options[+opt].target = id; } }
+      if (from) { var f = node(from); if (opt === 'next') { f.next = id; } else if (opt === 'fail') { f.failNext = id; } else { f.options[+opt].target = id; } }
       sel = { kind: 'node', id: id };
     });
   }
@@ -377,8 +427,8 @@
   document.querySelectorAll('.fb-pal-item').forEach(function (it) {
     it.addEventListener('pointerdown', function (e) {
       e.preventDefault();
-      var type = it.dataset.type;
-      var ghost = h('div', { class: 'fb-ghost', text: TYPES[type].icon + ' ' + TYPES[type].name });
+      var type = it.dataset.type, app = it.dataset.app;
+      var ghost = h('div', { class: 'fb-ghost', text: type === 'zoho' ? ZAPPS[app] : TYPES[type].icon + ' ' + TYPES[type].name });
       document.body.appendChild(ghost);
       var moved = false, sx = e.clientX, sy = e.clientY;
       function mv(ev) {
@@ -390,9 +440,9 @@
         var r = canvas.getBoundingClientRect();
         if (!moved) {
           var c = toWorld(r.left + r.width / 2, r.top + r.height / 3);
-          addNode(type, c.x - 120 + (graph.nodes.length % 5) * 18, c.y + (graph.nodes.length % 5) * 18);
+          addNode(type, c.x - 120 + (graph.nodes.length % 5) * 18, c.y + (graph.nodes.length % 5) * 18, null, null, app);
         } else if (ev.clientX > r.left && ev.clientX < r.right && ev.clientY > r.top && ev.clientY < r.bottom) {
-          var w = toWorld(ev.clientX, ev.clientY); addNode(type, w.x - 120, w.y - 20);
+          var w = toWorld(ev.clientX, ev.clientY); addNode(type, w.x - 120, w.y - 20, null, null, app);
         }
       }
       mv(e);
@@ -454,6 +504,12 @@
     var vars = ['name'];
     graph.nodes.forEach(function (n) { if (n.type === 'ask') { var v = n.saveAs || n.id; if (vars.indexOf(v) < 0) { vars.push(v); } } });
     if (graph.nodes.some(function (n) { return TYPES[n.type].choice; })) { vars.push('lastChoice'); }
+    vars.push('whatsapp');
+    graph.nodes.forEach(function (n) {
+      if (n.type !== 'zoho') { return; }
+      var za = zAction(n.config.action);
+      (za ? za.outputs : []).concat(['zohoError']).forEach(function (v) { if (vars.indexOf(v) < 0) { vars.push(v); } });
+    });
     return h('div', { class: 'fb-chips' }, [h('span', { text: 'Insert:' })].concat(vars.map(function (v) {
       return h('button', { type: 'button', text: '{{' + v + '}}', title: v === 'name' ? "Customer's WhatsApp name" : v === 'lastChoice' ? 'The option they last picked' : 'Answer saved by a question step', onclick: function () {
         var t = ta.querySelector('textarea'); var p = t.selectionStart || t.value.length;
@@ -466,7 +522,7 @@
     panel.innerHTML = '';
     if (sel && sel.kind === 'edge') {
       var n = node(sel.from);
-      var label = sel.opt === 'next' ? 'Then' : (n.options[+sel.opt] || {}).label;
+      var label = sel.opt === 'next' ? 'Then' : sel.opt === 'fail' ? 'Not found / failed' : (n.options[+sel.opt] || {}).label;
       panel.appendChild(h('div', { class: 'fb-p-head' }, [h('h3', { text: 'Connection' })]));
       panel.appendChild(h('p', { class: 'fb-muted', text: 'From ' + n.id + ' (' + label + ').' }));
       panel.appendChild(h('button', { type: 'button', class: 'fb-btn fb-btn-danger', text: 'Remove this connection', onclick: removeSelected }));
@@ -485,11 +541,13 @@
         if (nt === 'list' && !nd.buttonLabel) { nd.buttonLabel = 'View options'; }
         if (nt === 'ask' && !nd.saveAs) { nd.saveAs = d.saveAs; }
         if (nt === 'goto') { nd.targetFlowId = d.targetFlowId; }
+        if (nt === 'zoho' && !(nd.config && nd.config.action)) { nd.config = d.config; }
         if (!nd.text && d.text) { nd.text = d.text; }
       });
     });
     panel.appendChild(h('div', { class: 'fb-p-head', style: '--c:' + t.color }, [
-      h('span', { class: 'fb-p-ico', text: t.icon }), h('h3', { text: t.name }),
+      nd.type === 'zoho' ? h('span', { class: 'fb-zlogo fb-z-' + zApp(nd), text: 'Z' }) : h('span', { class: 'fb-p-ico', text: t.icon }),
+      h('h3', { text: nd.type === 'zoho' ? ZAPPS[zApp(nd)] : t.name }),
       graph.startNodeId === nd.id ? h('span', { class: 'fb-n-start', text: 'START' }) : null
     ]));
     panel.appendChild(h('p', { class: 'fb-muted', text: t.hint + '.' }));
@@ -498,7 +556,9 @@
     idIn.addEventListener('change', function () { renameNode(nd.id, idIn.value); });
     panel.appendChild(field('Step name', idIn, 'Letters, numbers and _ only. Used to link steps.'));
 
-    if (nd.type === 'goto') {
+    if (nd.type === 'zoho') {
+      zohoPanel(nd);
+    } else if (nd.type === 'goto') {
       var fs = h('select');
       OTHER_FLOWS.forEach(function (f) { fs.appendChild(h('option', { value: f.id, text: f.name, selected: f.id === nd.targetFlowId })); });
       fs.addEventListener('change', function () { change(function () { nd.targetFlowId = fs.value; }, { keepPanel: true }); });
@@ -540,7 +600,7 @@
       h('button', { type: 'button', class: 'fb-btn', text: '⧉ Duplicate', onclick: function () { duplicate(nd.id); } }),
       h('button', { type: 'button', class: 'fb-btn fb-btn-danger', text: '🗑 Delete', onclick: removeSelected })
     ]));
-    if (nd.type !== 'goto') {
+    if (nd.type !== 'goto' && nd.type !== 'zoho') {
       panel.appendChild(h('div', { class: 'fb-prev-t', text: 'WhatsApp preview' }));
       panel.appendChild(h('div', { class: 'fb-prev', id: 'fbPrev' }));
       renderPreview(nd);
@@ -629,6 +689,7 @@
       graph.nodes.forEach(function (n) {
         if (n.id === oldId) { n.id = id; }
         if (n.next === oldId) { n.next = id; }
+        if (n.failNext === oldId) { n.failNext = id; }
         n.options.forEach(function (o) { if (o.target === oldId) { o.target = id; } });
       });
       if (graph.startNodeId === oldId) { graph.startNodeId = id; }
@@ -646,13 +707,13 @@
     if (!sel) { return; }
     if (sel.kind === 'edge') {
       var s = sel;
-      change(function () { var n = node(s.from); if (s.opt === 'next') { n.next = ''; } else { n.options[+s.opt].target = ''; } sel = null; });
+      change(function () { var n = node(s.from); if (s.opt === 'next') { n.next = ''; } else if (s.opt === 'fail') { n.failNext = ''; } else { n.options[+s.opt].target = ''; } sel = null; });
       return;
     }
     var id = sel.id;
     change(function () {
       graph.nodes = graph.nodes.filter(function (n) { return n.id !== id; });
-      graph.nodes.forEach(function (n) { if (n.next === id) { n.next = ''; } n.options.forEach(function (o) { if (o.target === id) { o.target = ''; } }); });
+      graph.nodes.forEach(function (n) { if (n.next === id) { n.next = ''; } if (n.failNext === id) { n.failNext = ''; } n.options.forEach(function (o) { if (o.target === id) { o.target = ''; } }); });
       if (graph.startNodeId === id) { graph.startNodeId = graph.nodes.length ? graph.nodes[0].id : ''; }
       sel = null;
     });
@@ -673,7 +734,26 @@
       if (n.header.length > LIM.header) { e('header is too long'); }
       if (n.footer.length > LIM.footer) { e('footer is too long'); }
       if (n.buttonLabel.length > LIM.listBtn) { e('menu button text is too long'); }
-      if (t.next && n.next && !ids[n.next]) { e('its arrow points to a missing step'); }
+      if ((t.next || n.type === 'zoho') && n.next && !ids[n.next]) { e('its arrow points to a missing step'); }
+      if (n.type === 'zoho') {
+        var c = n.config || {}, za = zAction(c.action);
+        if (!za) { e('choose what the Zoho step should do'); }
+        else {
+          if ((c.action === 'crm_find' || c.action === 'crm_upsert') && !/^[A-Za-z][A-Za-z0-9_]{0,59}$/.test(c.module || '')) { e('choose the CRM module'); }
+          if (c.action === 'crm_upsert') {
+            var fl = (c.fields || []).filter(function (f) { return f.field; });
+            if (!fl.length) { e('map at least one CRM field'); }
+            if ((c.module === 'Leads' || c.module === 'Contacts') && !fl.some(function (f) { return f.field === 'Last_Name' && (f.value || '').trim(); })) { e('Last_Name is required for ' + c.module); }
+          }
+          if (c.action === 'crm_find' && c.matchBy === 'email' && !(c.value || '').trim()) { e('choose the email to search for'); }
+          if ((c.action === 'books_invoice' || c.action === 'inv_order') && !(c.number || '').trim()) { e('choose where the number comes from'); }
+          if (c.action === 'inv_stock' && !(c.query || '').trim()) { e('choose the item to search for'); }
+          if (c.action === 'people_apply' && (!(c.from || '').trim() || !(c.leaveType || '').trim())) { e('set the leave type and the from date'); }
+          if (!zConnected(za.app)) { warns.push({ id: n.id, msg: ZAPPS[za.app] + ' is not connected yet (Settings → Zoho)' }); }
+        }
+        if (n.failNext && !ids[n.failNext]) { e('its “not found” arrow points to a missing step'); }
+        if (!n.failNext) { warns.push({ id: n.id, msg: 'has no “not found / failed” arrow (the chat ends there)' }); }
+      }
       if (t.choice) {
         if (!n.options.length) { e('add at least one option'); }
         if (n.options.length > LIM.rows) { e('at most 10 options'); }
@@ -864,11 +944,131 @@
       if (n.type === 'text' || n.type === 'image') { addBot(n); id = n.next; continue; }
       if (TYPES[n.type].choice || n.type === 'ask') { addBot(n); sim.wait = n.id; return; }
       if (n.type === 'handoff') { if (n.text) { addBot(n); } addSys('🙋 Chat handed to your team. The bot is paused for this customer.'); sim.paused = true; sim.wait = null; return; }
+      if (n.type === 'zoho') { simZoho(n); return; }
       if (n.type === 'goto') { var f = OTHER_FLOWS.filter(function (x) { return x.id === n.targetFlowId; })[0]; addSys('↪ Continues in the flow “' + (f ? f.name : '?') + '”. (Test that flow in its own builder.)'); sim.wait = null; return; }
       if (n.text) { addBot(n); } addSys('🏁 Conversation ended. Type “hi” to start again.'); sim.wait = null; return;
     }
     sim.wait = null;
   }
+  function simZoho(n) {
+    var za = zAction(n.config.action) || { label: 'Zoho step', ok: 'Done', fail: 'Failed', outputs: [], app: 'crm' };
+    sim.wait = null;
+    var box = h('div', { class: 'wa-sys wa-zoho' }, [h('b', { text: '⚡ ' + ZAPPS[za.app] + ': ' + za.label }), h('div', { text: 'In the test chat, choose what Zoho answers:' })]);
+    var row = h('div', { class: 'wa-zbtns' }, [
+      h('button', { type: 'button', class: 'wa-btn', text: '✓ ' + za.ok + ' (sample data)', onclick: function () { row.remove(); za.outputs.forEach(function (o) { sim.vars[o] = Z_SAMPLE[o] || '[' + o + ']'; }); if (n.next) { runFrom(n.next); } else { addSys('🏁 No next step, so the conversation ends.'); } } }),
+      h('button', { type: 'button', class: 'wa-btn', text: '✗ ' + za.fail, onclick: function () { row.remove(); sim.vars.zohoError = 'sample: ' + za.fail.toLowerCase(); if (n.failNext) { runFrom(n.failNext); } else { addSys('🏁 No “not found” step, so the conversation ends.'); } } })
+    ]);
+    chatLog.appendChild(box); chatLog.appendChild(row); chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  // Zoho step editor (side panel)
+  var metaCache = {};
+  function zMeta(what, module) {
+    var key = what + '|' + (module || '');
+    if (!metaCache[key]) {
+      metaCache[key] = fetch(URLS.meta + '?flowId=' + encodeURIComponent(FLOW_ID) + '&what=' + what + (module ? '&module=' + encodeURIComponent(module) : ''),
+        { credentials: 'same-origin' }).then(function (r) { return r.json(); }).catch(function () { return { error: 'offline' }; });
+    }
+    return metaCache[key];
+  }
+  function zField(label, key, nd, placeholder, help) {
+    var c = nd.config;
+    var inp = textInput(c[key] || '', null, function (v) { c[key] = v; }, { placeholder: placeholder || '' });
+    var wrap = field(label, inp, help);
+    return wrap;
+  }
+  function zohoPanel(nd) {
+    var c = nd.config, app = zApp(nd), za = zAction(c.action);
+    if (!zConnected(app)) {
+      panel.appendChild(h('div', { class: 'fb-info fb-zinfo' }, [h('b', { text: ZAPPS[app] + ' is not connected. ' }), 'Until you connect it, this step takes the “not found / failed” arrow. ',
+        h('a', { href: URLS.settings, target: '_blank', rel: 'noopener', text: 'Connect Zoho in Settings ↗' })]));
+    }
+    var appSel = h('select');
+    Object.keys(ZAPPS).forEach(function (a) { appSel.appendChild(h('option', { value: a, text: ZAPPS[a] + (zConnected(a) ? '' : ' (not connected)'), selected: a === app })); });
+    appSel.addEventListener('change', function () { change(function () { nd.config = zDefaults(appSel.value); }); });
+    panel.appendChild(field('Zoho app', appSel));
+    var actSel = h('select');
+    ZOHO.catalog.filter(function (a) { return a.app === app; }).forEach(function (a) { actSel.appendChild(h('option', { value: a.id, text: a.label, selected: a.id === c.action })); });
+    actSel.addEventListener('change', function () { change(function () { nd.config = zActionDefaults(actSel.value); }); });
+    panel.appendChild(field('What should it do?', actSel));
+
+    if (c.action === 'crm_find' || c.action === 'crm_upsert') {
+      var modSel = h('select');
+      var mods = [{ value: 'Leads', label: 'Leads' }, { value: 'Contacts', label: 'Contacts' }];
+      function fillMods(list) {
+        modSel.innerHTML = '';
+        var seen = {};
+        list.concat(c.module && !list.some(function (m) { return m.value === c.module; }) ? [{ value: c.module, label: c.module }] : []).forEach(function (m) {
+          if (seen[m.value]) { return; } seen[m.value] = 1;
+          modSel.appendChild(h('option', { value: m.value, text: m.label, selected: m.value === c.module }));
+        });
+      }
+      fillMods(mods);
+      if (zConnected('crm')) { zMeta('modules').then(function (d) { if (d.items && d.items.length) { fillMods(d.items); } }); }
+      modSel.addEventListener('change', function () { change(function () { c.module = modSel.value; }); });
+      panel.appendChild(field('CRM module', modSel));
+    }
+    if (c.action === 'crm_find') {
+      var mb = h('select');
+      [['whatsapp', 'Their WhatsApp number'], ['email', 'An email address']].forEach(function (o) { mb.appendChild(h('option', { value: o[0], text: o[1], selected: (c.matchBy || 'whatsapp') === o[0] })); });
+      mb.addEventListener('change', function () { change(function () { c.matchBy = mb.value; if (mb.value === 'email' && !c.value) { c.value = '{{email}}'; } }); });
+      panel.appendChild(field('Find by', mb, 'Matches Mobile or Phone, ignoring spaces and country code format.'));
+      if (c.matchBy === 'email') { panel.appendChild(zField('Email to search', 'value', nd, '{{email}}')); }
+    }
+    if (c.action === 'crm_upsert') { panel.appendChild(crmFieldsEditor(nd)); }
+    if (c.action === 'books_invoice' || c.action === 'inv_order') {
+      panel.appendChild(zField(c.action === 'books_invoice' ? 'Invoice number' : 'Sales order number', 'number', nd, c.action === 'books_invoice' ? '{{invoiceNo}}' : '{{orderNo}}',
+        'Usually the answer of a Question step before this one.'));
+      var vf = h('input', { type: 'checkbox' }); vf.checked = c.verify !== false;
+      vf.addEventListener('change', function () { change(function () { c.verify = vf.checked; }, { keepPanel: true }); });
+      panel.appendChild(h('label', { class: 'fb-check' }, [vf, ' Only show it if it belongs to this WhatsApp number (recommended)']));
+    }
+    if (c.action === 'inv_stock') { panel.appendChild(zField('Item name or SKU', 'query', nd, '{{item}}', 'Searches item name and SKU.')); }
+    if (c.action === 'people_apply') {
+      panel.appendChild(zField('Leave type', 'leaveType', nd, '{{leaveType}}', 'e.g. Casual Leave. Matched to the leave types in Zoho People.'));
+      panel.appendChild(zField('From date', 'from', nd, '{{fromDate}}', 'Understands 14-10-2026, 14 Oct, today, tomorrow…'));
+      panel.appendChild(zField('To date (optional)', 'to', nd, '{{toDate}}'));
+      panel.appendChild(zField('Reason (optional)', 'reason', nd, '{{reason}}'));
+    }
+    if (c.action === 'books_balance' || c.action === 'people_balance') {
+      panel.appendChild(h('div', { class: 'fb-muted', text: c.action === 'books_balance' ? 'Finds the Zoho Books customer whose phone or mobile matches the WhatsApp number.' : 'Finds the employee whose Mobile in Zoho People matches the WhatsApp number.' }));
+    }
+    if (za) {
+      panel.appendChild(h('div', { class: 'fb-f-l fb-zout-t', text: 'Use the result in later messages' }));
+      panel.appendChild(h('div', { class: 'fb-zout' }, za.outputs.concat(['zohoError']).map(function (o) { return h('code', { text: '{{' + o + '}}' }); })));
+      panel.appendChild(field('✓ When ' + za.ok.toLowerCase() + ', go to', targetSelect(nd.next, function (v) { nd.next = v; }, nd.id)));
+      panel.appendChild(field('✗ When ' + za.fail.toLowerCase() + ', go to', targetSelect(nd.failNext, function (v) { nd.failNext = v; }, nd.id)));
+    }
+  }
+  function crmFieldsEditor(nd) {
+    var c = nd.config;
+    c.fields = c.fields || [];
+    var wrap = h('div', { class: 'fb-opts' }, [h('div', { class: 'fb-f-l', text: 'Save these CRM fields' })]);
+    var listId = 'fbCrmFields' + nd.id;
+    var dl = h('datalist', { id: listId });
+    wrap.appendChild(dl);
+    if (zConnected('crm') && c.module) {
+      zMeta('fields', c.module).then(function (d) {
+        (d.items || []).forEach(function (f) { dl.appendChild(h('option', { value: f.value, text: f.label + (f.required ? ' *' : '') })); });
+      });
+    } else {
+      ['Last_Name', 'First_Name', 'Email', 'Mobile', 'Phone', 'Company', 'Lead_Source', 'Description', 'City'].forEach(function (f) { dl.appendChild(h('option', { value: f })); });
+    }
+    c.fields.forEach(function (f, i) {
+      var fIn = textInput(f.field, null, function (v) { f.field = v.trim(); }, { placeholder: 'Field (API name)', list: listId });
+      var vIn = textInput(f.value, null, function (v) { f.value = v; }, { placeholder: 'Value, e.g. {{name}}' });
+      wrap.appendChild(h('div', { class: 'fb-zmap' }, [fIn, h('span', { text: '←' }), vIn,
+        h('button', { type: 'button', class: 'fb-icon', title: 'Remove', text: '✕', onclick: function () { change(function () { c.fields.splice(i, 1); }); } })]));
+    });
+    wrap.appendChild(h('button', { type: 'button', class: 'fb-btn fb-btn-add', text: '＋ Add field', onclick: function () { change(function () { c.fields.push({ field: '', value: '' }); }); } }));
+    var dup = h('select');
+    dup.appendChild(h('option', { value: '', text: 'Always create a new record' }));
+    c.fields.filter(function (f) { return f.field; }).forEach(function (f) { dup.appendChild(h('option', { value: f.field, text: 'Update if same ' + f.field + ' exists', selected: c.dupField === f.field })); });
+    dup.addEventListener('change', function () { change(function () { c.dupField = dup.value; }, { keepPanel: true }); });
+    wrap.appendChild(field('Duplicates', dup, 'Tip: use Mobile = {{whatsapp}} so a returning customer updates the same record.'));
+    return wrap;
+  }
+
   function userSays(text, pick) {
     if (!sim) { simStart(); }
     addMe(text);

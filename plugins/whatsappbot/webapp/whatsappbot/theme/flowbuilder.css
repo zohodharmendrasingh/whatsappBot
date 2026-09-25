@@ -272,3 +272,26 @@ html body .fb .fb-kw input { width: 125px; }
   .fb-badge.ok { display: none; }
   .fb-ic { width: 32px; }
 }
+
+/* ---------- Zoho steps ---------- */
+.fb-zlogo { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 5px; color: #fff; font: 800 12px/1 system-ui, sans-serif; flex-shrink: 0; background: #dc2626; }
+.fb-zlogo.sm { width: 16px; height: 16px; font-size: 10px; vertical-align: middle; }
+.fb-pal-ico.fb-zlogo { width: 24px; height: 24px; font-size: 13px; }
+.fb-z-crm { background: #1d4ed8; } .fb-z-books { background: #16a34a; } .fb-z-inventory { background: #ea580c; } .fb-z-people { background: #9333ea; }
+.fb-pal-t2 { margin-top: 14px; }
+.fb-n-ok { color: #12813b; justify-content: space-between; }
+.fb-n-fail { color: #b42318; background: #fef3f2; border-color: #fee4e2; }
+.fb-port.out.fail { border-color: #f04438; }
+.fb-port.out.fail.on, .fb-port.out.fail:hover { background: #f04438; }
+.fb-edge.fail { stroke: #f97066; stroke-dasharray: 5 4; }
+.fb-zinfo a { color: #9a3412; font-weight: 700; }
+.fb-zmap { display: grid; grid-template-columns: 1fr auto 1fr auto; gap: 6px; align-items: center; margin-bottom: 6px; }
+.fb-zmap span { color: var(--ms-muted); }
+html body .fb .fb-zmap input[type="text"] { font-size: 13px; padding: 6px 8px; min-width: 0; }
+.fb-zout-t { margin-top: 14px; }
+.fb-zout { display: flex; flex-wrap: wrap; gap: 4px; }
+.fb-zout code { background: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe; border-radius: 6px; padding: 1px 6px; font-size: 12px; }
+.fb-check { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; margin-top: 10px; color: #344054; }
+.wa-zoho { background: #eef2ff; color: #3730a3; text-align: left; }
+.wa-zoho b { display: block; margin-bottom: 2px; }
+.wa-zbtns { display: flex; flex-direction: column; gap: 4px; align-self: center; width: 88%; }

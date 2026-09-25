@@ -1,7 +1,7 @@
 <#-- Visual flow builder shell. Logic: /js/flowbuilder.js, styles: /theme/flowbuilder.css -->
-<link rel="stylesheet" href="/theme/flowbuilder.css?v=3"/>
+<link rel="stylesheet" href="/theme/flowbuilder.css?v=4"/>
 <div class="fb" id="fb" data-flow-id="${flow.flowId}" data-ai="<#if aiConfigured>Y<#else>N</#if>"
-     data-save-url="<@ofbizUrl>flowBuilderSave</@ofbizUrl>" data-ai-url="<@ofbizUrl>flowBuilderAi</@ofbizUrl>">
+     data-save-url="<@ofbizUrl>flowBuilderSave</@ofbizUrl>" data-meta-url="<@ofbizUrl>zohoMeta</@ofbizUrl>" data-settings-url="<@ofbizUrl>Settings</@ofbizUrl>#zoho" data-ai-url="<@ofbizUrl>flowBuilderAi</@ofbizUrl>">
   <div class="fb-top">
     <a class="fb-back" id="fbBack" href="<@ofbizUrl>FindFlow</@ofbizUrl>" title="All bots">←</a>
     <input id="fbName" class="fb-name" type="text" maxlength="90" placeholder="Bot name" aria-label="Bot name"/>
@@ -27,6 +27,12 @@
       <#list pal as p>
         <div class="fb-pal-item" data-type="${p[0]}" title="Drag onto the canvas or click to add">
           <span class="fb-pal-ico">${p[1]}</span><span><b>${p[2]}</b><small>${p[3]}</small></span>
+        </div>
+      </#list>
+      <div class="fb-pal-t fb-pal-t2">Zoho</div>
+      <#list [["crm","Zoho CRM","Leads &amp; contacts"],["books","Zoho Books","Invoices &amp; balance"],["inventory","Zoho Inventory","Stock &amp; orders"],["people","Zoho People","Leave &amp; HR"]] as z>
+        <div class="fb-pal-item fb-pal-zoho" data-type="zoho" data-app="${z[0]}" title="Drag onto the canvas or click to add">
+          <span class="fb-pal-ico fb-zlogo fb-z-${z[0]}">Z</span><span><b>${z[1]}</b><small>${z[2]}</small></span>
         </div>
       </#list>
       <div class="fb-pal-help">Drag a step onto the canvas. Drag from a <i class="fb-dot"></i> to connect.</div>
@@ -101,4 +107,5 @@
 <script type="text/plain" id="fbGraph">${graphB64}</script>
 <script type="text/plain" id="fbTemplates">${templatesB64}</script>
 <script type="text/plain" id="fbFlows">${otherFlowsB64}</script>
-<script src="/js/flowbuilder.js?v=3"></script>
+<script type="text/plain" id="fbZoho">${zohoB64}</script>
+<script src="/js/flowbuilder.js?v=4"></script>

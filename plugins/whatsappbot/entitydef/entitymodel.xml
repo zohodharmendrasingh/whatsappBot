@@ -45,6 +45,31 @@
         <relation type="one" fk-name="WATAI_TNT" rel-entity-name="WaTenant"><key-map field-name="tenantId"/></relation>
     </entity>
 
+    <entity entity-name="WaZohoConnection" package-name="com.msoftdynamic.whatsapp.saas" title="Workspace's connection to its own Zoho account (CRM, Books, Inventory, People)">
+        <field name="tenantId" type="id"/>
+        <field name="statusId" type="short-varchar"><description>CONNECTED / ERROR</description></field>
+        <field name="location" type="short-varchar"><description>Zoho data centre: com, in, eu, com.au, jp, ca, sa, uk, com.cn</description></field>
+        <field name="accountsServer" type="url"/>
+        <field name="apiDomain" type="url"/>
+        <field name="refreshToken" type="very-long" encrypt="true"/>
+        <field name="accessToken" type="very-long" encrypt="true"/>
+        <field name="accessExpiry" type="date-time"/>
+        <field name="apps" type="short-varchar"><description>Comma list: crm,books,inventory,people</description></field>
+        <field name="scopes" type="very-long"/>
+        <field name="booksOrgId" type="short-varchar"/>
+        <field name="booksOrgName" type="name"/>
+        <field name="inventoryOrgId" type="short-varchar"/>
+        <field name="inventoryOrgName" type="name"/>
+        <field name="clientId" type="short-varchar"><description>Optional: workspace's own Zoho API client instead of the platform client</description></field>
+        <field name="clientSecret" type="very-long" encrypt="true"/>
+        <field name="connectedBy" type="id-vlong"/>
+        <field name="connectedDate" type="date-time"/>
+        <field name="lastError" type="very-long"/>
+        <field name="lastErrorDate" type="date-time"/>
+        <prim-key field="tenantId"/>
+        <relation type="one" fk-name="WAZOHO_TNT" rel-entity-name="WaTenant"><key-map field-name="tenantId"/></relation>
+    </entity>
+
     <entity entity-name="WaTenantUser" package-name="com.msoftdynamic.whatsapp.saas" title="Login belonging to a tenant">
         <field name="tenantId" type="id"/>
         <field name="userLoginId" type="id-vlong"/>
@@ -197,6 +222,8 @@
         <field name="nextNodeId" type="id"/>
         <field name="targetFlowId" type="id"/>
         <field name="sequenceNum" type="numeric"/>
+        <field name="actionConfig" type="very-long"><description>WA_NODE_ZOHO: JSON with action and its settings</description></field>
+        <field name="failNodeId" type="id"><description>WA_NODE_ZOHO: step when nothing was found or the call failed</description></field>
         <field name="posX" type="numeric"><description>Visual builder canvas position</description></field>
         <field name="posY" type="numeric"/>
         <prim-key field="flowId"/>

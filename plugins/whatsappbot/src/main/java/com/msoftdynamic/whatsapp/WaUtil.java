@@ -250,6 +250,7 @@ public final class WaUtil {
         String name = contact.getString("profileName");
         all.putIfAbsent("name", UtilValidate.isEmpty(name) ? "there" : name);
         all.putIfAbsent("phone", contact.getString("waId"));
+        all.putIfAbsent("whatsapp", "+" + contact.getString("waId"));
         String out = text;
         for (Map.Entry<String, Object> e : all.entrySet()) {
             out = out.replace("{{" + e.getKey() + "}}", String.valueOf(e.getValue()));

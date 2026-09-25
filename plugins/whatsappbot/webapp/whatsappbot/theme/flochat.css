@@ -444,3 +444,23 @@ body #content-messages p:first-child { display: none !important; }
 .fc-ai-help { margin-top: 14px; font-size: 13.5px; color: #475467; }
 .fc-ai-help summary { cursor: pointer; font-weight: 600; color: var(--ms-navy); }
 .fc-ai-help ol { padding-left: 20px; line-height: 1.7; }
+
+/* Settings > Zoho */
+.fc-zoho-status { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.fc-zoho-status small { color: var(--ms-muted); }
+.fc-zoho-apps { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.fc-zoho-app { border: 1px solid var(--ms-border); border-radius: 999px; padding: 3px 10px; font-size: 12.5px; color: var(--ms-muted); }
+.fc-zoho-app.on { background: #fef2f2; border-color: #fecaca; color: #b91c1c; font-weight: 600; }
+.fc-zoho-flash { border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; font-size: 13.5px; }
+.fc-zoho-flash.ok { background: #e7f7ee; color: #12813b; } .fc-zoho-flash.err { background: #fef3f2; color: #b42318; }
+.fc-zoho-err { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; border-radius: 8px; padding: 8px 12px; font-size: 13px; margin-bottom: 12px; }
+.fc-zoho-orgs { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 14px; }
+.fc-zoho-orgs label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; font-size: 13px; }
+.fc-zoho-connect { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.fc-zoho-connect small { color: var(--ms-muted); }
+.fc-zoho-pick { display: flex; gap: 16px; flex-wrap: wrap; }
+.fc-zoho-pick label { display: flex; gap: 6px; align-items: center; font-size: 14px; }
+.fc-zoho code { background: #eef2f6; border-radius: 5px; padding: 2px 6px; word-break: break-all; }
+html body .fc-ai-remove button[type="submit"].buttontext { background: none; border: 0; box-shadow: none; color: #b42318; padding: 4px 0; font-size: 13.5px; font-weight: 600; text-decoration: underline; }
+html body .fc-ai-remove button[type="submit"].buttontext:hover { background: none; color: #912018; }
+.fc-zoho select, .fc-ai select { font-size: 14px; }

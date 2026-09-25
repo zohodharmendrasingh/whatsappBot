@@ -204,6 +204,17 @@ public final class BotEngine {
                 contact.set("botPaused", "Y");
                 clearState();
                 return;
+            case "WA_NODE_ZOHO":
+                // call the workspace's Zoho account; continue on the "found/done" or the "not found/failed" arrow
+                ZohoActions.Result zr = ZohoActions.run(delegator, channel.getString("tenantId"), node, vars, contact);
+                vars.remove("zohoError");
+                vars.putAll(zr.vars);
+                cur = zr.ok ? node.getString("nextNodeId") : node.getString("failNodeId");
+                if (UtilValidate.isEmpty(cur)) {
+                    clearState();
+                    return;
+                }
+                break;
             case "WA_NODE_GOTO_FLOW":
                 GenericValue target = EntityQuery.use(delegator).from("WaFlow")
                         .where("flowId", node.getString("targetFlowId")).queryOne();

@@ -20,6 +20,7 @@
     <Enumeration enumId="WA_NODE_HANDOFF" enumTypeId="WA_NODE_TYPE" enumCode="HANDOFF" sequenceId="06" description="Hand over to a human agent (bot pauses)"/>
     <Enumeration enumId="WA_NODE_GOTO_FLOW" enumTypeId="WA_NODE_TYPE" enumCode="GOTO" sequenceId="07" description="Jump to another flow"/>
     <Enumeration enumId="WA_NODE_END" enumTypeId="WA_NODE_TYPE" enumCode="END" sequenceId="08" description="Send text and end the conversation"/>
+    <Enumeration enumId="WA_NODE_ZOHO" enumTypeId="WA_NODE_TYPE" enumCode="ZOHO" sequenceId="09" description="Call Zoho CRM / Books / Inventory / People, then continue (found / not found)"/>
 
     <WaPlan planId="WA_STARTER" planName="Starter" monthlyPrice="19" currencyUomId="USD" maxChannels="1" maxFlows="3" maxMessagesPerMonth="2000" isActive="Y"/>
     <WaPlan planId="WA_GROWTH" planName="Growth" monthlyPrice="49" currencyUomId="USD" maxChannels="2" maxFlows="15" maxMessagesPerMonth="10000" isActive="Y"/>

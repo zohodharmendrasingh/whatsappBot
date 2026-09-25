@@ -49,6 +49,7 @@ public final class WaFlowBuilder {
         TYPE_TO_ENUM.put("handoff", "WA_NODE_HANDOFF");
         TYPE_TO_ENUM.put("end", "WA_NODE_END");
         TYPE_TO_ENUM.put("goto", "WA_NODE_GOTO_FLOW");
+        TYPE_TO_ENUM.put("zoho", "WA_NODE_ZOHO");
         TYPE_TO_ENUM.forEach((k, v) -> ENUM_TO_TYPE.put(v, k));
     }
 
@@ -105,6 +106,14 @@ public final class WaFlowBuilder {
             o.put("validation", s(n.getString("validationRegex")));
             o.put("next", s(n.getString("nextNodeId")));
             o.put("targetFlowId", s(n.getString("targetFlowId")));
+            if ("WA_NODE_ZOHO".equals(n.getString("nodeTypeId"))) {
+                try {
+                    o.set("config", WaUtil.JSON.readTree(UtilValidate.isEmpty(n.getString("actionConfig")) ? "{}" : n.getString("actionConfig")));
+                } catch (Exception e) {
+                    o.putObject("config");
+                }
+                o.put("failNext", s(n.getString("failNodeId")));
+            }
             if (n.get("posX") != null) {
                 o.put("x", n.getLong("posX"));
                 o.put("y", n.getLong("posY") == null ? 0L : n.getLong("posY"));
@@ -196,6 +205,19 @@ public final class WaFlowBuilder {
                     c.errors.add(name + ": a flow cannot jump to itself; connect to a step instead.");
                 }
             }
+            if ("zoho".equals(type)) {
+                for (String e : ZohoActions.validate(n.path("config"))) {
+                    c.errors.add(name + ": " + e + ".");
+                }
+                String app = ZohoActions.appOf(n.path("config").path("action").asText(""));
+                if (app != null && !ZohoClient.hasApp(ZohoClient.connection(delegator, tenantId), app)) {
+                    c.warnings.add(name + ": " + ZohoClient.APP_NAMES.get(app) + " is not connected yet, so this step will take the 'not found / failed' path until you connect it in Settings.");
+                }
+                String fn = n.path("failNext").asText("");
+                if (!fn.isEmpty() && !ids.contains(fn)) {
+                    c.errors.add(name + ": its 'not found' arrow points to a step that no longer exists.");
+                }
+            }
             if (lenOver(n, "header", MAX_HEADER)) {
                 c.errors.add(name + ": header is longer than " + MAX_HEADER + " characters.");
             }
@@ -278,6 +300,10 @@ public final class WaFlowBuilder {
             if (!next.isEmpty()) {
                 q.add(next);
             }
+            String failNext = n.path("failNext").asText("");
+            if (!failNext.isEmpty()) {
+                q.add(failNext);
+            }
             for (JsonNode o : n.path("options")) {
                 String t = o.path("target").asText("");
                 if (!t.isEmpty()) {
@@ -312,9 +338,14 @@ public final class WaFlowBuilder {
             v.set("mediaUrl", "image".equals(type) ? blankToNull(n.path("mediaUrl").asText("").trim()) : null);
             v.set("saveAsVariable", "ask".equals(type) ? blankToNull(n.path("saveAs").asText("").trim()) : null);
             v.set("validationRegex", "ask".equals(type) ? blankToNull(n.path("validation").asText("")) : null);
-            boolean hasNext = "text".equals(type) || "image".equals(type) || "ask".equals(type);
+            boolean hasNext = "text".equals(type) || "image".equals(type) || "ask".equals(type) || "zoho".equals(type);
             v.set("nextNodeId", hasNext ? blankToNull(n.path("next").asText("")) : null);
             v.set("targetFlowId", "goto".equals(type) ? blankToNull(n.path("targetFlowId").asText("")) : null);
+            if ("zoho".equals(type)) {
+                v.set("actionConfig", n.path("config").toString());
+                v.set("failNodeId", blankToNull(n.path("failNext").asText("")));
+                ensureZohoEnum(delegator);
+            }
             v.set("sequenceNum", seq);
             seq += 10;
             if (n.has("x") && n.path("x").isNumber()) {
@@ -362,6 +393,15 @@ public final class WaFlowBuilder {
         }
     }
 
+    /** The node type is seed data; create it on first use so updates work without reloading seed data. */
+    private static void ensureZohoEnum(Delegator delegator) throws GenericEntityException {
+        if (EntityQuery.use(delegator).from("Enumeration").where("enumId", "WA_NODE_ZOHO").cache().queryOne() == null) {
+            delegator.createOrStore(delegator.makeValue("Enumeration", UtilMisc.toMap("enumId", "WA_NODE_ZOHO",
+                    "enumTypeId", "WA_NODE_TYPE", "enumCode", "ZOHO", "sequenceId", "09",
+                    "description", "Call Zoho CRM / Books / Inventory / People, then continue (found / not found)")));
+        }
+    }
+
     public static String normaliseKeywords(String s) {
         Set<String> out = new LinkedHashSet<>();
         for (String k : s.split(",")) {
@@ -379,6 +419,11 @@ public final class WaFlowBuilder {
      * fixes ids, types, lengths and dangling links. Never throws on odd input.
      */
     public static ObjectNode sanitize(JsonNode raw, String businessName) {
+        return sanitize(raw, businessName, java.util.Collections.emptySet());
+    }
+
+    /** @param zohoApps connected Zoho apps; Zoho steps for other apps become plain messages */
+    public static ObjectNode sanitize(JsonNode raw, String businessName, Set<String> zohoApps) {
         ObjectNode g = WaUtil.JSON.createObjectNode();
         JsonNode in = raw.path("nodes");
         Map<String, String> idMap = new LinkedHashMap<>();   // original id -> clean id of its first step (for links)
@@ -412,6 +457,15 @@ public final class WaFlowBuilder {
                 type = "handoff";
             } else if ("menu".equals(type)) {
                 type = "list";
+            }
+            boolean zohoOk = false;
+            if ("zoho".equals(type)) {
+                JsonNode zc = n.path("config");
+                String app = ZohoActions.appOf(zc.path("action").asText(""));
+                zohoOk = app != null && zohoApps.contains(app) && ZohoActions.validate(zc).isEmpty();
+                if (!zohoOk) {
+                    type = "text";
+                }
             }
             if (!TYPE_TO_ENUM.containsKey(type) || "goto".equals(type)) {
                 type = "goto".equals(type) ? "end" : "text";
@@ -451,10 +505,15 @@ public final class WaFlowBuilder {
                 re = "";
             }
             o.put("validation", re);
-            boolean hasNext = "text".equals(type) || "image".equals(type) || "ask".equals(type);
+            boolean hasNext = "text".equals(type) || "image".equals(type) || "ask".equals(type) || "zoho".equals(type);
             String next = idMap.get(n.path("next").asText(""));
             o.put("next", hasNext && next != null && !next.equals(id) ? next : "");
             o.put("targetFlowId", "");
+            if (zohoOk) {
+                o.set("config", n.path("config").deepCopy());
+                String fn = idMap.get(n.path("failNext").asText(""));
+                o.put("failNext", fn != null && !fn.equals(id) ? fn : "");
+            }
             if (n.path("x").isNumber()) {
                 o.put("x", n.path("x").asDouble());
                 o.put("y", n.path("y").asDouble());

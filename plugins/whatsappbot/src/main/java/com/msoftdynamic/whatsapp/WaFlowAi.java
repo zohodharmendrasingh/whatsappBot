@@ -7,6 +7,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -140,6 +141,37 @@ public final class WaFlowAi {
         "- Write in the same language as the business description unless told otherwise.");
 
     public static Result generate(Delegator delegator, String tenantKey, String description, String businessName, JsonNode currentGraph) {
+        return generate(delegator, tenantKey, description, businessName, currentGraph, java.util.Collections.emptySet());
+    }
+
+    private static final Map<String, String> ZOHO_DOCS = Map.of(
+        "crm", "- crm_find: find the customer in Zoho CRM by their WhatsApp number. config {\"action\":\"crm_find\",\"module\":\"Contacts\"|\"Leads\",\"matchBy\":\"whatsapp\"}. Sets {{crmName}}, {{crmEmail}}, {{crmOwner}}.\n"
+             + "- crm_upsert: create or update a CRM record. config {\"action\":\"crm_upsert\",\"module\":\"Leads\",\"dupField\":\"Mobile\",\"fields\":[{\"field\":\"Last_Name\",\"value\":\"{{fullName}}\"},{\"field\":\"Mobile\",\"value\":\"{{whatsapp}}\"},{\"field\":\"Email\",\"value\":\"{{email}}\"},{\"field\":\"Lead_Source\",\"value\":\"WhatsApp\"},{\"field\":\"Description\",\"value\":\"...\"}]}. Use real CRM API field names; Last_Name is required.",
+        "books", "- books_invoice: invoice status by number. config {\"action\":\"books_invoice\",\"number\":\"{{invoiceNo}}\",\"verify\":true}. Sets {{invoiceStatus}}, {{invoiceTotal}}, {{invoiceBalance}}, {{invoiceDueDate}}, {{invoiceLink}}.\n"
+             + "- books_balance: the customer's balance by WhatsApp number. config {\"action\":\"books_balance\"}. Sets {{customerName}}, {{balanceDue}}, {{unpaidCount}}, {{unpaidInvoices}} (multi-line list).",
+        "inventory", "- inv_stock: stock and price of an item. config {\"action\":\"inv_stock\",\"query\":\"{{item}}\"}. Sets {{itemName}}, {{itemRate}}, {{itemStock}}, {{itemList}}.\n"
+             + "- inv_order: sales order status by number. config {\"action\":\"inv_order\",\"number\":\"{{orderNo}}\",\"verify\":true}. Sets {{orderStatus}}, {{orderShipped}}, {{orderTotal}}, {{orderDate}}.",
+        "people", "- people_balance: employee's leave balance (employee found by WhatsApp number). config {\"action\":\"people_balance\"}. Sets {{employeeName}}, {{leaveBalances}}.\n"
+             + "- people_apply: apply for leave. config {\"action\":\"people_apply\",\"leaveType\":\"{{leaveType}}\",\"from\":\"{{fromDate}}\",\"to\":\"{{toDate}}\",\"reason\":\"{{reason}}\"}. Sets {{leaveRequestId}}.");
+
+    static String zohoPrompt(java.util.Set<String> apps) {
+        if (apps == null || apps.isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder("\n\nThis business has connected Zoho. You may add steps of type \"zoho\" that read or write their Zoho data:\n")
+            .append("{\"id\":..., \"type\":\"zoho\", \"config\":{...}, \"next\": step when it worked/was found, \"failNext\": step when not found or failed}. ")
+            .append("Collect the needed inputs first with ask steps (saveAs), then use them as {{variables}} in config. Show results in the next message with the variables. ")
+            .append("Always connect failNext to a helpful message or a handoff. {{whatsapp}} is the customer's number with +. Available actions:\n");
+        for (String a : List.of("crm", "books", "inventory", "people")) {
+            if (apps.contains(a)) {
+                sb.append(ZOHO_DOCS.get(a)).append("\n");
+            }
+        }
+        return sb.toString();
+    }
+
+    public static Result generate(Delegator delegator, String tenantKey, String description, String businessName, JsonNode currentGraph,
+            java.util.Set<String> zohoApps) {
         Key k = key(delegator, tenantKey);
         if (k == null) {
             return new Result(null, "Add your Claude API key in Settings > AI assistant to use AI.");
@@ -177,12 +209,12 @@ public final class WaFlowAi {
             user.append("Create a WhatsApp chatbot flow for this business:\n").append(description.trim());
         }
         try {
-            String text = call(user.toString(), k);
+            String text = call(user.toString(), k, zohoPrompt(zohoApps));
             JsonNode raw = WaUtil.JSON.readTree(extractJson(text));
             if (!raw.path("nodes").isArray() || raw.path("nodes").size() == 0) {
                 return new Result(null, "The AI did not return a usable flow. Please try again with a little more detail.");
             }
-            ObjectNode g = WaFlowBuilder.sanitize(raw, businessName);
+            ObjectNode g = WaFlowBuilder.sanitize(raw, businessName, zohoApps == null ? java.util.Collections.emptySet() : zohoApps);
             // keep canvas positions of steps that still exist
             if (currentGraph != null) {
                 Map<String, JsonNode> old = new java.util.HashMap<>();
@@ -213,7 +245,8 @@ public final class WaFlowAi {
         }
     }
 
-    private static String call(String userText, Key k) throws AiException {
+    private static String call(String userText, Key k, String systemExtra) throws AiException {
+        String system = SYSTEM + systemExtra;
         String provider = WaUtil.prop("ai.provider", "anthropic").trim().toLowerCase();
         String apiKey = k.apiKey;
         String model = UtilValidate.isNotEmpty(k.model) ? k.model : null;
@@ -225,14 +258,14 @@ public final class WaFlowAi {
             body.put("model", model != null ? model : WaUtil.prop("ai.model", "gpt-4.1"));
             body.putObject("response_format").put("type", "json_object");
             ArrayNode msgs = body.putArray("messages");
-            msgs.addObject().put("role", "system").put("content", SYSTEM);
+            msgs.addObject().put("role", "system").put("content", system);
             msgs.addObject().put("role", "user").put("content", userText);
             rb = HttpRequest.newBuilder(URI.create(base + "/v1/chat/completions")).header("Authorization", "Bearer " + apiKey);
         } else {
             String base = WaUtil.prop("ai.base.url", "https://api.anthropic.com").replaceAll("/+$", "");
             body.put("model", model != null ? model : WaUtil.prop("ai.model", "claude-sonnet-5"));
             body.put("max_tokens", WaUtil.propInt("ai.max.tokens", 8000));
-            body.put("system", SYSTEM);
+            body.put("system", system);
             body.putArray("messages").addObject().put("role", "user").put("content", userText);
             rb = HttpRequest.newBuilder(URI.create(base + "/v1/messages"))
                     .header("x-api-key", apiKey).header("anthropic-version", "2023-06-01");

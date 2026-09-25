@@ -15,11 +15,11 @@
     <request-map uri="FlowBuilder"><security https="true" auth="true"/><response name="success" type="view" value="FlowBuilder"/></request-map>
     <request-map uri="flowBuilderData"><security https="true" auth="true"/>
         <event type="java" path="com.msoftdynamic.whatsapp.WaFlowEvents" invoke="graph"/><response name="none" type="none"/></request-map>
-    <request-map uri="flowBuilderSave"><security https="true" auth="true"/>
+    <request-map uri="flowBuilderSave" method="post"><security https="true" auth="true"/>
         <event type="java" path="com.msoftdynamic.whatsapp.WaFlowEvents" invoke="save"/><response name="none" type="none"/></request-map>
-    <request-map uri="flowBuilderAi"><security https="true" auth="true"/>
+    <request-map uri="flowBuilderAi" method="post"><security https="true" auth="true"/>
         <event type="java" path="com.msoftdynamic.whatsapp.WaFlowEvents" invoke="ai"/><response name="none" type="none"/></request-map>
-    <request-map uri="flowWizard"><security https="true" auth="true"/>
+    <request-map uri="flowWizard" method="post"><security https="true" auth="true"/>
         <event type="java" path="com.msoftdynamic.whatsapp.WaFlowEvents" invoke="wizard"/>
         <response name="success" type="request-redirect" value="FlowBuilder"><redirect-parameter name="flowId"/><redirect-parameter name="created"/></response>
         <response name="error" type="view" value="FindFlow"/></request-map>
@@ -112,10 +112,17 @@
     <request-map uri="removeTeamMember"><security https="true" auth="true"/><event type="service" invoke="removeWaTenantUser"/>
         <response name="success" type="request-redirect-noparam" value="Settings"/><response name="error" type="view" value="Settings"/></request-map>
 
-    <request-map uri="saveAiKey"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaFlowEvents" invoke="saveAiKey"/>
+    <request-map uri="saveAiKey" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaFlowEvents" invoke="saveAiKey"/>
         <response name="success" type="view" value="Settings"/><response name="error" type="view" value="Settings"/></request-map>
-    <request-map uri="removeAiKey"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaFlowEvents" invoke="removeAiKey"/>
+    <request-map uri="removeAiKey" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaFlowEvents" invoke="removeAiKey"/>
         <response name="success" type="view" value="Settings"/><response name="error" type="view" value="Settings"/></request-map>
+
+    <request-map uri="zohoConnect" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaZohoEvents" invoke="connect"/><response name="none" type="none"/></request-map>
+    <request-map uri="zohoCallback"><security https="true" auth="false"/><event type="java" path="com.msoftdynamic.whatsapp.WaZohoEvents" invoke="callback"/><response name="none" type="none"/></request-map>
+    <request-map uri="zohoDisconnect" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaZohoEvents" invoke="disconnect"/><response name="none" type="none"/></request-map>
+    <request-map uri="zohoSaveOrgs" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaZohoEvents" invoke="saveOrgs"/><response name="none" type="none"/></request-map>
+    <request-map uri="zohoSaveClient" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaZohoEvents" invoke="saveClient"/><response name="none" type="none"/></request-map>
+    <request-map uri="zohoMeta"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaZohoEvents" invoke="meta"/><response name="none" type="none"/></request-map>
 
     <!-- ===== Billing (PayPal) ===== -->
     <request-map uri="Billing"><security https="true" auth="true"/><response name="success" type="view" value="Billing"/></request-map>

@@ -1,5 +1,5 @@
 <#-- Bot Flows home: create a bot (AI / template / blank) + list of flows -->
-<link rel="stylesheet" href="/theme/flowbuilder.css?v=3"/>
+<link rel="stylesheet" href="/theme/flowbuilder.css?v=4"/>
 <div class="fh">
 <#if canCreateFlow>
   <section class="fh-create">

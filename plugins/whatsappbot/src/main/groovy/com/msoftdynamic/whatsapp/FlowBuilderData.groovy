@@ -27,3 +27,11 @@ EntityQuery.use(delegator).from("WaFlow").where("tenantId", flow.tenantId).order
 context.otherFlowsB64 = b64(others)
 context.aiConfigured = WaFlowAi.isConfigured(delegator, flow.tenantId)
 context.businessName = business
+// Zoho: which apps this workspace has connected + the step catalogue
+def zs = com.msoftdynamic.whatsapp.WaZohoEvents.summary(delegator, flow.tenantId)
+def zo = WaUtil.JSON.createObjectNode()
+zo.put("connected", zs.connected as boolean)
+def za = zo.putArray("apps"); (zs.apps ?: []).each { za.add(it) }
+zo.set("catalog", com.msoftdynamic.whatsapp.ZohoActions.catalogJson())
+zo.put("booksOrg", zs.booksOrgName ?: ""); zo.put("inventoryOrg", zs.inventoryOrgName ?: "")
+context.zohoB64 = b64(zo)
