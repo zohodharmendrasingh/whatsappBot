@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://ofbiz.apache.org/Widget-Form" xsi:schemaLocation="http://ofbiz.apache.org/Widget-Form http://ofbiz.apache.org/dtds/widget-form.xsd">
+
+    <!-- ============================== Inbox ============================== -->
+    <grid name="ListContacts" list-name="contacts" paginate-target="Inbox" default-table-style="basic-table hover-bar" odd-row-style="alternate-row">
+        <actions>
+            <entity-condition entity-name="WaContact" list="contacts">
+                <condition-list combine="and">
+                    <condition-expr field-name="tenantId" from-field="scopeTenantId" ignore-if-empty="true"/>
+                    <condition-expr field-name="waId" operator="like" from-field="waIdLike" ignore-if-empty="true"/>
+                    <condition-expr field-name="botPaused" from-field="parameters.botPaused" ignore-if-empty="true"/>
+                </condition-list>
+                <order-by field-name="-lastMessageDate"/>
+            </entity-condition>
+        </actions>
+        <alt-row-style use-when="unreadCount!=null&amp;&amp;unreadCount&gt;0" style="Validate"/>
+        <field name="profileName" title="Customer" widget-style="buttontext">
+            <hyperlink target="Conversation" description="${profileName} " also-hidden="false"><parameter param-name="contactId"/></hyperlink>
+        </field>
+        <field name="waId" title="WhatsApp"><display/></field>
+        <field name="unreadCount" title="Unread"><display/></field>
+        <field name="botPaused" title="Agent handling"><display/></field>
+        <field name="optInStatus" title="Opted in"><display/></field>
+        <field name="lastMessageDate" title="Last message"><display type="date-time"/></field>
+        <field name="tenantId" use-when="&quot;Y&quot;.equals(isWaAdmin)"><display/></field>
+    </grid>
+
+    <form name="FindContacts" type="single" target="Inbox">
+        <field name="waIdText" title="Number contains"><text size="15"/></field>
+        <field name="botPaused" title="Agent handling">
+            <drop-down allow-empty="true"><option key="Y" description="Yes (waiting for agent)"/><option key="N" description="No (bot)"/></drop-down>
+        </field>
+        <field name="submitButton" title="${uiLabelMap.CommonFind}"><submit/></field>
+    </form>
+
+    <form name="ContactHeader" type="single" default-map-name="contact">
+        <field name="contactId"><display/></field>
+        <field name="profileName" title="Customer"><display/></field>
+        <field name="waId" title="WhatsApp"><display/></field>
+        <field name="botPaused" title="Agent handling"><display/></field>
+        <field name="optInStatus" title="Opted in"><display/></field>
+        <field name="lastInboundDate" title="Last customer message"><display type="date-time"/></field>
+        <field name="sessionData" title="Captured data"><display/></field>
+    </form>
+
+    <form name="ReplyForm" type="single" target="waSendMessage">
+        <field name="contactId"><hidden/></field>
+        <field name="text" title="Reply" required-field="true"><textarea cols="80" rows="3"/></field>
+        <field name="mediaUrl" title="Image URL (optional)"><text size="60"/></field>
+        <field name="pauseBot" title="Take over chat (pause bot)"><check><option key="Y" description=" "/></check></field>
+        <field name="submitButton" title="Send"><submit/></field>
+    </form>
+
+    <form name="TemplateReplyForm" type="single" target="waSendMessage">
+        <field name="contactId"><hidden/></field>
+        <field name="templateName" title="Approved template" required-field="true">
+            <drop-down allow-empty="false">
+                <entity-options entity-name="WaTemplate" key-field-name="templateName" description="${templateName} (${languageCode})">
+                    <entity-constraint name="channelId" env-name="contact.channelId"/>
+                    <entity-constraint name="metaStatus" value="APPROVED"/>
+                    <entity-order-by field-name="templateName"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="languageCode" title="Language"><text size="6" default-value="en"/></field>
+        <field name="templateParamsText" title="Body values ({{1}}|{{2}}...)"><text size="60"/></field>
+        <field name="submitButton" title="Send template"><submit/></field>
+    </form>
+
+    <!-- ============================== Flows ============================== -->
+    <grid name="ListFlows" list-name="flows" default-table-style="basic-table hover-bar" odd-row-style="alternate-row">
+        <actions>
+            <entity-condition entity-name="WaFlow" list="flows">
+                <condition-expr field-name="tenantId" from-field="scopeTenantId" ignore-if-empty="true"/>
+                <order-by field-name="flowName"/>
+            </entity-condition>
+        </actions>
+        <field name="flowId" widget-style="buttontext"><hyperlink target="EditFlow" description="${flowId}" also-hidden="false"><parameter param-name="flowId"/></hyperlink></field>
+        <field name="flowName" title="Name"><display/></field>
+        <field name="triggerKeywords" title="Keywords"><display/></field>
+        <field name="startNodeId" title="Start step"><display/></field>
+        <field name="isDefault" title="Default"><display/></field>
+        <field name="isActive" title="Active"><display/></field>
+        <field name="tenantId" use-when="&quot;Y&quot;.equals(isWaAdmin)"><display/></field>
+    </grid>
+
+    <form name="EditFlow" type="single" target="updateWaFlow" default-map-name="flow">
+        <alt-target use-when="flow==null" target="waCreateFlow"/>
+        <field name="tenantId" use-when="flow==null"><hidden value="${currentTenantId}"/></field>
+        <field name="flowId" use-when="flow!=null"><display/></field>
+        <field name="flowId" use-when="flow==null" title="Flow id (optional)" tooltip="Letters/digits, e.g. MAIN"><text size="20"/></field>
+        <field name="flowName" title="Name" required-field="true"><text size="40"/></field>
+        <field name="triggerKeywords" title="Trigger keywords" tooltip="Comma separated, e.g. hi,hello,menu"><text size="60"/></field>
+        <field name="startNodeId" title="Start step id"><text size="20" default-value="START"/></field>
+        <field name="isDefault" title="Default flow" tooltip="Runs when no keyword matches">
+            <drop-down allow-empty="false" no-current-selected-key="N"><option key="N" description="No"/><option key="Y" description="Yes"/></drop-down>
+        </field>
+        <field name="isActive" title="Active"><drop-down allow-empty="false"><option key="Y" description="Yes"/><option key="N" description="No"/></drop-down></field>
+        <field name="submitButton" title="${uiLabelMap.CommonSave}"><submit/></field>
+    </form>
+
+    <grid name="ListFlowNodes" list-name="nodes" default-table-style="basic-table hover-bar" odd-row-style="alternate-row">
+        <actions>
+            <entity-condition entity-name="WaFlowNode" list="nodes">
+                <condition-expr field-name="flowId" from-field="parameters.flowId"/>
+                <order-by field-name="sequenceNum"/>
+                <order-by field-name="nodeId"/>
+            </entity-condition>
+        </actions>
+        <field name="nodeId" title="Step" widget-style="buttontext">
+            <hyperlink target="EditFlowNode" description="${nodeId}" also-hidden="false"><parameter param-name="flowId"/><parameter param-name="nodeId"/></hyperlink>
+        </field>
+        <field name="nodeTypeId" title="Type"><display-entity entity-name="Enumeration" key-field-name="enumId" description="${enumCode}"/></field>
+        <field name="messageText" title="Message"><display/></field>
+        <field name="saveAsVariable" title="Saves to"><display/></field>
+        <field name="nextNodeId" title="Next"><display/></field>
+        <field name="sequenceNum" title="Seq"><display/></field>
+    </grid>
+
+    <form name="EditFlowNode" type="single" target="updateWaFlowNode" default-map-name="node">
+        <alt-target use-when="node==null" target="createWaFlowNode"/>
+        <field name="flowId"><hidden value="${parameters.flowId}"/></field>
+        <field name="nodeId" use-when="node!=null" title="Step id"><display/></field>
+        <field name="nodeId" use-when="node==null" title="Step id" required-field="true" tooltip="e.g. START, ASK_NAME"><text size="20"/></field>
+        <field name="nodeTypeId" title="Type" required-field="true">
+            <drop-down allow-empty="false">
+                <entity-options entity-name="Enumeration" key-field-name="enumId" description="${enumCode} - ${description}">
+                    <entity-constraint name="enumTypeId" value="WA_NODE_TYPE"/>
+                    <entity-order-by field-name="sequenceId"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="messageText" title="Message" tooltip="Use {{name}}, {{phone}} or any saved variable like {{fullName}}"><textarea cols="70" rows="4"/></field>
+        <field name="headerText" title="Header (buttons/list)"><text size="40" maxlength="60"/></field>
+        <field name="footerText" title="Footer (buttons/list)"><text size="40" maxlength="60"/></field>
+        <field name="buttonLabel" title="List button label"><text size="20" maxlength="20"/></field>
+        <field name="mediaUrl" title="Image URL (IMAGE type)"><text size="60"/></field>
+        <field name="saveAsVariable" title="Save answer as (ASK type)"><text size="20"/></field>
+        <field name="validationRegex" title="Answer must match regex (ASK)"><text size="40"/></field>
+        <field name="nextNodeId" title="Next step id"><text size="20"/></field>
+        <field name="targetFlowId" title="Go to flow (GOTO type)">
+            <drop-down allow-empty="true">
+                <entity-options entity-name="WaFlow" key-field-name="flowId" description="${flowName}">
+                    <entity-constraint name="tenantId" env-name="flow.tenantId"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="sequenceNum" title="Sequence"><text size="5"/></field>
+        <field name="submitButton" title="${uiLabelMap.CommonSave}"><submit/></field>
+    </form>
+
+    <grid name="ListNodeOptions" list-name="options" default-table-style="basic-table hover-bar" odd-row-style="alternate-row">
+        <actions>
+            <entity-condition entity-name="WaFlowNodeOption" list="options">
+                <condition-list combine="and">
+                    <condition-expr field-name="flowId" from-field="parameters.flowId"/>
+                    <condition-expr field-name="nodeId" from-field="parameters.nodeId"/>
+                </condition-list>
+                <order-by field-name="optionSeqId"/>
+            </entity-condition>
+        </actions>
+        <field name="optionSeqId" title="#"><display/></field>
+        <field name="optionLabel" title="Button / row title"><display/></field>
+        <field name="optionDescription" title="Row description"><display/></field>
+        <field name="matchKeywords" title="Also matches typed"><display/></field>
+        <field name="targetNodeId" title="Goes to step"><display/></field>
+        <field name="deleteLink" title=" " widget-style="buttontext">
+            <hyperlink target="deleteWaFlowNodeOption" description="${uiLabelMap.CommonDelete}" request-confirmation="true" also-hidden="false">
+                <parameter param-name="flowId"/><parameter param-name="nodeId"/><parameter param-name="optionSeqId"/>
+            </hyperlink>
+        </field>
+    </grid>
+
+    <form name="AddNodeOption" type="single" target="createWaFlowNodeOption">
+        <field name="flowId"><hidden value="${parameters.flowId}"/></field>
+        <field name="nodeId"><hidden value="${parameters.nodeId}"/></field>
+        <field name="optionLabel" title="Title" required-field="true" tooltip="Buttons: max 20 chars, list rows: max 24"><text size="24" maxlength="24"/></field>
+        <field name="optionDescription" title="Row description (list)"><text size="40" maxlength="72"/></field>
+        <field name="matchKeywords" title="Typed keywords" tooltip="e.g. 1,price,rate"><text size="30"/></field>
+        <field name="targetNodeId" title="Go to step">
+            <drop-down allow-empty="true">
+                <entity-options entity-name="WaFlowNode" key-field-name="nodeId" description="${nodeId}">
+                    <entity-constraint name="flowId" env-name="parameters.flowId"/>
+                    <entity-order-by field-name="nodeId"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="submitButton" title="Add option"><submit/></field>
+    </form>
+
+    <!-- ============================== Channels ============================== -->
+    <grid name="ListChannels" list-name="channels" default-table-style="basic-table hover-bar" odd-row-style="alternate-row">
+        <actions>
+            <entity-condition entity-name="WaChannel" list="channels">
+                <condition-expr field-name="tenantId" from-field="scopeTenantId" ignore-if-empty="true"/>
+                <order-by field-name="channelId"/>
+            </entity-condition>
+        </actions>
+        <field name="channelId" widget-style="buttontext"><hyperlink target="EditChannel" description="${channelId}" also-hidden="false"><parameter param-name="channelId"/></hyperlink></field>
+        <field name="channelName" title="Name"><display/></field>
+        <field name="displayPhoneNumber" title="Number"><display/></field>
+        <field name="phoneNumberId" title="Phone number id"><display/></field>
+        <field name="wabaId" title="WABA id"><display/></field>
+        <field name="defaultFlowId" title="Default flow"><display/></field>
+        <field name="isActive" title="Active"><display/></field>
+        <field name="tenantId" use-when="&quot;Y&quot;.equals(isWaAdmin)"><display/></field>
+    </grid>
+
+    <form name="EditChannel" type="single" target="updateWaChannel" default-map-name="channel">
+        <alt-target use-when="channel==null" target="waCreateChannel"/>
+        <field name="channelId" use-when="channel!=null"><display/></field>
+        <field name="tenantId" use-when="channel==null"><hidden value="${currentTenantId}"/></field>
+        <field name="channelName" title="Name"><text size="30"/></field>
+        <field name="displayPhoneNumber" title="Display number"><text size="20"/></field>
+        <field name="phoneNumberId" title="Phone number id" required-field="true"><text size="25"/></field>
+        <field name="wabaId" title="WhatsApp Business Account id"><text size="25"/></field>
+        <field name="newAccessToken" title="Access token" tooltip="Permanent system-user token. On edit, leave blank to keep the current one."><password size="60"/></field>
+        <field name="graphApiVersion" title="Graph API version" tooltip="Empty = whatsappbot.properties"><text size="8"/></field>
+        <field name="defaultFlowId" title="Default flow">
+            <drop-down allow-empty="true">
+                <entity-options entity-name="WaFlow" key-field-name="flowId" description="${flowName}">
+                    <entity-constraint name="tenantId" env-name="formTenantId"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="isActive" title="Active"><drop-down allow-empty="false"><option key="Y" description="Yes"/><option key="N" description="No"/></drop-down></field>
+        <field name="submitButton" title="${uiLabelMap.CommonSave}"><submit/></field>
+    </form>
+
+    <!-- ============================== Templates / broadcast ============================== -->
+    <grid name="ListTemplates" list-name="templates" paginate-target="Templates" default-table-style="basic-table hover-bar" odd-row-style="alternate-row">
+        <actions>
+            <entity-condition entity-name="WaTemplate" list="templates">
+                <condition-expr field-name="tenantId" from-field="scopeTenantId" ignore-if-empty="true"/>
+                <order-by field-name="templateName"/>
+            </entity-condition>
+        </actions>
+        <alt-row-style use-when="&quot;APPROVED&quot;.equals(metaStatus)" style="Validate"/>
+        <alt-row-style use-when="&quot;REJECTED&quot;.equals(metaStatus)" style="Warn"/>
+        <field name="templateName" title="Name"><display/></field>
+        <field name="languageCode" title="Lang"><display/></field>
+        <field name="category"><display/></field>
+        <field name="metaStatus" title="Status"><display/></field>
+        <field name="bodyText" title="Body"><display/></field>
+        <field name="channelId" title="Number"><display/></field>
+        <field name="lastSyncDate" title="Synced"><display type="date-time"/></field>
+    </grid>
+
+    <form name="SyncTemplates" type="single" target="waSyncTemplates">
+        <field name="channelId" title="WhatsApp number">
+            <drop-down allow-empty="false">
+                <entity-options entity-name="WaChannel" key-field-name="channelId" description="${channelName} ${displayPhoneNumber}">
+                    <entity-constraint name="tenantId" env-name="scopeTenantId" ignore-if-empty="true"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="submitButton" title="Sync templates from Meta"><submit/></field>
+    </form>
+
+    <form name="BroadcastForm" type="single" target="waSendBroadcast">
+        <field name="channelId" title="From number" required-field="true">
+            <drop-down allow-empty="false">
+                <entity-options entity-name="WaChannel" key-field-name="channelId" description="${channelName} ${displayPhoneNumber}">
+                    <entity-constraint name="tenantId" env-name="scopeTenantId" ignore-if-empty="true"/>
+                    <entity-constraint name="isActive" value="Y"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="templateName" title="Approved template" required-field="true">
+            <drop-down allow-empty="false">
+                <entity-options entity-name="WaTemplate" key-field-name="templateName" description="${templateName} (${languageCode}) - ${category}">
+                    <entity-constraint name="tenantId" env-name="scopeTenantId" ignore-if-empty="true"/>
+                    <entity-constraint name="metaStatus" value="APPROVED"/>
+                    <entity-order-by field-name="templateName"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="languageCode" title="Language"><text size="6" default-value="en"/></field>
+        <field name="bodyParams" title="Body values" tooltip="{{1}}|{{2}}... same for every recipient"><text size="60"/></field>
+        <field name="numbers" title="Numbers" required-field="true" tooltip="With country code, one per line or comma separated (spaces inside a number are fine)"><textarea cols="40" rows="10"/></field>
+        <field name="submitButton" title="Send broadcast"><submit/></field>
+    </form>
+
+    <!-- ============================== API keys ============================== -->
+    <grid name="ListApiKeys" list-name="apiKeys" default-table-style="basic-table hover-bar" odd-row-style="alternate-row">
+        <actions>
+            <entity-condition entity-name="WaApiKey" list="apiKeys">
+                <condition-expr field-name="tenantId" from-field="scopeTenantId" ignore-if-empty="true"/>
+                <order-by field-name="-createdDate"/>
+            </entity-condition>
+        </actions>
+        <field name="apiKeyId" title="Id"><display/></field>
+        <field name="keyPrefix" title="Key"><display/></field>
+        <field name="description"><display/></field>
+        <field name="isActive" title="Active"><display/></field>
+        <field name="lastUsedDate" title="Last used"><display type="date-time"/></field>
+        <field name="createdDate" title="Created"><display type="date-time"/></field>
+        <field name="tenantId" use-when="&quot;Y&quot;.equals(isWaAdmin)"><display/></field>
+        <field name="revokeLink" title=" " widget-style="buttontext" use-when="&quot;Y&quot;.equals(isActive)">
+            <hyperlink target="updateWaApiKey" description="Revoke" request-confirmation="true" also-hidden="false">
+                <parameter param-name="apiKeyId"/><parameter param-name="isActive" value="N"/>
+            </hyperlink>
+        </field>
+    </grid>
+
+    <form name="CreateApiKey" type="single" target="waCreateApiKey">
+        <field name="tenantId"><hidden value="${currentTenantId}"/></field>
+        <field name="description" title="Used for"><text size="40" default-value="Zoho CRM integration"/></field>
+        <field name="submitButton" title="Generate API key"><submit/></field>
+    </form>
+
+    <!-- ============================== Tenants (admin) ============================== -->
+    <grid name="ListTenants" list-name="tenants" paginate-target="Tenants" default-table-style="basic-table hover-bar" odd-row-style="alternate-row">
+        <actions>
+            <entity-condition entity-name="WaTenant" list="tenants"><order-by field-name="tenantName"/></entity-condition>
+        </actions>
+        <field name="tenantId" widget-style="buttontext"><hyperlink target="EditTenant" description="${tenantId}" also-hidden="false"><parameter param-name="tenantId"/></hyperlink></field>
+        <field name="tenantName" title="Business"><display/></field>
+        <field name="planId" title="Plan"><display-entity entity-name="WaPlan" description="${planName}"/></field>
+        <field name="statusId" title="Status"><display-entity entity-name="StatusItem"/></field>
+        <field name="subscriptionThruDate" title="Paid until"><display type="date"/></field>
+        <field name="contactEmail" title="Email"><display/></field>
+        <field name="switchLink" title=" " widget-style="buttontext">
+            <hyperlink target="main" description="Work as this tenant" also-hidden="false"><parameter param-name="switchTenantId" from-field="tenantId"/></hyperlink>
+        </field>
+    </grid>
+
+    <form name="EditTenant" type="single" target="updateWaTenant" default-map-name="tenant">
+        <alt-target use-when="tenant==null" target="createWaTenant"/>
+        <field name="tenantId" use-when="tenant!=null"><display/></field>
+        <field name="tenantId" use-when="tenant==null" title="Tenant id (optional)"><text size="20"/></field>
+        <field name="tenantName" title="Business name" required-field="true"><text size="40"/></field>
+        <field name="planId" title="Plan">
+            <drop-down allow-empty="false">
+                <entity-options entity-name="WaPlan" key-field-name="planId" description="${planName} - ${monthlyPrice} ${currencyUomId}">
+                    <entity-constraint name="isActive" value="Y"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="statusId" title="Status">
+            <drop-down allow-empty="false" no-current-selected-key="WA_TNT_TRIAL">
+                <entity-options entity-name="StatusItem" key-field-name="statusId">
+                    <entity-constraint name="statusTypeId" value="WA_TENANT_STATUS"/>
+                    <entity-order-by field-name="sequenceId"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="subscriptionThruDate" title="Paid until"><date-time type="timestamp"/></field>
+        <field name="contactEmail" title="Email"><text size="40"/></field>
+        <field name="contactPhone" title="Phone"><text size="20"/></field>
+        <field name="partyId" title="Linked party id (optional)"><text size="20"/></field>
+        <field name="submitButton" title="${uiLabelMap.CommonSave}"><submit/></field>
+    </form>
+
+    <grid name="ListTenantUsers" list-name="tenantUsers" default-table-style="basic-table" odd-row-style="alternate-row">
+        <actions>
+            <entity-condition entity-name="WaTenantUser" list="tenantUsers"><condition-expr field-name="tenantId" from-field="parameters.tenantId"/></entity-condition>
+        </actions>
+        <field name="userLoginId" title="Login"><display/></field>
+        <field name="roleTypeId" title="Role"><display/></field>
+        <field name="fromDate" title="Since"><display type="date"/></field>
+        <field name="removeLink" title=" " widget-style="buttontext">
+            <hyperlink target="removeWaTenantUser" description="Remove" request-confirmation="true" also-hidden="false">
+                <parameter param-name="tenantId"/><parameter param-name="userLoginId"/>
+            </hyperlink>
+        </field>
+    </grid>
+
+    <form name="AddTenantUser" type="single" target="waCreateTenantUser">
+        <field name="tenantId"><hidden value="${parameters.tenantId}"/></field>
+        <field name="userLoginId" title="Login id" required-field="true"><text size="25"/></field>
+        <field name="password" title="Password" required-field="true"><password size="20"/></field>
+        <field name="roleTypeId" title="Role"><drop-down><option key="WA_OWNER" description="Owner"/><option key="WA_AGENT" description="Agent"/></drop-down></field>
+        <field name="submitButton" title="Add user"><submit/></field>
+    </form>
+
+    <grid name="ListUsage" list-name="usageList" default-table-style="basic-table" odd-row-style="alternate-row">
+        <actions>
+            <entity-condition entity-name="WaUsage" list="usageList">
+                <condition-expr field-name="tenantId" from-field="parameters.tenantId"/>
+                <order-by field-name="-periodId"/>
+            </entity-condition>
+        </actions>
+        <field name="periodId" title="Month (YYYYMM)"><display/></field>
+        <field name="messagesIn" title="Received"><display/></field>
+        <field name="messagesOut" title="Sent"><display/></field>
+    </grid>
+
+    <!-- ============================== Plans (admin) ============================== -->
+    <form name="ListPlans" type="list" list-name="plans" target="updateWaPlan" default-table-style="basic-table hover-bar" odd-row-style="alternate-row">
+        <actions>
+            <entity-condition entity-name="WaPlan" list="plans"><order-by field-name="monthlyPrice"/></entity-condition>
+        </actions>
+        <field name="planId"><display/></field>
+        <field name="planName" title="Name"><text size="15"/></field>
+        <field name="monthlyPrice" title="Price / month"><text size="8"/></field>
+        <field name="currencyUomId" title="Currency"><text size="4"/></field>
+        <field name="maxChannels" title="Numbers"><text size="4"/></field>
+        <field name="maxFlows" title="Flows"><text size="4"/></field>
+        <field name="maxMessagesPerMonth" title="Msgs / month"><text size="8"/></field>
+        <field name="isActive" title="Active"><drop-down allow-empty="false"><option key="Y"/><option key="N"/></drop-down></field>
+        <field name="submitButton" title="${uiLabelMap.CommonUpdate}"><submit/></field>
+    </form>
+
+    <form name="CreatePlan" type="single" target="createWaPlan">
+        <field name="planId" title="Plan id"><text size="15"/></field>
+        <field name="planName" title="Name" required-field="true"><text size="20"/></field>
+        <field name="monthlyPrice" title="Price / month"><text size="8"/></field>
+        <field name="currencyUomId" title="Currency"><text size="4" default-value="USD"/></field>
+        <field name="maxChannels" title="Max numbers"><text size="4"/></field>
+        <field name="maxFlows" title="Max flows"><text size="4"/></field>
+        <field name="maxMessagesPerMonth" title="Max sent msgs / month (empty = unlimited)"><text size="8"/></field>
+        <field name="isActive"><hidden value="Y"/></field>
+        <field name="submitButton" title="${uiLabelMap.CommonCreate}"><submit/></field>
+    </form>
+
+    <!-- ============================== Webhook log (admin) ============================== -->
+    <grid name="ListWebhookLogs" list-name="logs" paginate-target="WebhookLogs" default-table-style="basic-table hover-bar" odd-row-style="alternate-row">
+        <actions>
+            <entity-condition entity-name="WaWebhookLog" list="logs">
+                <condition-expr field-name="processedStatus" from-field="parameters.processedStatus" ignore-if-empty="true"/>
+                <order-by field-name="-receivedDate"/>
+            </entity-condition>
+        </actions>
+        <alt-row-style use-when="&quot;ERROR&quot;.equals(processedStatus)" style="Warn"/>
+        <field name="webhookLogId" title="Id" widget-style="buttontext">
+            <hyperlink target="ViewWebhookLog" description="${webhookLogId}" also-hidden="false"><parameter param-name="webhookLogId"/></hyperlink>
+        </field>
+        <field name="receivedDate" title="Received"><display type="date-time"/></field>
+        <field name="phoneNumberId" title="Phone number id"><display/></field>
+        <field name="signatureValid" title="Signed"><display/></field>
+        <field name="processedStatus" title="Status"><display/></field>
+        <field name="errorText" title="Error"><display/></field>
+    </grid>
+
+    <form name="ViewWebhookLog" type="single" default-map-name="webhookLog">
+        <field name="webhookLogId"><display/></field>
+        <field name="receivedDate"><display type="date-time"/></field>
+        <field name="processedStatus"><display/></field>
+        <field name="errorText"><display/></field>
+        <field name="payload"><display/></field>
+    </form>
+
+    <!-- ============================== Customer settings ============================== -->
+    <form name="TenantProfile" type="single" target="updateTenantProfile" default-map-name="currentTenant">
+        <field name="tenantId"><hidden/></field>
+        <field name="tenantName" title="Business name" required-field="true"><text size="40"/></field>
+        <field name="contactEmail" title="Contact email"><text size="40"/></field>
+        <field name="contactPhone" title="Contact phone"><text size="20"/></field>
+        <field name="submitButton" title="Save profile"><submit/></field>
+    </form>
+
+    <grid name="TeamMembers" list-name="teamMembers" default-table-style="basic-table" odd-row-style="alternate-row">
+        <actions>
+            <entity-condition entity-name="WaTenantUser" list="teamMembers">
+                <condition-expr field-name="tenantId" from-field="currentTenantId"/>
+                <order-by field-name="fromDate"/>
+            </entity-condition>
+        </actions>
+        <field name="userLoginId" title="Login"><display/></field>
+        <field name="roleTypeId" title="Role"><display description="${groovy: roleTypeId == 'WA_OWNER' ? 'Owner' : 'Agent'}"/></field>
+        <field name="fromDate" title="Member since"><display type="date"/></field>
+        <field name="removeLink" title=" " widget-style="buttontext" use-when="!userLoginId.equals(userLogin.getString(&quot;userLoginId&quot;))">
+            <hyperlink target="removeTeamMember" description="Remove" request-confirmation="true" also-hidden="false">
+                <parameter param-name="tenantId"/><parameter param-name="userLoginId"/>
+            </hyperlink>
+        </field>
+    </grid>
+
+    <form name="AddTeamMember" type="single" target="addTeamMember">
+        <field name="tenantId"><hidden value="${currentTenantId}"/></field>
+        <field name="userLoginId" title="Login (email)" required-field="true"><text size="30"/></field>
+        <field name="password" title="Temporary password" required-field="true"><password size="20"/></field>
+        <field name="roleTypeId" title="Role"><drop-down><option key="WA_AGENT" description="Agent - inbox and bot flows"/><option key="WA_OWNER" description="Owner - also team, profile and API keys"/></drop-down></field>
+        <field name="submitButton" title="Add team member"><submit/></field>
+    </form>
+</forms>

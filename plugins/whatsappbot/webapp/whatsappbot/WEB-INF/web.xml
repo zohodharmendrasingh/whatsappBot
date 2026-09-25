@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="4.0" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd">
+    <display-name>FloChat</display-name>
+    <description>Multi-tenant WhatsApp chatbot platform on Apache OFBiz</description>
+
+    <context-param><param-name>localDispatcherName</param-name><param-value>whatsappbot</param-value></context-param>
+    <context-param><param-name>entityDelegatorName</param-name><param-value>default</param-value></context-param>
+    <context-param><param-name>mainDecoratorLocation</param-name><param-value>component://whatsappbot/widget/CommonScreens.xml</param-value></context-param>
+    <context-param><param-name>mainMenuLocation</param-name><param-value>component://whatsappbot/widget/WaMenus.xml</param-value></context-param>
+    <context-param><param-name>visualThemeId</param-name><param-value>MSOFT_WHATSAPP</param-value></context-param>
+    <context-param><param-name>compressHTML</param-name><param-value>false</param-value></context-param>
+
+    <filter>
+        <description>Keeps the raw POST body re-readable for signature checks (must run before ContextFilter)</description>
+        <filter-name>WaRawBodyFilter</filter-name>
+        <filter-class>com.msoftdynamic.whatsapp.WaRawBodyFilter</filter-class>
+    </filter>
+    <filter>
+        <display-name>ControlFilter</display-name>
+        <filter-name>ControlFilter</filter-name>
+        <filter-class>org.apache.ofbiz.webapp.control.ControlFilter</filter-class>
+        <init-param>
+            <param-name>allowedPaths</param-name>
+            <!-- /webhook and /api are the public endpoints (servlets below) -->
+            <param-value>/error:/control:/select:/index.html:/index.jsp:/default.html:/default.jsp:/images:/js:/theme:/favicon.ico:/robots.txt:/webhook:/api</param-value>
+        </init-param>
+        <init-param><param-name>redirectPath</param-name><param-value>/control/home</param-value></init-param>
+    </filter>
+    <filter>
+        <display-name>ContextFilter</display-name>
+        <filter-name>ContextFilter</filter-name>
+        <filter-class>org.apache.ofbiz.webapp.control.ContextFilter</filter-class>
+    </filter>
+    <filter>
+        <display-name>SameSiteFilter</display-name>
+        <filter-name>SameSiteFilter</filter-name>
+        <filter-class>org.apache.ofbiz.webapp.control.SameSiteFilter</filter-class>
+    </filter>
+    <filter-mapping><filter-name>WaRawBodyFilter</filter-name><url-pattern>/webhook</url-pattern></filter-mapping>
+    <filter-mapping><filter-name>WaRawBodyFilter</filter-name><url-pattern>/api/*</url-pattern></filter-mapping>
+    <filter-mapping><filter-name>ControlFilter</filter-name><url-pattern>/*</url-pattern></filter-mapping>
+    <filter-mapping><filter-name>ContextFilter</filter-name><url-pattern>/*</url-pattern></filter-mapping>
+    <filter-mapping><filter-name>SameSiteFilter</filter-name><url-pattern>/*</url-pattern></filter-mapping>
+
+    <listener><listener-class>org.apache.ofbiz.webapp.control.ControlEventListener</listener-class></listener>
+    <listener><listener-class>org.apache.ofbiz.webapp.control.LoginEventListener</listener-class></listener>
+
+    <servlet>
+        <servlet-name>ControlServlet</servlet-name>
+        <servlet-class>org.apache.ofbiz.webapp.control.ControlServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping><servlet-name>ControlServlet</servlet-name><url-pattern>/control/*</url-pattern></servlet-mapping>
+
+    <servlet>
+        <description>Meta WhatsApp Cloud API webhook</description>
+        <servlet-name>WhatsAppWebhook</servlet-name>
+        <servlet-class>com.msoftdynamic.whatsapp.WhatsAppWebhookServlet</servlet-class>
+    </servlet>
+    <servlet-mapping><servlet-name>WhatsAppWebhook</servlet-name><url-pattern>/webhook</url-pattern></servlet-mapping>
+
+    <servlet>
+        <description>Tenant REST API (API key auth)</description>
+        <servlet-name>WhatsAppApi</servlet-name>
+        <servlet-class>com.msoftdynamic.whatsapp.WhatsAppApiServlet</servlet-class>
+    </servlet>
+    <servlet-mapping><servlet-name>WhatsAppApi</servlet-name><url-pattern>/api/*</url-pattern></servlet-mapping>
+
+    <welcome-file-list><welcome-file>index.jsp</welcome-file></welcome-file-list>
+</web-app>

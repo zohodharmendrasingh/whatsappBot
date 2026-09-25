@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-engine-xml>
+    <SecurityPermission permissionId="WABOT_VIEW" description="View WhatsApp Bot screens (own tenant)"/>
+    <SecurityPermission permissionId="WABOT_CREATE" description="Create WhatsApp Bot data (own tenant)"/>
+    <SecurityPermission permissionId="WABOT_UPDATE" description="Update WhatsApp Bot data (own tenant)"/>
+    <SecurityPermission permissionId="WABOT_DELETE" description="Delete WhatsApp Bot data (own tenant)"/>
+    <SecurityPermission permissionId="WABOT_ADMIN" description="Platform admin: all tenants, plans, webhook logs"/>
+
+    <!-- Platform owner (FloChat) -->
+    <SecurityGroup groupId="WABOT_ADMIN" description="WhatsApp Bot platform administrator"/>
+    <SecurityGroupPermission groupId="WABOT_ADMIN" permissionId="OFBTOOLS_VIEW" fromDate="2026-01-01 00:00:00.0"/>
+    <SecurityGroupPermission groupId="WABOT_ADMIN" permissionId="WABOT_ADMIN" fromDate="2026-01-01 00:00:00.0"/>
+
+    <!-- Customer (tenant) users: only see their own tenant's data -->
+    <SecurityGroup groupId="WABOT_TENANT" description="WhatsApp Bot tenant user"/>
+    <SecurityGroupPermission groupId="WABOT_TENANT" permissionId="OFBTOOLS_VIEW" fromDate="2026-01-01 00:00:00.0"/>
+    <SecurityGroupPermission groupId="WABOT_TENANT" permissionId="WABOT_VIEW" fromDate="2026-01-01 00:00:00.0"/>
+    <SecurityGroupPermission groupId="WABOT_TENANT" permissionId="WABOT_CREATE" fromDate="2026-01-01 00:00:00.0"/>
+    <SecurityGroupPermission groupId="WABOT_TENANT" permissionId="WABOT_UPDATE" fromDate="2026-01-01 00:00:00.0"/>
+    <SecurityGroupPermission groupId="WABOT_TENANT" permissionId="WABOT_DELETE" fromDate="2026-01-01 00:00:00.0"/>
+
+    <SecurityGroupPermission groupId="SUPER" permissionId="WABOT_ADMIN" fromDate="2026-01-01 00:00:00.0"/>
+</entity-engine-xml>

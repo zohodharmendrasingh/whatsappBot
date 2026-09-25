@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-engine-xml>
+    <!-- FloChat theme as the default look for every user -->
+    <SystemProperty systemResourceId="general" systemPropertyId="VISUAL_THEME" systemPropertyValue="MSOFT_WHATSAPP"
+        description="Default visual theme (set by the WhatsApp Bot plugin)"/>
+    <UserPreference userLoginId="_NA_" userPrefTypeId="VISUAL_THEME" userPrefGroupTypeId="GLOBAL_PREFERENCES" userPrefValue="MSOFT_WHATSAPP"/>
+</entity-engine-xml>

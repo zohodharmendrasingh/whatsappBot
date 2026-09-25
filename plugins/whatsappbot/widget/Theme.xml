@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- FloChat visual theme: Helveticus base, own branding, no OFBiz app switcher -->
+<theme name="flochat"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://ofbiz.apache.org/Widget-Theme" xsi:schemaLocation="http://ofbiz.apache.org/Widget-Theme http://ofbiz.apache.org/dtds/widget-theme.xsd">
+    <visual-themes>
+        <visual-theme id="MSOFT_WHATSAPP" display-name="FloChat">
+            <description>FloChat - WhatsApp automation platform</description>
+            <screenshot location="/theme/flochat-logo.svg"/>
+        </visual-theme>
+    </visual-themes>
+    <extends location="component://helveticus/widget/Theme.xml"/>
+    <theme-properties>
+        <property name="VT_HDR_IMAGE_URL" value="/theme/flochat-logo.svg"/>
+        <property name="VT_SHORTCUT_ICON" value="/theme/favicon"/>
+        <property name="VT_HDR_TMPLT_LOC" value="component://whatsappbot/template/theme/Header.ftl"/>
+        <property name="VT_NAV_TMPLT_LOC" value="component://whatsappbot/template/theme/TopBar.ftl"/>
+        <property name="VT_FTR_TMPLT_LOC" value="component://whatsappbot/template/theme/Footer.ftl"/>
+        <property name="VT_LOGIN_TMPLT_LOC" value="component://whatsappbot/template/theme/Login.ftl"/>
+        <property name="VT_STYLESHEET['add']" value="/theme/flochat.css"/>
+    </theme-properties>
+</theme>

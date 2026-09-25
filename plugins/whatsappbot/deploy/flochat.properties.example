@@ -1,0 +1,25 @@
+# FloChat server settings -> copy to /etc/flochat/flochat.properties (chmod 640, owner flochat)
+# Values here override plugins/whatsappbot/config/whatsappbot.properties. Keep secrets ONLY here.
+# The file is re-read automatically a few seconds after you save it.
+
+# ---- Public address
+brand.app.url=https://flochat.flolink.ai
+brand.domain=flochat.flolink.ai
+brand.support.email=info@msoftdynamic.com
+
+# ---- Meta / WhatsApp (developers.facebook.com > FloChat app)
+meta.app.id=2484887488701796
+meta.app.secret=
+meta.embedded.signup.config.id=1048501558221577
+# any random string, also typed into Meta > WhatsApp > Configuration > Webhook
+webhook.verify.token=
+
+# ---- PayPal (developer.paypal.com > Apps & Credentials > Live)
+paypal.mode=live
+paypal.client.id=
+paypal.client.secret=
+
+# ---- Sign-up
+saas.signup.enabled=true
+# remove WA_TEST once live payments are tested
+saas.hidden.plans=WA_TEST

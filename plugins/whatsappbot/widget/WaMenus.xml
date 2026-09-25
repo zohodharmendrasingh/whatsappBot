@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menus xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://ofbiz.apache.org/Widget-Menu" xsi:schemaLocation="http://ofbiz.apache.org/Widget-Menu http://ofbiz.apache.org/dtds/widget-menu.xsd">
+    <menu name="WaAppBar" title="${uiLabelMap.WaApplication}" id="app-navigation" type="simple" default-menu-item-name="main"
+          default-selected-style="selected" menu-container-style="button-bar tab-bar" selected-menuitem-context-field-name="headerItem">
+        <menu-item name="main" title="${uiLabelMap.WaDashboard}"><link target="main"/></menu-item>
+        <menu-item name="Inbox" title="${uiLabelMap.WaInbox}"><link target="Inbox"/></menu-item>
+        <menu-item name="Flows" title="${uiLabelMap.WaFlows}"><link target="FindFlow"/></menu-item>
+        <menu-item name="Channels" title="${uiLabelMap.WaChannels}"><link target="Channels"/></menu-item>
+        <menu-item name="Templates" title="${uiLabelMap.WaTemplates}"><link target="Templates"/></menu-item>
+        <menu-item name="Broadcast" title="Broadcast"><link target="Broadcast"/></menu-item>
+        <menu-item name="ApiKeys" title="${uiLabelMap.WaApiKeys}"><link target="ApiKeys"/></menu-item>
+        <menu-item name="Tenants" title="${uiLabelMap.WaTenants}">
+            <condition><if-has-permission permission="WABOT" action="_ADMIN"/></condition>
+            <link target="Tenants"/>
+        </menu-item>
+        <menu-item name="Plans" title="${uiLabelMap.WaPlans}">
+            <condition><if-has-permission permission="WABOT" action="_ADMIN"/></condition>
+            <link target="Plans"/>
+        </menu-item>
+        <menu-item name="WebhookLogs" title="${uiLabelMap.WaWebhookLogs}">
+            <condition><if-has-permission permission="WABOT" action="_ADMIN"/></condition>
+            <link target="WebhookLogs"/>
+        </menu-item>
+    </menu>
+</menus>

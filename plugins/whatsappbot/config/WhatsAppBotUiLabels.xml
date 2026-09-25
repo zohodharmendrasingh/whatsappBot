@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://ofbiz.apache.org/dtds/ofbiz-properties.xsd">
+    <property key="WaApplication"><value xml:lang="en">FloChat</value></property>
+    <property key="WaCompanyName"><value xml:lang="en">FloChat</value></property>
+    <property key="WaCompanySubtitle"><value xml:lang="en">WhatsApp automation</value></property>
+    <property key="WaDashboard"><value xml:lang="en">Dashboard</value></property>
+    <property key="WaTenants"><value xml:lang="en">Tenants</value></property>
+    <property key="WaPlans"><value xml:lang="en">Plans</value></property>
+    <property key="WaChannels"><value xml:lang="en">WhatsApp Numbers</value></property>
+    <property key="WaFlows"><value xml:lang="en">Bot Flows</value></property>
+    <property key="WaInbox"><value xml:lang="en">Inbox</value></property>
+    <property key="WaTemplates"><value xml:lang="en">Templates</value></property>
+    <property key="WaApiKeys"><value xml:lang="en">API Keys</value></property>
+    <property key="WaWebhookLogs"><value xml:lang="en">Webhook Log</value></property>
+    <property key="WaConnectWhatsApp"><value xml:lang="en">Connect WhatsApp (Embedded Signup)</value></property>
+    <property key="WaNoTenant"><value xml:lang="en">Your login is not linked to any tenant. Ask the platform admin to add you.</value></property>
+    <property key="WaPermissionError"><value xml:lang="en">You do not have permission for this tenant.</value></property>
+    <property key="WaQuotaExceeded"><value xml:lang="en">Monthly message quota of your plan is exhausted.</value></property>
+    <property key="WaTenantInactive"><value xml:lang="en">Tenant subscription is not active.</value></property>
+    <property key="WaWindowClosed"><value xml:lang="en">The 24-hour customer service window is closed. Use an approved template instead.</value></property>
+    <property key="WaApiKeyCreated"><value xml:lang="en">Copy this API key now, it will not be shown again:</value></property>
+    <property key="WaBilling"><value xml:lang="en">Plan &amp; Billing</value></property>
+    <property key="WaSettings"><value xml:lang="en">Team &amp; Profile</value></property>
+    <property key="WaAdminHome"><value xml:lang="en">Platform overview</value></property>
+    <property key="WaBroadcast"><value xml:lang="en">Broadcasts</value></property>
+    <property key="WaApiIntegrations"><value xml:lang="en">API &amp; Integrations</value></property>
+    <property key="WaCustomers"><value xml:lang="en">Customers</value></property>
+    <property key="WaPlansPricing"><value xml:lang="en">Plans &amp; Pricing</value></property>
+</resource>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- FloChat - WhatsApp Bot SaaS plugin for Apache OFBiz 24.09 -->
+<ofbiz-component name="whatsappbot" enabled="true"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://ofbiz.apache.org/dtds/ofbiz-component.xsd">
+    <resource-loader name="main" type="component"/>
+    <classpath type="dir" location="config"/>
+
+    <entity-resource type="model" reader-name="main" loader="main" location="entitydef/entitymodel.xml"/>
+    <entity-resource type="data" reader-name="seed" loader="main" location="data/WaTypeData.xml"/>
+    <entity-resource type="data" reader-name="seed" loader="main" location="data/WaSecurityPermissionSeedData.xml"/>
+    <entity-resource type="data" reader-name="seed" loader="main" location="data/WaThemeData.xml"/>
+    <entity-resource type="data" reader-name="demo" loader="main" location="data/WaDemoData.xml"/>
+
+    <service-resource type="model" loader="main" location="servicedef/services.xml"/>
+
+    <webapp name="whatsappbot"
+        title="FloChat"
+        position="30"
+        menu-name="main"
+        server="default-server"
+        location="webapp/whatsappbot"
+        base-permission="OFBTOOLS,WABOT"
+        mount-point="/"/>
+
+    <!-- Switch off the stock OFBiz business apps: a plugin webapp on the same mount point overrides the
+         original, and an empty location means it is never started. Delete a line to bring that app back. -->
+    <webapp name="off-accounting" title="off" server="default-server" location="" mount-point="/accounting" app-bar-display="false"/>
+    <webapp name="off-ap" title="off" server="default-server" location="" mount-point="/ap" app-bar-display="false"/>
+    <webapp name="off-ar" title="off" server="default-server" location="" mount-point="/ar" app-bar-display="false"/>
+    <webapp name="off-catalog" title="off" server="default-server" location="" mount-point="/catalog" app-bar-display="false"/>
+    <webapp name="off-content" title="off" server="default-server" location="" mount-point="/content" app-bar-display="false"/>
+    <webapp name="off-facility" title="off" server="default-server" location="" mount-point="/facility" app-bar-display="false"/>
+    <webapp name="off-humanres" title="off" server="default-server" location="" mount-point="/humanres" app-bar-display="false"/>
+    <webapp name="off-manufacturing" title="off" server="default-server" location="" mount-point="/manufacturing" app-bar-display="false"/>
+    <webapp name="off-marketing" title="off" server="default-server" location="" mount-point="/marketing" app-bar-display="false"/>
+    <webapp name="off-ofbizsetup" title="off" server="default-server" location="" mount-point="/ofbizsetup" app-bar-display="false"/>
+    <webapp name="off-ordermgr" title="off" server="default-server" location="" mount-point="/ordermgr" app-bar-display="false"/>
+    <webapp name="off-partymgr" title="off" server="default-server" location="" mount-point="/partymgr" app-bar-display="false"/>
+    <webapp name="off-sfa" title="off" server="default-server" location="" mount-point="/sfa" app-bar-display="false"/>
+    <webapp name="off-workeffort" title="off" server="default-server" location="" mount-point="/workeffort" app-bar-display="false"/>
+</ofbiz-component>

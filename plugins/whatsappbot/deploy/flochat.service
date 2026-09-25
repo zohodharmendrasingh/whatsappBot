@@ -1,0 +1,21 @@
+[Unit]
+Description=FloChat (Apache OFBiz 24.09)
+After=network.target postgresql.service
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=flochat
+Group=flochat
+WorkingDirectory=/opt/flochat/ofbiz
+Environment=FLOCHAT_CONFIG=/etc/flochat/flochat.properties
+Environment=JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ExecStart=/opt/flochat/ofbiz/gradlew --no-daemon --offline ofbiz
+Restart=on-failure
+RestartSec=10
+TimeoutStartSec=900
+TimeoutStopSec=60
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

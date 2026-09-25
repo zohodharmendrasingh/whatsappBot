@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site-conf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ofbiz.apache.org/Site-Conf"
+        xsi:schemaLocation="http://ofbiz.apache.org/Site-Conf http://ofbiz.apache.org/dtds/site-conf.xsd">
+    <include location="component://common/webcommon/WEB-INF/common-controller.xml"/>
+    <description>WhatsApp Bot SaaS - controller</description>
+
+    <!-- ===== Pages ===== -->
+    <request-map uri="main"><security https="true" auth="true"/><response name="success" type="view" value="main"/></request-map>
+    <request-map uri="Inbox"><security https="true" auth="true"/><response name="success" type="view" value="Inbox"/></request-map>
+    <request-map uri="Conversation"><security https="true" auth="true"/><response name="success" type="view" value="Conversation"/></request-map>
+    <request-map uri="FindFlow"><security https="true" auth="true"/><response name="success" type="view" value="FindFlow"/></request-map>
+    <request-map uri="EditFlow"><security https="true" auth="true"/><response name="success" type="view" value="EditFlow"/></request-map>
+    <request-map uri="EditFlowNode"><security https="true" auth="true"/><response name="success" type="view" value="EditFlowNode"/></request-map>
+    <request-map uri="Channels"><security https="true" auth="true"/><response name="success" type="view" value="Channels"/></request-map>
+    <request-map uri="EditChannel"><security https="true" auth="true"/><response name="success" type="view" value="EditChannel"/></request-map>
+    <request-map uri="Templates"><security https="true" auth="true"/><response name="success" type="view" value="Templates"/></request-map>
+    <request-map uri="Broadcast"><security https="true" auth="true"/><response name="success" type="view" value="Broadcast"/></request-map>
+    <request-map uri="ApiKeys"><security https="true" auth="true"/><response name="success" type="view" value="ApiKeys"/></request-map>
+    <request-map uri="Tenants"><security https="true" auth="true"/><response name="success" type="view" value="Tenants"/></request-map>
+    <request-map uri="EditTenant"><security https="true" auth="true"/><response name="success" type="view" value="EditTenant"/></request-map>
+    <request-map uri="Plans"><security https="true" auth="true"/><response name="success" type="view" value="Plans"/></request-map>
+    <request-map uri="WebhookLogs"><security https="true" auth="true"/><response name="success" type="view" value="WebhookLogs"/></request-map>
+    <request-map uri="ViewWebhookLog"><security https="true" auth="true"/><response name="success" type="view" value="ViewWebhookLog"/></request-map>
+
+    <request-map uri="AdminHome"><security https="true" auth="true"/><response name="success" type="view" value="AdminHome"/></request-map>
+    <request-map uri="Settings"><security https="true" auth="true"/><response name="success" type="view" value="Settings"/></request-map>
+    <!-- ===== Actions (service calls) ===== -->
+    <request-map uri="createWaTenant"><security https="true" auth="true"/><event type="service" invoke="createWaTenant"/>
+        <response name="success" type="request-redirect" value="EditTenant"><redirect-parameter name="tenantId"/></response><response name="error" type="view" value="Tenants"/></request-map>
+    <request-map uri="updateWaTenant"><security https="true" auth="true"/><event type="service" invoke="updateWaTenant"/>
+        <response name="success" type="request-redirect" value="EditTenant"><redirect-parameter name="tenantId"/></response><response name="error" type="view" value="EditTenant"/></request-map>
+    <request-map uri="waCreateTenantUser"><security https="true" auth="true"/><event type="service" invoke="waCreateTenantUser"/>
+        <response name="success" type="request-redirect" value="EditTenant"><redirect-parameter name="tenantId"/></response><response name="error" type="view" value="EditTenant"/></request-map>
+    <request-map uri="removeWaTenantUser"><security https="true" auth="true"/><event type="service" invoke="removeWaTenantUser"/>
+        <response name="success" type="request-redirect" value="EditTenant"><redirect-parameter name="tenantId"/></response><response name="error" type="view" value="EditTenant"/></request-map>
+    <request-map uri="createWaPlan"><security https="true" auth="true"/><event type="service" invoke="createWaPlan"/>
+        <response name="success" type="request-redirect-noparam" value="Plans"/><response name="error" type="view" value="Plans"/></request-map>
+    <request-map uri="updateWaPlan"><security https="true" auth="true"/><event type="service" invoke="updateWaPlan"/>
+        <response name="success" type="request-redirect-noparam" value="Plans"/><response name="error" type="view" value="Plans"/></request-map>
+    <request-map uri="waCreateChannel"><security https="true" auth="true"/><event type="service" invoke="waCreateChannel"/>
+        <response name="success" type="request-redirect" value="EditChannel"><redirect-parameter name="channelId"/></response><response name="error" type="view" value="Channels"/></request-map>
+    <request-map uri="updateWaChannel"><security https="true" auth="true"/><event type="service" invoke="updateWaChannel"/>
+        <response name="success" type="request-redirect" value="EditChannel"><redirect-parameter name="channelId"/></response><response name="error" type="view" value="EditChannel"/></request-map>
+    <request-map uri="waCompleteEmbeddedSignup"><security https="true" auth="true"/><event type="service" invoke="waCompleteEmbeddedSignup"/>
+        <response name="success" type="request-redirect-noparam" value="Channels"/><response name="error" type="view" value="Channels"/></request-map>
+    <request-map uri="waCreateFlow"><security https="true" auth="true"/><event type="service" invoke="waCreateFlow"/>
+        <response name="success" type="request-redirect" value="EditFlow"><redirect-parameter name="flowId"/></response><response name="error" type="view" value="FindFlow"/></request-map>
+    <request-map uri="updateWaFlow"><security https="true" auth="true"/><event type="service" invoke="updateWaFlow"/>
+        <response name="success" type="request-redirect" value="EditFlow"><redirect-parameter name="flowId"/></response><response name="error" type="view" value="EditFlow"/></request-map>
+    <request-map uri="deleteWaFlow"><security https="true" auth="true"/><event type="service" invoke="deleteWaFlow"/>
+        <response name="success" type="request-redirect-noparam" value="FindFlow"/><response name="error" type="view" value="EditFlow"/></request-map>
+    <request-map uri="createWaFlowNode"><security https="true" auth="true"/><event type="service" invoke="createWaFlowNode"/>
+        <response name="success" type="request-redirect" value="EditFlowNode"><redirect-parameter name="flowId"/><redirect-parameter name="nodeId"/></response><response name="error" type="view" value="EditFlow"/></request-map>
+    <request-map uri="updateWaFlowNode"><security https="true" auth="true"/><event type="service" invoke="updateWaFlowNode"/>
+        <response name="success" type="request-redirect" value="EditFlowNode"><redirect-parameter name="flowId"/><redirect-parameter name="nodeId"/></response><response name="error" type="view" value="EditFlowNode"/></request-map>
+    <request-map uri="deleteWaFlowNode"><security https="true" auth="true"/><event type="service" invoke="deleteWaFlowNode"/>
+        <response name="success" type="request-redirect" value="EditFlow"><redirect-parameter name="flowId"/></response><response name="error" type="view" value="EditFlowNode"/></request-map>
+    <request-map uri="createWaFlowNodeOption"><security https="true" auth="true"/><event type="service" invoke="createWaFlowNodeOption"/>
+        <response name="success" type="request-redirect" value="EditFlowNode"><redirect-parameter name="flowId"/><redirect-parameter name="nodeId"/></response><response name="error" type="view" value="EditFlowNode"/></request-map>
+    <request-map uri="updateWaFlowNodeOption"><security https="true" auth="true"/><event type="service" invoke="updateWaFlowNodeOption"/>
+        <response name="success" type="request-redirect" value="EditFlowNode"><redirect-parameter name="flowId"/><redirect-parameter name="nodeId"/></response><response name="error" type="view" value="EditFlowNode"/></request-map>
+    <request-map uri="deleteWaFlowNodeOption"><security https="true" auth="true"/><event type="service" invoke="deleteWaFlowNodeOption"/>
+        <response name="success" type="request-redirect" value="EditFlowNode"><redirect-parameter name="flowId"/><redirect-parameter name="nodeId"/></response><response name="error" type="view" value="EditFlowNode"/></request-map>
+    <request-map uri="waSendMessage"><security https="true" auth="true"/><event type="service" invoke="waSendMessage"/>
+        <response name="success" type="request-redirect" value="Inbox"><redirect-parameter name="contactId"/></response><response name="error" type="view" value="Inbox"/></request-map>
+    <request-map uri="waResumeBot"><security https="true" auth="true"/><event type="service" invoke="waResumeBot"/>
+        <response name="success" type="request-redirect" value="Inbox"><redirect-parameter name="contactId"/></response><response name="error" type="view" value="Inbox"/></request-map>
+    <request-map uri="waPauseBot"><security https="true" auth="true"/><event type="service" invoke="waPauseBot"/>
+        <response name="success" type="request-redirect" value="Inbox"><redirect-parameter name="contactId"/></response><response name="error" type="view" value="Inbox"/></request-map>
+    <request-map uri="waSendBroadcast"><security https="true" auth="true"/><event type="service" invoke="waSendBroadcast"/>
+        <response name="success" type="request-redirect-noparam" value="Broadcast"/><response name="error" type="view" value="Broadcast"/></request-map>
+    <request-map uri="waSyncTemplates"><security https="true" auth="true"/><event type="service" invoke="waSyncTemplates"/>
+        <response name="success" type="request-redirect-noparam" value="Templates"/><response name="error" type="view" value="Templates"/></request-map>
+    <request-map uri="waCreateApiKey"><security https="true" auth="true"/><event type="service" invoke="waCreateApiKey"/>
+        <response name="success" type="request-redirect-noparam" value="ApiKeys"/><response name="error" type="view" value="ApiKeys"/></request-map>
+    <request-map uri="updateWaApiKey"><security https="true" auth="true"/><event type="service" invoke="updateWaApiKey"/>
+        <response name="success" type="request-redirect-noparam" value="ApiKeys"/><response name="error" type="view" value="ApiKeys"/></request-map>
+
+
+
+    <!-- ===== Public website (no login) ===== -->
+    <request-map uri="home"><security https="true" auth="false"/><response name="success" type="view" value="Home"/></request-map>
+    <request-map uri="privacy"><security https="true" auth="false"/><response name="success" type="view" value="Privacy"/></request-map>
+    <request-map uri="terms"><security https="true" auth="false"/><response name="success" type="view" value="Terms"/></request-map>
+    <request-map uri="data-deletion"><security https="true" auth="false"/><response name="success" type="view" value="DataDeletion"/></request-map>
+    <request-map uri="signup"><security https="true" auth="false"/><response name="success" type="view" value="Signup"/></request-map>
+    <request-map uri="doSignup"><security https="true" auth="false"/>
+        <event type="java" path="com.msoftdynamic.whatsapp.WaSignupEvents" invoke="signup"/>
+        <response name="success" type="request-redirect-noparam" value="main"/>
+        <response name="login" type="request-redirect-noparam" value="main"/>
+        <response name="error" type="view" value="Signup"/></request-map>
+
+    <!-- ===== Customer settings ===== -->
+    <request-map uri="updateTenantProfile"><security https="true" auth="true"/><event type="service" invoke="waUpdateTenantProfile"/>
+        <response name="success" type="request-redirect-noparam" value="Settings"/><response name="error" type="view" value="Settings"/></request-map>
+    <request-map uri="addTeamMember"><security https="true" auth="true"/><event type="service" invoke="waCreateTenantUser"/>
+        <response name="success" type="request-redirect-noparam" value="Settings"/><response name="error" type="view" value="Settings"/></request-map>
+    <request-map uri="removeTeamMember"><security https="true" auth="true"/><event type="service" invoke="removeWaTenantUser"/>
+        <response name="success" type="request-redirect-noparam" value="Settings"/><response name="error" type="view" value="Settings"/></request-map>
+
+    <!-- ===== Billing (PayPal) ===== -->
+    <request-map uri="Billing"><security https="true" auth="true"/><response name="success" type="view" value="Billing"/></request-map>
+    <request-map uri="paypalCreateOrder"><security https="true" auth="true"/>
+        <event type="java" path="com.msoftdynamic.whatsapp.WaBillingEvents" invoke="createOrder"/>
+        <response name="none" type="none"/></request-map>
+    <request-map uri="paypalCaptureOrder"><security https="true" auth="true"/>
+        <event type="java" path="com.msoftdynamic.whatsapp.WaBillingEvents" invoke="captureOrder"/>
+        <response name="none" type="none"/></request-map>
+
+    <!-- ===== Views ===== -->
+    <view-map name="main" type="screen" page="component://whatsappbot/widget/WaScreens.xml#main"/>
+    <view-map name="Inbox" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Inbox"/>
+    <view-map name="Conversation" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Conversation"/>
+    <view-map name="FindFlow" type="screen" page="component://whatsappbot/widget/WaScreens.xml#FindFlow"/>
+    <view-map name="EditFlow" type="screen" page="component://whatsappbot/widget/WaScreens.xml#EditFlow"/>
+    <view-map name="EditFlowNode" type="screen" page="component://whatsappbot/widget/WaScreens.xml#EditFlowNode"/>
+    <view-map name="Channels" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Channels"/>
+    <view-map name="EditChannel" type="screen" page="component://whatsappbot/widget/WaScreens.xml#EditChannel"/>
+    <view-map name="Templates" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Templates"/>
+    <view-map name="Broadcast" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Broadcast"/>
+    <view-map name="ApiKeys" type="screen" page="component://whatsappbot/widget/WaScreens.xml#ApiKeys"/>
+    <view-map name="Tenants" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Tenants"/>
+    <view-map name="EditTenant" type="screen" page="component://whatsappbot/widget/WaScreens.xml#EditTenant"/>
+    <view-map name="Plans" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Plans"/>
+    <view-map name="WebhookLogs" type="screen" page="component://whatsappbot/widget/WaScreens.xml#WebhookLogs"/>
+    <view-map name="ViewWebhookLog" type="screen" page="component://whatsappbot/widget/WaScreens.xml#ViewWebhookLog"/>
+    <view-map name="AdminHome" type="screen" page="component://whatsappbot/widget/WaScreens.xml#AdminHome"/>
+    <view-map name="Settings" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Settings"/>
+    <view-map name="Billing" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Billing"/>
+    <view-map name="Home" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Home" auth="false"/>
+    <view-map name="Privacy" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Privacy" auth="false"/>
+    <view-map name="Terms" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Terms" auth="false"/>
+    <view-map name="DataDeletion" type="screen" page="component://whatsappbot/widget/WaScreens.xml#DataDeletion" auth="false"/>
+    <view-map name="Signup" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Signup" auth="false"/>
+</site-conf>

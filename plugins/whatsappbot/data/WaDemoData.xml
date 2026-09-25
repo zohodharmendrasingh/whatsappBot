@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-engine-xml>
+    <!-- Demo tenant with a ready-made menu bot. Login: wademo / ofbiz -->
+    <WaTenant tenantId="DEMO" tenantName="Demo Jewellers" planId="WA_GROWTH" statusId="WA_TNT_TRIAL" contactEmail="demo@example.com" createdDate="2026-01-01 00:00:00.0"/>
+    <UserLogin userLoginId="wademo" currentPassword="{SHA}47b56994cbc2b6d10aa1be30f70165adb305a41a" requirePasswordChange="N"/>
+    <UserLoginSecurityGroup userLoginId="wademo" groupId="WABOT_TENANT" fromDate="2026-01-01 00:00:00.0"/>
+    <WaTenantUser tenantId="DEMO" userLoginId="wademo" roleTypeId="WA_OWNER" fromDate="2026-01-01 00:00:00.0"/>
+    <UserLoginSecurityGroup userLoginId="admin" groupId="WABOT_ADMIN" fromDate="2026-01-01 00:00:00.0"/>
+
+    <WaFlow flowId="DEMO_MAIN" tenantId="DEMO" flowName="Main menu" triggerKeywords="hi,hello,menu,start" startNodeId="WELCOME" isDefault="Y" isActive="Y"/>
+    <WaFlowNode flowId="DEMO_MAIN" nodeId="WELCOME" nodeTypeId="WA_NODE_BUTTONS" sequenceNum="1"
+        headerText="Demo Jewellers" footerText="Reply MENU anytime"
+        messageText="Hi {{name}}! 👋 Welcome to Demo Jewellers. How can we help you today?"/>
+    <WaFlowNodeOption flowId="DEMO_MAIN" nodeId="WELCOME" optionSeqId="01" optionLabel="View collections" matchKeywords="1,collection,catalog" targetNodeId="COLLECTIONS"/>
+    <WaFlowNodeOption flowId="DEMO_MAIN" nodeId="WELCOME" optionSeqId="02" optionLabel="Book appointment" matchKeywords="2,book,appointment" targetNodeId="ASK_NAME"/>
+    <WaFlowNodeOption flowId="DEMO_MAIN" nodeId="WELCOME" optionSeqId="03" optionLabel="Talk to us" matchKeywords="3,agent,human,help" targetNodeId="HANDOFF"/>
+
+    <WaFlowNode flowId="DEMO_MAIN" nodeId="COLLECTIONS" nodeTypeId="WA_NODE_LIST" sequenceNum="2" buttonLabel="Collections"
+        messageText="Choose a collection to see today's designs:"/>
+    <WaFlowNodeOption flowId="DEMO_MAIN" nodeId="COLLECTIONS" optionSeqId="01" optionLabel="Gold" optionDescription="22K hallmarked" targetNodeId="GOLD"/>
+    <WaFlowNodeOption flowId="DEMO_MAIN" nodeId="COLLECTIONS" optionSeqId="02" optionLabel="Diamond" optionDescription="Certified solitaires" targetNodeId="DIAMOND"/>
+    <WaFlowNodeOption flowId="DEMO_MAIN" nodeId="COLLECTIONS" optionSeqId="03" optionLabel="Silver" optionDescription="925 sterling" targetNodeId="SILVER"/>
+    <WaFlowNode flowId="DEMO_MAIN" nodeId="GOLD" nodeTypeId="WA_NODE_END" sequenceNum="3" messageText="Our gold collection: https://example.com/gold ✨ Reply MENU to go back."/>
+    <WaFlowNode flowId="DEMO_MAIN" nodeId="DIAMOND" nodeTypeId="WA_NODE_END" sequenceNum="4" messageText="Our diamond collection: https://example.com/diamond 💎 Reply MENU to go back."/>
+    <WaFlowNode flowId="DEMO_MAIN" nodeId="SILVER" nodeTypeId="WA_NODE_END" sequenceNum="5" messageText="Our silver collection: https://example.com/silver Reply MENU to go back."/>
+
+    <WaFlowNode flowId="DEMO_MAIN" nodeId="ASK_NAME" nodeTypeId="WA_NODE_ASK" sequenceNum="6" saveAsVariable="fullName"
+        messageText="Sure! What name should we book the appointment under?" nextNodeId="ASK_DATE"/>
+    <WaFlowNode flowId="DEMO_MAIN" nodeId="ASK_DATE" nodeTypeId="WA_NODE_ASK" sequenceNum="7" saveAsVariable="visitDate"
+        validationRegex="^\d{1,2}[/-]\d{1,2}([/-]\d{2,4})?$"
+        messageText="Thanks {{fullName}}. Which date would you like to visit? (e.g. 25/10)" nextNodeId="BOOKED"/>
+    <WaFlowNode flowId="DEMO_MAIN" nodeId="BOOKED" nodeTypeId="WA_NODE_HANDOFF" sequenceNum="8"
+        messageText="✅ Noted: {{fullName}} on {{visitDate}}. Our team will confirm shortly."/>
+    <WaFlowNode flowId="DEMO_MAIN" nodeId="HANDOFF" nodeTypeId="WA_NODE_HANDOFF" sequenceNum="9"
+        messageText="Connecting you to our team. Someone will reply here shortly 🙏"/>
+</entity-engine-xml>

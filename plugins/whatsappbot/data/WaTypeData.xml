@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-engine-xml>
+    <StatusType statusTypeId="WA_TENANT_STATUS" hasTable="N" description="WhatsApp Bot tenant status"/>
+    <StatusItem statusId="WA_TNT_TRIAL" statusTypeId="WA_TENANT_STATUS" statusCode="TRIAL" sequenceId="01" description="Trial"/>
+    <StatusItem statusId="WA_TNT_ACTIVE" statusTypeId="WA_TENANT_STATUS" statusCode="ACTIVE" sequenceId="02" description="Active"/>
+    <StatusItem statusId="WA_TNT_SUSPENDED" statusTypeId="WA_TENANT_STATUS" statusCode="SUSPENDED" sequenceId="03" description="Suspended"/>
+    <StatusItem statusId="WA_TNT_CANCELLED" statusTypeId="WA_TENANT_STATUS" statusCode="CANCELLED" sequenceId="04" description="Cancelled"/>
+    <StatusValidChange statusId="WA_TNT_TRIAL" statusIdTo="WA_TNT_ACTIVE" transitionName="Activate"/>
+    <StatusValidChange statusId="WA_TNT_TRIAL" statusIdTo="WA_TNT_CANCELLED" transitionName="Cancel"/>
+    <StatusValidChange statusId="WA_TNT_ACTIVE" statusIdTo="WA_TNT_SUSPENDED" transitionName="Suspend"/>
+    <StatusValidChange statusId="WA_TNT_ACTIVE" statusIdTo="WA_TNT_CANCELLED" transitionName="Cancel"/>
+    <StatusValidChange statusId="WA_TNT_SUSPENDED" statusIdTo="WA_TNT_ACTIVE" transitionName="Reactivate"/>
+
+    <EnumerationType enumTypeId="WA_NODE_TYPE" hasTable="N" description="WhatsApp bot node type"/>
+    <Enumeration enumId="WA_NODE_TEXT" enumTypeId="WA_NODE_TYPE" enumCode="TEXT" sequenceId="01" description="Send text, then continue to next node"/>
+    <Enumeration enumId="WA_NODE_IMAGE" enumTypeId="WA_NODE_TYPE" enumCode="IMAGE" sequenceId="02" description="Send image (mediaUrl) with caption, then continue"/>
+    <Enumeration enumId="WA_NODE_BUTTONS" enumTypeId="WA_NODE_TYPE" enumCode="BUTTONS" sequenceId="03" description="Reply buttons (max 3 options), wait for choice"/>
+    <Enumeration enumId="WA_NODE_LIST" enumTypeId="WA_NODE_TYPE" enumCode="LIST" sequenceId="04" description="List menu (max 10 options), wait for choice"/>
+    <Enumeration enumId="WA_NODE_ASK" enumTypeId="WA_NODE_TYPE" enumCode="ASK" sequenceId="05" description="Ask a question, save answer to a variable"/>
+    <Enumeration enumId="WA_NODE_HANDOFF" enumTypeId="WA_NODE_TYPE" enumCode="HANDOFF" sequenceId="06" description="Hand over to a human agent (bot pauses)"/>
+    <Enumeration enumId="WA_NODE_GOTO_FLOW" enumTypeId="WA_NODE_TYPE" enumCode="GOTO" sequenceId="07" description="Jump to another flow"/>
+    <Enumeration enumId="WA_NODE_END" enumTypeId="WA_NODE_TYPE" enumCode="END" sequenceId="08" description="Send text and end the conversation"/>
+
+    <WaPlan planId="WA_STARTER" planName="Starter" monthlyPrice="19" currencyUomId="USD" maxChannels="1" maxFlows="3" maxMessagesPerMonth="2000" isActive="Y"/>
+    <WaPlan planId="WA_GROWTH" planName="Growth" monthlyPrice="49" currencyUomId="USD" maxChannels="2" maxFlows="15" maxMessagesPerMonth="10000" isActive="Y"/>
+    <!-- $1 plan for testing live PayPal payments; hidden from the website via saas.hidden.plans -->
+    <WaPlan planId="WA_TEST" planName="Test" monthlyPrice="1" currencyUomId="USD" maxChannels="1" maxFlows="3" maxMessagesPerMonth="100" isActive="Y"/>
+    <WaPlan planId="WA_PRO" planName="Pro" monthlyPrice="99" currencyUomId="USD" maxChannels="5" isActive="Y"/>
+</entity-engine-xml>

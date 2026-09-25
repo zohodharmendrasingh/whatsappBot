@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://ofbiz.apache.org/dtds/services.xsd">
+    <description>WhatsApp Bot SaaS services</description>
+    <vendor>FloChat</vendor>
+    <version>1.0</version>
+
+    <!-- ===================== Security ===================== -->
+    <service name="waTenantPermissionCheck" engine="java" auth="true"
+            location="com.msoftdynamic.whatsapp.WaServices" invoke="tenantPermissionCheck">
+        <description>Grants platform admins everything; tenant users only data of tenants they belong to.
+            The tenant is resolved from tenantId or from any of the record ids passed in.</description>
+        <implements service="permissionInterface"/>
+        <attribute name="tenantId" type="String" mode="IN" optional="true"/>
+        <attribute name="channelId" type="String" mode="IN" optional="true"/>
+        <attribute name="flowId" type="String" mode="IN" optional="true"/>
+        <attribute name="contactId" type="String" mode="IN" optional="true"/>
+        <attribute name="templateId" type="String" mode="IN" optional="true"/>
+        <attribute name="apiKeyId" type="String" mode="IN" optional="true"/>
+    </service>
+
+    <!-- ===================== Plans & tenants (platform admin) ===================== -->
+    <service name="createWaPlan" engine="entity-auto" invoke="create" default-entity-name="WaPlan" auth="true">
+        <required-permissions join-type="AND"><check-permission permission="WABOT" action="_ADMIN"/></required-permissions>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+    </service>
+    <service name="updateWaPlan" engine="entity-auto" invoke="update" default-entity-name="WaPlan" auth="true">
+        <required-permissions join-type="AND"><check-permission permission="WABOT" action="_ADMIN"/></required-permissions>
+        <auto-attributes include="pk" mode="IN" optional="false"/>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+    </service>
+
+    <service name="createWaTenant" engine="entity-auto" invoke="create" default-entity-name="WaTenant" auth="true">
+        <required-permissions join-type="AND"><check-permission permission="WABOT" action="_ADMIN"/></required-permissions>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <override name="tenantName" optional="false"/>
+        <override name="planId" optional="false"/>
+    </service>
+    <service name="updateWaTenant" engine="entity-auto" invoke="update" default-entity-name="WaTenant" auth="true">
+        <required-permissions join-type="AND"><check-permission permission="WABOT" action="_ADMIN"/></required-permissions>
+        <auto-attributes include="pk" mode="IN" optional="false"/>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+    </service>
+
+    <service name="waCreateTenantUser" engine="java" auth="true"
+            location="com.msoftdynamic.whatsapp.WaServices" invoke="createTenantUser">
+        <description>Create a login for a tenant (owner or agent) and link it to the tenant</description>
+        <permission-service service-name="waTenantPermissionCheck" main-action="CREATE" resource-description="OWNER"/>
+        <attribute name="tenantId" type="String" mode="IN" optional="false"/>
+        <attribute name="userLoginId" type="String" mode="IN" optional="false"/>
+        <attribute name="password" type="String" mode="IN" optional="false"/>
+        <attribute name="roleTypeId" type="String" mode="IN" optional="true" default-value="WA_AGENT"/>
+    </service>
+    <service name="removeWaTenantUser" engine="entity-auto" invoke="delete" default-entity-name="WaTenantUser" auth="true">
+        <permission-service service-name="waTenantPermissionCheck" main-action="DELETE" resource-description="OWNER"/>
+        <auto-attributes include="pk" mode="IN" optional="false"/>
+    </service>
+
+    <service name="waUpdateTenantProfile" engine="entity-auto" invoke="update" default-entity-name="WaTenant" auth="true">
+        <description>Tenant owner edits own business profile (not plan/status/subscription)</description>
+        <permission-service service-name="waTenantPermissionCheck" main-action="UPDATE" resource-description="OWNER"/>
+        <attribute name="tenantId" type="String" mode="IN" optional="false"/>
+        <attribute name="tenantName" type="String" mode="IN" optional="false"/>
+        <attribute name="contactEmail" type="String" mode="IN" optional="true"/>
+        <attribute name="contactPhone" type="String" mode="IN" optional="true"/>
+    </service>
+
+    <!-- ===================== Channels ===================== -->
+    <service name="waCreateChannel" engine="java" auth="true"
+            location="com.msoftdynamic.whatsapp.WaServices" invoke="createChannel">
+        <description>Add a WhatsApp number manually (checks plan limit)</description>
+        <permission-service service-name="waTenantPermissionCheck" main-action="CREATE"/>
+        <auto-attributes entity-name="WaChannel" include="nonpk" mode="IN" optional="true"><exclude field-name="accessToken"/></auto-attributes>
+        <attribute name="newAccessToken" type="String" mode="IN" optional="false" allow-html="any"/>
+        <attribute name="channelId" type="String" mode="OUT" optional="false"/>
+        <override name="tenantId" optional="false"/>
+        <override name="phoneNumberId" optional="false"/>
+    </service>
+    <service name="updateWaChannel" engine="java" auth="true"
+            location="com.msoftdynamic.whatsapp.WaServices" invoke="updateChannel">
+        <description>Update a number; the token is only replaced when newAccessToken is given</description>
+        <permission-service service-name="waTenantPermissionCheck" main-action="UPDATE"/>
+        <attribute name="channelId" type="String" mode="IN" optional="false"/>
+        <auto-attributes entity-name="WaChannel" include="nonpk" mode="IN" optional="true">
+            <exclude field-name="accessToken"/><exclude field-name="tenantId"/><exclude field-name="createdDate"/>
+        </auto-attributes>
+        <attribute name="newAccessToken" type="String" mode="IN" optional="true" allow-html="any"/>
+    </service>
+    <service name="waCompleteEmbeddedSignup" engine="java" auth="true" use-transaction="false"
+            location="com.msoftdynamic.whatsapp.WaServices" invoke="completeEmbeddedSignup">
+        <description>Finish Meta Embedded Signup: exchange code for a business token, subscribe the app
+            to the WABA webhooks, register the number and store it as a channel.</description>
+        <permission-service service-name="waTenantPermissionCheck" main-action="CREATE"/>
+        <attribute name="tenantId" type="String" mode="IN" optional="false"/>
+        <attribute name="code" type="String" mode="IN" optional="false"/>
+        <attribute name="wabaId" type="String" mode="IN" optional="false"/>
+        <attribute name="phoneNumberId" type="String" mode="IN" optional="false"/>
+        <attribute name="pin" type="String" mode="IN" optional="true"><description>6 digit 2-step PIN used to register the number</description></attribute>
+        <attribute name="channelId" type="String" mode="OUT" optional="true"/>
+    </service>
+
+    <!-- ===================== Flows ===================== -->
+    <service name="waCreateFlow" engine="java" auth="true"
+            location="com.msoftdynamic.whatsapp.WaServices" invoke="createFlow">
+        <permission-service service-name="waTenantPermissionCheck" main-action="CREATE"/>
+        <auto-attributes entity-name="WaFlow" include="nonpk" mode="IN" optional="true"/>
+        <attribute name="flowId" type="String" mode="INOUT" optional="true"/>
+        <override name="tenantId" optional="false"/>
+        <override name="flowName" optional="false"/>
+    </service>
+    <service name="updateWaFlow" engine="entity-auto" invoke="update" default-entity-name="WaFlow" auth="true">
+        <permission-service service-name="waTenantPermissionCheck" main-action="UPDATE"/>
+        <auto-attributes include="pk" mode="IN" optional="false"/>
+        <auto-attributes include="nonpk" mode="IN" optional="true"><exclude field-name="tenantId"/></auto-attributes>
+    </service>
+    <service name="deleteWaFlow" engine="java" auth="true"
+            location="com.msoftdynamic.whatsapp.WaServices" invoke="deleteFlow">
+        <permission-service service-name="waTenantPermissionCheck" main-action="DELETE"/>
+        <attribute name="flowId" type="String" mode="IN" optional="false"/>
+    </service>
+    <service name="createWaFlowNode" engine="entity-auto" invoke="create" default-entity-name="WaFlowNode" auth="true">
+        <permission-service service-name="waTenantPermissionCheck" main-action="CREATE"/>
+        <auto-attributes include="pk" mode="IN" optional="false"/>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <override name="nodeTypeId" optional="false"/>
+        <override name="messageText" allow-html="any"/>
+    </service>
+    <service name="updateWaFlowNode" engine="entity-auto" invoke="update" default-entity-name="WaFlowNode" auth="true">
+        <permission-service service-name="waTenantPermissionCheck" main-action="UPDATE"/>
+        <auto-attributes include="pk" mode="IN" optional="false"/>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <override name="messageText" allow-html="any"/>
+    </service>
+    <service name="deleteWaFlowNode" engine="java" auth="true"
+            location="com.msoftdynamic.whatsapp.WaServices" invoke="deleteFlowNode">
+        <permission-service service-name="waTenantPermissionCheck" main-action="DELETE"/>
+        <attribute name="flowId" type="String" mode="IN" optional="false"/>
+        <attribute name="nodeId" type="String" mode="IN" optional="false"/>
+    </service>
+    <service name="createWaFlowNodeOption" engine="entity-auto" invoke="create" default-entity-name="WaFlowNodeOption" auth="true">
+        <permission-service service-name="waTenantPermissionCheck" main-action="CREATE"/>
+        <auto-attributes include="pk" mode="IN" optional="false"/>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <override name="optionSeqId" mode="OUT"/>
+        <override name="optionLabel" optional="false"/>
+    </service>
+    <service name="updateWaFlowNodeOption" engine="entity-auto" invoke="update" default-entity-name="WaFlowNodeOption" auth="true">
+        <permission-service service-name="waTenantPermissionCheck" main-action="UPDATE"/>
+        <auto-attributes include="pk" mode="IN" optional="false"/>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+    </service>
+    <service name="deleteWaFlowNodeOption" engine="entity-auto" invoke="delete" default-entity-name="WaFlowNodeOption" auth="true">
+        <permission-service service-name="waTenantPermissionCheck" main-action="DELETE"/>
+        <auto-attributes include="pk" mode="IN" optional="false"/>
+    </service>
+
+    <!-- ===================== Inbox / messaging ===================== -->
+    <service name="waSendMessage" engine="java" auth="true" use-transaction="false"
+            location="com.msoftdynamic.whatsapp.WaServices" invoke="sendMessage">
+        <description>Send a text, image or template message to a contact (agent reply, API, broadcast).
+            Free-form messages are only allowed within 24h of the customer's last message.</description>
+        <permission-service service-name="waTenantPermissionCheck" main-action="CREATE"/>
+        <attribute name="tenantId" type="String" mode="IN" optional="true"/>
+        <attribute name="contactId" type="String" mode="INOUT" optional="true"/>
+        <attribute name="channelId" type="String" mode="IN" optional="true"><description>With toNumber, when contactId is unknown</description></attribute>
+        <attribute name="toNumber" type="String" mode="IN" optional="true"/>
+        <attribute name="text" type="String" mode="IN" optional="true" allow-html="any"/>
+        <attribute name="mediaUrl" type="String" mode="IN" optional="true"/>
+        <attribute name="templateName" type="String" mode="IN" optional="true"/>
+        <attribute name="languageCode" type="String" mode="IN" optional="true" default-value="en"/>
+        <attribute name="templateParams" type="List" mode="IN" optional="true"><description>Body {{1}}..{{n}} values</description></attribute>
+        <attribute name="templateParamsText" type="String" mode="IN" optional="true"><description>Same as templateParams, pipe separated (for UI forms)</description></attribute>
+        <attribute name="pauseBot" type="String" mode="IN" optional="true"><description>Y = agent takes over the chat</description></attribute>
+        <attribute name="sentBy" type="String" mode="IN" optional="true"/>
+        <attribute name="messageId" type="String" mode="OUT" optional="true"/>
+        <attribute name="wamid" type="String" mode="OUT" optional="true"/>
+    </service>
+    <service name="waResumeBot" engine="java" auth="true"
+            location="com.msoftdynamic.whatsapp.WaServices" invoke="resumeBot">
+        <description>Give the chat back to the bot (clears human hand-off)</description>
+        <permission-service service-name="waTenantPermissionCheck" main-action="UPDATE"/>
+        <attribute name="contactId" type="String" mode="IN" optional="false"/>
+    </service>
+    <service name="waPauseBot" engine="java" auth="true"
+            location="com.msoftdynamic.whatsapp.WaServices" invoke="pauseBot">
+        <permission-service service-name="waTenantPermissionCheck" main-action="UPDATE"/>
+        <attribute name="contactId" type="String" mode="IN" optional="false"/>
+    </service>
+    <service name="waSendBroadcast" engine="java" auth="true" use-transaction="false"
+            location="com.msoftdynamic.whatsapp.WaServices" invoke="sendBroadcast">
+        <description>Send an approved template to many numbers (one per line or comma separated)</description>
+        <permission-service service-name="waTenantPermissionCheck" main-action="CREATE"/>
+        <attribute name="channelId" type="String" mode="IN" optional="false"/>
+        <attribute name="templateName" type="String" mode="IN" optional="false"/>
+        <attribute name="languageCode" type="String" mode="IN" optional="true" default-value="en"/>
+        <attribute name="numbers" type="String" mode="IN" optional="false"/>
+        <attribute name="bodyParams" type="String" mode="IN" optional="true"><description>Pipe separated values for {{1}}|{{2}}...</description></attribute>
+        <attribute name="sentCount" type="Integer" mode="OUT" optional="true"/>
+        <attribute name="failedCount" type="Integer" mode="OUT" optional="true"/>
+    </service>
+
+    <!-- ===================== Templates ===================== -->
+    <service name="waSyncTemplates" engine="java" auth="true" use-transaction="false"
+            location="com.msoftdynamic.whatsapp.WaServices" invoke="syncTemplates">
+        <description>Pull message templates and their approval status from Meta</description>
+        <permission-service service-name="waTenantPermissionCheck" main-action="UPDATE"/>
+        <attribute name="channelId" type="String" mode="IN" optional="false"/>
+        <attribute name="syncedCount" type="Integer" mode="OUT" optional="true"/>
+    </service>
+
+    <!-- ===================== API keys ===================== -->
+    <service name="waCreateApiKey" engine="java" auth="true"
+            location="com.msoftdynamic.whatsapp.WaServices" invoke="createApiKey">
+        <permission-service service-name="waTenantPermissionCheck" main-action="CREATE" resource-description="OWNER"/>
+        <attribute name="tenantId" type="String" mode="IN" optional="false"/>
+        <attribute name="description" type="String" mode="IN" optional="true"/>
+        <attribute name="apiKey" type="String" mode="OUT" optional="false"/>
+        <attribute name="apiKeyId" type="String" mode="OUT" optional="false"/>
+    </service>
+    <service name="updateWaApiKey" engine="entity-auto" invoke="update" default-entity-name="WaApiKey" auth="true">
+        <permission-service service-name="waTenantPermissionCheck" main-action="UPDATE" resource-description="OWNER"/>
+        <attribute name="apiKeyId" type="String" mode="IN" optional="false"/>
+        <attribute name="isActive" type="String" mode="IN" optional="true"/>
+        <attribute name="description" type="String" mode="IN" optional="true"/>
+    </service>
+
+    <!-- ===================== Webhook processing (internal) ===================== -->
+    <service name="waProcessWebhook" engine="java" auth="false" use-transaction="false" export="false"
+            location="com.msoftdynamic.whatsapp.WaServices" invoke="processWebhook">
+        <description>Parse a stored webhook payload: inbound messages drive the bot, statuses update delivery</description>
+        <attribute name="webhookLogId" type="String" mode="IN" optional="false"/>
+    </service>
+    <service name="waPurgeWebhookLogs" engine="java" auth="false" export="false"
+            location="com.msoftdynamic.whatsapp.WaServices" invoke="purgeWebhookLogs">
+        <description>Delete processed webhook logs older than N days (schedule daily)</description>
+        <attribute name="daysToKeep" type="Integer" mode="IN" optional="true" default-value="15"/>
+    </service>
+</services>
