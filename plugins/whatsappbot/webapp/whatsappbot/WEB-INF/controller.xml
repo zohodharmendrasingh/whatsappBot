@@ -7,6 +7,9 @@
     <!-- ===== Pages ===== -->
     <request-map uri="main"><security https="true" auth="true"/><response name="success" type="view" value="main"/></request-map>
     <request-map uri="Inbox"><security https="true" auth="true"/><response name="success" type="view" value="Inbox"/></request-map>
+    <request-map uri="inboxPoll"><security https="true" auth="true"/>
+        <event type="java" path="com.msoftdynamic.whatsapp.WaInboxEvents" invoke="poll"/>
+        <response name="none" type="none"/></request-map>
     <request-map uri="Conversation"><security https="true" auth="true"/><response name="success" type="view" value="Conversation"/></request-map>
     <request-map uri="FindFlow"><security https="true" auth="true"/><response name="success" type="view" value="FindFlow"/></request-map>
     <request-map uri="EditFlow"><security https="true" auth="true"/><response name="success" type="view" value="EditFlow"/></request-map>

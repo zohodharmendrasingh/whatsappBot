@@ -134,6 +134,13 @@ public final class WaServices {
         Delegator delegator = dctx.getDelegator();
         String tenantId = (String) context.get("tenantId");
         try {
+            GenericValue dup = EntityQuery.use(delegator).from("WaChannel")
+                    .where("phoneNumberId", context.get("phoneNumberId")).queryFirst();
+            if (dup != null) {
+                return ServiceUtil.returnError(tenantId != null && tenantId.equals(dup.getString("tenantId"))
+                        ? "This number is already added (channel " + dup.getString("channelId") + "). Open it from the list above to update its token."
+                        : "This WhatsApp number is already connected to another FloChat workspace.");
+            }
             String limitErr = checkPlanLimit(delegator, tenantId, "maxChannels", "WaChannel");
             if (limitErr != null) {
                 return ServiceUtil.returnError(limitErr);

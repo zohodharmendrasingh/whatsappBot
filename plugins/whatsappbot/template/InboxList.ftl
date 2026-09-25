@@ -27,3 +27,41 @@
     </#list>
   </div>
 </div>
+<script type="application/javascript">
+/* Live inbox: poll a small change signature; when it changes, re-fetch this page and swap the list and chat in place
+   (the reply box is left untouched so a half-typed reply is never lost). */
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var pollUrl = '<@ofbizUrl>inboxPoll</@ofbizUrl>' + (params.get('contactId') ? '?contactId=' + encodeURIComponent(params.get('contactId')) : '');
+  var sig = null, busy = false;
+  function swap(doc, sel) {
+    var a = document.querySelector(sel), b = doc.querySelector(sel);
+    if (a && b && a.innerHTML !== b.innerHTML) { a.innerHTML = b.innerHTML; return true; }
+    return false;
+  }
+  function refresh() {
+    busy = true;
+    return fetch(window.location.href, { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (html) {
+      var doc = new DOMParser().parseFromString(html, 'text/html');
+      var chat = document.getElementById('waChat');
+      var atBottom = chat && (chat.scrollHeight - chat.scrollTop - chat.clientHeight < 60);
+      swap(doc, '.ms-conv-list');
+      swap(doc, '.wa-chat-head');
+      if (swap(doc, '#waChat') && chat && atBottom) { chat.scrollTop = chat.scrollHeight; }
+      var nav = document.querySelector('.ms-nav-item.active'), nav2 = doc.querySelector('.ms-nav-item.active');
+      if (nav && nav2) { nav.innerHTML = nav2.innerHTML; }
+    }).catch(function () {}).then(function () { busy = false; });
+  }
+  function tick() {
+    if (busy || document.hidden) { return; }
+    fetch(pollUrl, { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+      if (!d || !d.sig) { return; }
+      if (sig !== null && d.sig !== sig) { refresh(); }
+      sig = d.sig;
+    }).catch(function () {});
+  }
+  tick();
+  setInterval(tick, 4000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) { tick(); } });
+})();
+</script>
