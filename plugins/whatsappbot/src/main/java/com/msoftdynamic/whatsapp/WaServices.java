@@ -156,7 +156,10 @@ public final class WaServices {
             }
             ch.set("createdDate", UtilDateTime.nowTimestamp());
             ch.create();
-            Map<String, Object> result = ServiceUtil.returnSuccess();
+            String subErr = subscribeWaba(ch);
+            Map<String, Object> result = subErr == null
+                    ? ServiceUtil.returnSuccess("Number saved and subscribed to incoming WhatsApp messages")
+                    : ServiceUtil.returnSuccess("Number saved, but " + subErr);
             result.put("channelId", channelId);
             return result;
         } catch (GenericEntityException e) {
@@ -190,10 +193,30 @@ public final class WaServices {
                 return ServiceUtil.returnError(err);
             }
             ch.store();
+            if (idsChanged) {
+                String subErr = subscribeWaba(ch);
+                return subErr == null
+                        ? ServiceUtil.returnSuccess("Number saved and subscribed to incoming WhatsApp messages")
+                        : ServiceUtil.returnSuccess("Number saved, but " + subErr);
+            }
         } catch (GenericEntityException e) {
             return ServiceUtil.returnError(e.getMessage());
         }
         return ServiceUtil.returnSuccess();
+    }
+
+    /**
+     * Subscribe FloChat's Meta app to the number's WhatsApp Business Account, so Meta forwards incoming
+     * messages and delivery statuses to our webhook. Embedded Signup does this too; manual numbers need it here.
+     * Returns null on success, otherwise a short reason.
+     */
+    static String subscribeWaba(GenericValue ch) {
+        if (UtilValidate.isEmpty(ch.getString("wabaId")) || UtilValidate.isEmpty(ch.getString("accessToken"))) {
+            return "no WhatsApp Business Account id/token to subscribe incoming messages";
+        }
+        GraphApiClient.Result sub = GraphApiClient.post(GraphApiClient.baseUrl(ch) + "/" + ch.getString("wabaId")
+                + "/subscribed_apps", ch.getString("accessToken"), null);
+        return sub.isOk() ? null : "incoming messages could not be subscribed: " + sub.errorMessage();
     }
 
     /** A channel's default flow must belong to the same tenant. */
