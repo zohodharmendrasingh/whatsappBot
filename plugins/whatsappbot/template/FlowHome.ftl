@@ -35,9 +35,9 @@
         <div class="fh-connect">
           <div class="fh-connect-ico">✨</div>
           <div>
-            <b>Connect your Claude API key to build bots with AI</b>
-            <p>Describe your business in one sentence and AI designs the whole bot. You use your own Claude key, so you control the cost (usually a few cents per bot).</p>
-            <a class="fh-btn fh-btn-primary" href="<@ofbizUrl>Settings</@ofbizUrl>#ai">Add Claude API key</a>
+            <b>Connect your AI key (Claude or OpenAI) to build bots with AI</b>
+            <p>Describe your business in one sentence and AI designs the whole bot. You use your own Claude or OpenAI key, so you control the cost (usually a few cents per bot).</p>
+            <a class="fh-btn fh-btn-primary" href="<@ofbizUrl>Settings</@ofbizUrl>#ai">Add AI key</a>
             <span class="fh-or">or start from a template (no key needed)</span>
           </div>
         </div>

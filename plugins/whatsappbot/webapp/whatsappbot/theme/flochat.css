@@ -464,3 +464,13 @@ body #content-messages p:first-child { display: none !important; }
 html body .fc-ai-remove button[type="submit"].buttontext { background: none; border: 0; box-shadow: none; color: #b42318; padding: 4px 0; font-size: 13.5px; font-weight: 600; text-decoration: underline; }
 html body .fc-ai-remove button[type="submit"].buttontext:hover { background: none; color: #912018; }
 .fc-zoho select, .fc-ai select { font-size: 14px; }
+.fc-ai-form2 { flex-direction: column; align-items: stretch; gap: 14px; }
+.fc-ai-prov { display: flex; gap: 10px; flex-wrap: wrap; }
+.fc-ai-card { display: flex !important; flex-direction: row !important; align-items: center; gap: 10px !important; border: 1.5px solid var(--ms-border); border-radius: 10px; padding: 10px 14px; cursor: pointer; min-width: 190px; background: #fff; }
+.fc-ai-card.on { border-color: var(--ms-green); background: var(--ms-green-soft); }
+.fc-ai-card b { display: block; font-size: 14px; } .fc-ai-card small { display: block; font-weight: 400; color: var(--ms-muted); font-size: 12px; }
+.fc-ai-fields { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+html body .fc-ai-card { flex: 0 0 auto; justify-content: flex-start; width: auto; }
+html body .fc-ai-card input[type="radio"] { width: auto; margin: 0; flex: none; }
+html body .fc-ai-card span { text-align: left; }
+.fc-ai > .fc-ai-note { font-size: 13px; }

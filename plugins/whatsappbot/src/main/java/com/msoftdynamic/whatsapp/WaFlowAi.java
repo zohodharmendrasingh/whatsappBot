@@ -43,14 +43,29 @@ public final class WaFlowAi {
 
     /** The key a workspace uses: its own key first, then the optional platform key. */
     static final class Key {
+        final String provider;
         final String apiKey;
         final String model;
         final boolean own;
-        Key(String apiKey, String model, boolean own) {
+        Key(String provider, String apiKey, String model, boolean own) {
+            this.provider = "openai".equals(provider) ? "openai" : "anthropic";
             this.apiKey = apiKey;
             this.model = model;
             this.own = own;
         }
+    }
+
+    public static String providerName(String provider) {
+        return "openai".equals(provider) ? "OpenAI" : "Claude";
+    }
+
+    static String baseUrl(String provider) {
+        String def = "openai".equals(provider) ? "https://api.openai.com" : "https://api.anthropic.com";
+        String b = WaUtil.prop("ai.base.url." + provider, "").trim();
+        if (b.isEmpty()) {
+            b = WaUtil.prop("ai.base.url", def).trim();
+        }
+        return b.replaceAll("/+$", "");
     }
 
     static Key key(Delegator delegator, String tenantId) {
@@ -58,13 +73,13 @@ public final class WaFlowAi {
             GenericValue t = tenantId == null ? null
                     : EntityQuery.use(delegator).from("WaTenantAi").where("tenantId", tenantId).queryOne();
             if (t != null && UtilValidate.isNotEmpty(t.getString("apiKey"))) {
-                return new Key(t.getString("apiKey").trim(), t.getString("model"), true);
+                return new Key(t.getString("provider"), t.getString("apiKey").trim(), t.getString("model"), true);
             }
         } catch (GenericEntityException e) {
             Debug.logError(e, "Could not read workspace AI key", MODULE);
         }
         String platform = WaUtil.prop("ai.api.key", "").trim();
-        return platform.isEmpty() ? null : new Key(platform, null, false);
+        return platform.isEmpty() ? null : new Key(WaUtil.prop("ai.provider", "anthropic").trim().toLowerCase(), platform, null, false);
     }
 
     public static boolean isConfigured(Delegator delegator, String tenantId) {
@@ -72,20 +87,20 @@ public final class WaFlowAi {
     }
 
     /** Checks a key with a free call (list models). Returns null if the key works, else a message. */
-    public static String verifyKey(String apiKey) {
-        String provider = WaUtil.prop("ai.provider", "anthropic").trim().toLowerCase();
+    public static String verifyKey(String provider, String apiKey) {
         HttpRequest.Builder rb;
+        String name = providerName(provider);
         if ("openai".equals(provider)) {
-            rb = HttpRequest.newBuilder(URI.create(WaUtil.prop("ai.base.url", "https://api.openai.com").replaceAll("/+$", "") + "/v1/models"))
-                    .header("Authorization", "Bearer " + apiKey);
+            rb = HttpRequest.newBuilder(URI.create(baseUrl(provider) + "/v1/models")).header("Authorization", "Bearer " + apiKey);
         } else {
-            rb = HttpRequest.newBuilder(URI.create(WaUtil.prop("ai.base.url", "https://api.anthropic.com").replaceAll("/+$", "") + "/v1/models"))
+            rb = HttpRequest.newBuilder(URI.create(baseUrl(provider) + "/v1/models"))
                     .header("x-api-key", apiKey).header("anthropic-version", "2023-06-01");
         }
         try {
             HttpResponse<String> res = HTTP.send(rb.timeout(Duration.ofSeconds(20)).GET().build(), HttpResponse.BodyHandlers.ofString());
             if (res.statusCode() == 401 || res.statusCode() == 403) {
-                return "This API key was not accepted by Claude. Please copy it again from console.anthropic.com.";
+                return "This API key was not accepted by " + name + ". Please copy it again from "
+                        + ("openai".equals(provider) ? "platform.openai.com" : "console.anthropic.com") + ".";
             }
             if (res.statusCode() / 100 != 2 && res.statusCode() != 429) {
                 Debug.logWarning("AI key check " + res.statusCode() + ": " + res.body(), MODULE);
@@ -94,7 +109,7 @@ public final class WaFlowAi {
             return null;
         } catch (Exception e) {
             Debug.logWarning(e, "AI key check failed", MODULE);
-            return "Could not reach Claude to check the key. Please try again in a minute.";
+            return "Could not reach " + name + " to check the key. Please try again in a minute.";
         }
     }
 
@@ -174,7 +189,7 @@ public final class WaFlowAi {
             java.util.Set<String> zohoApps) {
         Key k = key(delegator, tenantKey);
         if (k == null) {
-            return new Result(null, "Add your Claude API key in Settings > AI assistant to use AI.");
+            return new Result(null, "Add your AI key (Claude or OpenAI) in Settings > AI assistant to use AI.");
         }
         if (UtilValidate.isEmpty(description) || description.trim().length() < 5) {
             return new Result(null, "Describe your business or the change you want in a few words.");
@@ -247,22 +262,22 @@ public final class WaFlowAi {
 
     private static String call(String userText, Key k, String systemExtra) throws AiException {
         String system = SYSTEM + systemExtra;
-        String provider = WaUtil.prop("ai.provider", "anthropic").trim().toLowerCase();
+        String provider = k.provider;
         String apiKey = k.apiKey;
         String model = UtilValidate.isNotEmpty(k.model) ? k.model : null;
         int timeout = WaUtil.propInt("ai.timeout.seconds", 120);
         ObjectNode body = WaUtil.JSON.createObjectNode();
         HttpRequest.Builder rb;
         if ("openai".equals(provider)) {
-            String base = WaUtil.prop("ai.base.url", "https://api.openai.com").replaceAll("/+$", "");
-            body.put("model", model != null ? model : WaUtil.prop("ai.model", "gpt-4.1"));
+            String base = baseUrl(provider);
+            body.put("model", model != null ? model : WaUtil.prop("ai.model.openai", "gpt-4.1"));
             body.putObject("response_format").put("type", "json_object");
             ArrayNode msgs = body.putArray("messages");
             msgs.addObject().put("role", "system").put("content", system);
             msgs.addObject().put("role", "user").put("content", userText);
             rb = HttpRequest.newBuilder(URI.create(base + "/v1/chat/completions")).header("Authorization", "Bearer " + apiKey);
         } else {
-            String base = WaUtil.prop("ai.base.url", "https://api.anthropic.com").replaceAll("/+$", "");
+            String base = baseUrl(provider);
             body.put("model", model != null ? model : WaUtil.prop("ai.model", "claude-sonnet-5"));
             body.put("max_tokens", WaUtil.propInt("ai.max.tokens", 8000));
             body.put("system", system);
@@ -289,11 +304,18 @@ public final class WaFlowAi {
         }
         if (res.statusCode() == 401 || res.statusCode() == 403) {
             Debug.logWarning("AI auth failed: " + res.body(), MODULE);
-            throw new AiException(k.own ? "Your Claude API key was not accepted. Please update it in Settings > AI assistant."
+            throw new AiException(k.own ? "Your " + providerName(provider) + " API key was not accepted. Please update it in Settings > AI assistant."
                     : "The AI key is not valid. Please check ai.api.key in the configuration.");
         }
         if (res.statusCode() == 400 && json.path("error").path("message").asText("").toLowerCase().contains("credit")) {
             throw new AiException("Your Claude account has no credit left. Add credit at console.anthropic.com (Billing), then try again.");
+        }
+        String errCode = json.path("error").path("code").asText(json.path("error").path("type").asText(""));
+        if ("insufficient_quota".equals(errCode)) {
+            throw new AiException("Your OpenAI account has no credit left. Add credit at platform.openai.com (Billing), then try again.");
+        }
+        if (res.statusCode() == 404 && json.path("error").path("message").asText("").toLowerCase().contains("model")) {
+            throw new AiException("The chosen " + providerName(provider) + " model is not available for your account. Pick another model in Settings > AI assistant.");
         }
         if (res.statusCode() == 429 || res.statusCode() == 529) {
             throw new AiException("The AI service is busy right now. Please try again in a minute.");

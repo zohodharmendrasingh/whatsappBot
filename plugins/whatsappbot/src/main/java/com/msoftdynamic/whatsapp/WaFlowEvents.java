@@ -256,6 +256,13 @@ public final class WaFlowEvents {
     public static final Map<String, String> AI_MODELS = UtilMisc.toMap(
             "claude-sonnet-5", "Claude Sonnet 5 (recommended, best flows)",
             "claude-haiku-4-5-20251001", "Claude Haiku 4.5 (faster, cheaper)");
+    public static final Map<String, String> OPENAI_MODELS = UtilMisc.toMap(
+            "gpt-4.1", "GPT-4.1 (recommended)",
+            "gpt-4.1-mini", "GPT-4.1 mini (faster, cheaper)");
+
+    static Map<String, String> models(String provider) {
+        return "openai".equals(provider) ? OPENAI_MODELS : AI_MODELS;
+    }
 
     /** POST saveAiKey apiKey, model : owner saves the workspace's own Claude API key after checking it. */
     public static String saveAiKey(HttpServletRequest request, HttpServletResponse response) {
@@ -266,15 +273,21 @@ public final class WaFlowEvents {
             return fail(request, "Only the workspace owner can change the AI key.");
         }
         String key = request.getParameter("apiKey") == null ? "" : request.getParameter("apiKey").trim();
-        String model = request.getParameter("model");
-        if (UtilValidate.isNotEmpty(model) && !AI_MODELS.containsKey(model)) {
+        String provider = "openai".equals(request.getParameter("provider")) ? "openai" : "anthropic";
+        String name = WaFlowAi.providerName(provider);
+        String model = request.getParameter("model." + provider);
+        if (model == null) {
+            model = request.getParameter("model");
+        }
+        if (UtilValidate.isNotEmpty(model) && !models(provider).containsKey(model)) {
             model = null;
         }
         try {
             GenericValue row = EntityQuery.use(delegator).from("WaTenantAi").where("tenantId", tenantId).queryOne();
             if (key.isEmpty()) {
-                if (row == null) {
-                    return fail(request, "Paste your Claude API key first.");
+                String current = row == null ? null : ("openai".equals(row.getString("provider")) ? "openai" : "anthropic");
+                if (row == null || UtilValidate.isEmpty(row.getString("apiKey")) || !provider.equals(current)) {
+                    return fail(request, "Paste your " + name + " API key first.");
                 }
                 row.set("model", UtilValidate.isEmpty(model) ? null : model);
                 row.set("updatedBy", w.userLogin.getString("userLoginId"));
@@ -283,23 +296,30 @@ public final class WaFlowEvents {
                 request.setAttribute("_EVENT_MESSAGE_", "AI settings saved.");
                 return "success";
             }
-            if (key.length() < 20 || key.length() > 300 || key.matches(".*\\s.*")) {
-                return fail(request, "That does not look like a Claude API key. It starts with sk-ant- and is about 100 characters long.");
+            boolean looksClaude = key.startsWith("sk-ant-");
+            if (key.length() < 20 || key.length() > 400 || key.matches(".*\\s.*") || !key.startsWith("sk-")) {
+                return fail(request, "That does not look like " + ("openai".equals(provider)
+                        ? "an OpenAI API key. It starts with sk- (for example sk-proj-...)." : "a Claude API key. It starts with sk-ant- and is about 100 characters long."));
             }
-            String err = WaFlowAi.verifyKey(key);
+            if (looksClaude != "anthropic".equals(provider)) {
+                return fail(request, looksClaude ? "This is a Claude key. Choose Claude (Anthropic) above, or paste an OpenAI key."
+                        : "This does not look like a Claude key (those start with sk-ant-). If it is an OpenAI key, choose OpenAI above.");
+            }
+            String err = WaFlowAi.verifyKey(provider, key);
             if (err != null) {
                 return fail(request, err);
             }
             if (row == null) {
                 row = delegator.makeValue("WaTenantAi", UtilMisc.toMap("tenantId", tenantId));
             }
+            row.set("provider", provider);
             row.set("apiKey", key);
             row.set("keyHint", "..." + key.substring(key.length() - 4));
             row.set("model", UtilValidate.isEmpty(model) ? null : model);
             row.set("updatedBy", w.userLogin.getString("userLoginId"));
             row.set("updatedDate", org.apache.ofbiz.base.util.UtilDateTime.nowTimestamp());
             delegator.createOrStore(row);
-            request.setAttribute("_EVENT_MESSAGE_", "Claude API key connected. You can now build bots with AI.");
+            request.setAttribute("_EVENT_MESSAGE_", name + " API key connected. You can now build bots with AI.");
             return "success";
         } catch (Exception e) {
             Debug.logError(e, MODULE);
@@ -317,7 +337,7 @@ public final class WaFlowEvents {
         }
         try {
             delegator.removeByAnd("WaTenantAi", UtilMisc.toMap("tenantId", tenantId));
-            request.setAttribute("_EVENT_MESSAGE_", "Claude API key removed.");
+            request.setAttribute("_EVENT_MESSAGE_", "AI key removed.");
             return "success";
         } catch (Exception e) {
             return fail(request, "Could not remove the key: " + e.getMessage());

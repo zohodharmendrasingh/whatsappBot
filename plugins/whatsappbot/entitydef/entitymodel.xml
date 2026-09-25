@@ -36,6 +36,7 @@
 
     <entity entity-name="WaTenantAi" package-name="com.msoftdynamic.whatsapp.saas" title="Workspace's own AI (Claude API) key for the flow builder">
         <field name="tenantId" type="id"/>
+        <field name="provider" type="short-varchar"><description>anthropic (Claude) or openai</description></field>
         <field name="apiKey" type="very-long" encrypt="true"/>
         <field name="keyHint" type="short-varchar"><description>Last characters of the key, for display</description></field>
         <field name="model" type="short-varchar"><description>Optional model override</description></field>

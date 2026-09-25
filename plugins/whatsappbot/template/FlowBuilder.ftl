@@ -85,10 +85,10 @@
 
   <div class="fb-modal" id="fbAiKeyModal" hidden>
     <div class="fb-modal-box">
-      <h3>✨ Connect your Claude API key</h3>
-      <p>To build and edit bots with AI, add your own Claude API key once in Settings. It takes about 2 minutes and building a bot usually costs a few cents on your Claude account.</p>
+      <h3>✨ Connect your AI key</h3>
+      <p>To build and edit bots with AI, add your own Claude or OpenAI API key once in Settings. It takes about 2 minutes and building a bot usually costs a few cents on your own account.</p>
       <div class="fb-modal-actions"><button type="button" class="fb-btn" data-close>Not now</button>
-        <a class="fb-btn fb-btn-ai" id="fbAiKeyGo" href="<@ofbizUrl>Settings</@ofbizUrl>#ai">Add Claude API key</a></div>
+        <a class="fb-btn fb-btn-ai" id="fbAiKeyGo" href="<@ofbizUrl>Settings</@ofbizUrl>#ai">Add AI key</a></div>
     </div>
   </div>
 
