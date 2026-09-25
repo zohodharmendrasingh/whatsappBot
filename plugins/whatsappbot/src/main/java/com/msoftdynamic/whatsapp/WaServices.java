@@ -436,11 +436,48 @@ public final class WaServices {
 
     /** Shared by the service and the REST API servlet. */
     @SuppressWarnings("unchecked")
+    /**
+     * Language to send a template in: the requested one if the synced template exists in that language,
+     * otherwise the language the template was synced with (e.g. hello_world is en_US, not en).
+     */
+    static String templateLanguage(Delegator delegator, GenericValue channel, String templateName, String requested) {
+        try {
+            List<GenericValue> tpls = EntityQuery.use(delegator).from("WaTemplate")
+                    .where("channelId", channel.getString("channelId"), "templateName", templateName).queryList();
+            if (tpls.isEmpty()) {
+                return requested;
+            }
+            for (GenericValue t : tpls) {
+                if (t.getString("languageCode") != null && t.getString("languageCode").equalsIgnoreCase(requested)) {
+                    return t.getString("languageCode");
+                }
+            }
+            return tpls.get(0).getString("languageCode");
+        } catch (GenericEntityException e) {
+            Debug.logWarning(e, "Template language lookup failed", MODULE);
+            return requested;
+        }
+    }
+
     public static Map<String, Object> doSend(Delegator delegator, GenericValue channel, GenericValue contact,
                                              Map<String, ? extends Object> in, String sentBy, Locale locale) {
         String text = (String) in.get("text");
         String mediaUrl = (String) in.get("mediaUrl");
         String templateName = (String) in.get("templateName");
+        String templateLang = (String) in.get("languageCode");
+        String templateId = (String) in.get("templateId");
+        if (UtilValidate.isNotEmpty(templateId)) {
+            try {
+                GenericValue tpl = EntityQuery.use(delegator).from("WaTemplate").where("templateId", templateId).queryOne();
+                if (tpl == null || !channel.getString("channelId").equals(tpl.getString("channelId"))) {
+                    return ServiceUtil.returnError("Template not found for this WhatsApp number");
+                }
+                templateName = tpl.getString("templateName");
+                templateLang = tpl.getString("languageCode");
+            } catch (GenericEntityException e) {
+                return ServiceUtil.returnError(e.getMessage());
+            }
+        }
         String to = contact.getString("waId");
         ObjectNode payload;
         String log;
@@ -450,7 +487,7 @@ public final class WaServices {
             if (params == null && UtilValidate.isNotEmpty(paramsText)) {
                 params = Arrays.asList(paramsText.split("\\|", -1));
             }
-            payload = WaMessenger.template(to, templateName, (String) in.get("languageCode"), params);
+            payload = WaMessenger.template(to, templateName, templateLanguage(delegator, channel, templateName, templateLang), params);
             log = "[template " + templateName + "] " + (params == null ? "" : String.join(" | ", params));
         } else {
             if (!WaMessenger.windowOpen(contact)) {
@@ -523,6 +560,9 @@ public final class WaServices {
             if (channel == null) {
                 return ServiceUtil.returnError("Unknown channel");
             }
+            if (UtilValidate.isEmpty(context.get("templateId")) && UtilValidate.isEmpty(context.get("templateName"))) {
+                return ServiceUtil.returnError("Choose a template");
+            }
             String bodyParams = (String) context.get("bodyParams");
             List<String> params = UtilValidate.isEmpty(bodyParams) ? null : Arrays.asList(bodyParams.split("\\|", -1));
             Set<String> numbers = new LinkedHashSet<>();
@@ -535,6 +575,7 @@ public final class WaServices {
             for (String n : numbers) {
                 GenericValue contact = WaMessenger.findOrCreateContact(delegator, channel, n, null);
                 Map<String, Object> in = new HashMap<>();
+                in.put("templateId", context.get("templateId"));
                 in.put("templateName", context.get("templateName"));
                 in.put("languageCode", context.get("languageCode"));
                 in.put("templateParams", params);
@@ -552,8 +593,12 @@ public final class WaServices {
         } catch (GenericEntityException e) {
             return ServiceUtil.returnError(e.getMessage());
         }
-        Map<String, Object> result = ServiceUtil.returnSuccess("Broadcast: " + sent + " sent, " + failed + " failed"
-                + (errors.isEmpty() ? "" : ". " + String.join("; ", errors)));
+        String summary = "Broadcast: " + sent + " sent, " + failed + " failed"
+                + (errors.isEmpty() ? "" : ". " + String.join("; ", errors));
+        if (sent == 0 && failed > 0) {
+            return ServiceUtil.returnError(summary);
+        }
+        Map<String, Object> result = ServiceUtil.returnSuccess(summary);
         result.put("sentCount", sent);
         result.put("failedCount", failed);
         return result;

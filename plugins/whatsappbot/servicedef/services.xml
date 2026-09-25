@@ -168,8 +168,9 @@
         <attribute name="toNumber" type="String" mode="IN" optional="true"/>
         <attribute name="text" type="String" mode="IN" optional="true" allow-html="any"/>
         <attribute name="mediaUrl" type="String" mode="IN" optional="true"/>
+        <attribute name="templateId" type="String" mode="IN" optional="true"><description>Synced template (sets name + language)</description></attribute>
         <attribute name="templateName" type="String" mode="IN" optional="true"/>
-        <attribute name="languageCode" type="String" mode="IN" optional="true" default-value="en"/>
+        <attribute name="languageCode" type="String" mode="IN" optional="true"/>
         <attribute name="templateParams" type="List" mode="IN" optional="true"><description>Body {{1}}..{{n}} values</description></attribute>
         <attribute name="templateParamsText" type="String" mode="IN" optional="true"><description>Same as templateParams, pipe separated (for UI forms)</description></attribute>
         <attribute name="pauseBot" type="String" mode="IN" optional="true"><description>Y = agent takes over the chat</description></attribute>
@@ -193,8 +194,9 @@
         <description>Send an approved template to many numbers (one per line or comma separated)</description>
         <permission-service service-name="waTenantPermissionCheck" main-action="CREATE"/>
         <attribute name="channelId" type="String" mode="IN" optional="false"/>
-        <attribute name="templateName" type="String" mode="IN" optional="false"/>
-        <attribute name="languageCode" type="String" mode="IN" optional="true" default-value="en"/>
+        <attribute name="templateId" type="String" mode="IN" optional="true"><description>Synced template (sets name + language)</description></attribute>
+        <attribute name="templateName" type="String" mode="IN" optional="true"/>
+        <attribute name="languageCode" type="String" mode="IN" optional="true"/>
         <attribute name="numbers" type="String" mode="IN" optional="false"/>
         <attribute name="bodyParams" type="String" mode="IN" optional="true"><description>Pipe separated values for {{1}}|{{2}}...</description></attribute>
         <attribute name="sentCount" type="Integer" mode="OUT" optional="true"/>

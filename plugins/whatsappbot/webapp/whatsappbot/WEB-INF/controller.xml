@@ -68,9 +68,9 @@
     <request-map uri="waPauseBot"><security https="true" auth="true"/><event type="service" invoke="waPauseBot"/>
         <response name="success" type="request-redirect" value="Inbox"><redirect-parameter name="contactId"/></response><response name="error" type="view" value="Inbox"/></request-map>
     <request-map uri="waSendBroadcast"><security https="true" auth="true"/><event type="service" invoke="waSendBroadcast"/>
-        <response name="success" type="request-redirect-noparam" value="Broadcast"/><response name="error" type="view" value="Broadcast"/></request-map>
+        <response name="success" type="view" value="Broadcast"/><response name="error" type="view" value="Broadcast"/></request-map>
     <request-map uri="waSyncTemplates"><security https="true" auth="true"/><event type="service" invoke="waSyncTemplates"/>
-        <response name="success" type="request-redirect-noparam" value="Templates"/><response name="error" type="view" value="Templates"/></request-map>
+        <response name="success" type="view" value="Templates"/><response name="error" type="view" value="Templates"/></request-map>
     <request-map uri="waCreateApiKey"><security https="true" auth="true"/><event type="service" invoke="waCreateApiKey"/>
         <response name="success" type="request-redirect-noparam" value="ApiKeys"/><response name="error" type="view" value="ApiKeys"/></request-map>
     <request-map uri="updateWaApiKey"><security https="true" auth="true"/><event type="service" invoke="updateWaApiKey"/>

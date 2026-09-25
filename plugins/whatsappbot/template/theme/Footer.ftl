@@ -10,5 +10,10 @@
   </#list>
 </#if>
 <@scriptTagsFooter/>
+<script type="application/javascript">
+/* keep browsers from auto-filling the FloChat login into Meta/API credential fields */
+document.querySelectorAll('input[name=newAccessToken], input[type=password][name*=Token], input[type=password][name*=token]').forEach(function (e) { e.setAttribute('autocomplete', 'new-password'); });
+document.querySelectorAll('input[name=wabaId], input[name=phoneNumberId], input[name=displayPhoneNumber]').forEach(function (e) { e.setAttribute('autocomplete', 'off'); });
+</script>
 </body>
 </html>

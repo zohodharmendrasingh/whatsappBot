@@ -54,16 +54,15 @@
 
     <form name="TemplateReplyForm" type="single" target="waSendMessage">
         <field name="contactId"><hidden/></field>
-        <field name="templateName" title="Approved template" required-field="true">
+        <field name="templateId" title="Approved template" required-field="true">
             <drop-down allow-empty="false">
-                <entity-options entity-name="WaTemplate" key-field-name="templateName" description="${templateName} (${languageCode})">
+                <entity-options entity-name="WaTemplate" key-field-name="templateId" description="${templateName} (${languageCode})">
                     <entity-constraint name="channelId" env-name="contact.channelId"/>
                     <entity-constraint name="metaStatus" value="APPROVED"/>
                     <entity-order-by field-name="templateName"/>
                 </entity-options>
             </drop-down>
         </field>
-        <field name="languageCode" title="Language"><text size="6" default-value="en"/></field>
         <field name="templateParamsText" title="Body values ({{1}}|{{2}}...)"><text size="60"/></field>
         <field name="submitButton" title="Send template"><submit/></field>
     </form>
@@ -267,16 +266,15 @@
                 </entity-options>
             </drop-down>
         </field>
-        <field name="templateName" title="Approved template" required-field="true">
+        <field name="templateId" title="Approved template" required-field="true" tooltip="The template's language is used automatically">
             <drop-down allow-empty="false">
-                <entity-options entity-name="WaTemplate" key-field-name="templateName" description="${templateName} (${languageCode}) - ${category}">
+                <entity-options entity-name="WaTemplate" key-field-name="templateId" description="${templateName} (${languageCode}) - ${category}">
                     <entity-constraint name="tenantId" env-name="scopeTenantId" ignore-if-empty="true"/>
                     <entity-constraint name="metaStatus" value="APPROVED"/>
                     <entity-order-by field-name="templateName"/>
                 </entity-options>
             </drop-down>
         </field>
-        <field name="languageCode" title="Language"><text size="6" default-value="en"/></field>
         <field name="bodyParams" title="Body values" tooltip="{{1}}|{{2}}... same for every recipient"><text size="60"/></field>
         <field name="numbers" title="Numbers" required-field="true" tooltip="With country code, one per line or comma separated (spaces inside a number are fine)"><textarea cols="40" rows="10"/></field>
         <field name="submitButton" title="Send broadcast"><submit/></field>
