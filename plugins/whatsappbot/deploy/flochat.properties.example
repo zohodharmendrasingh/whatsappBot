@@ -23,3 +23,11 @@ paypal.client.secret=
 saas.signup.enabled=true
 # remove WA_TEST once live payments are tested
 saas.hidden.plans=WA_TEST
+
+# AI bot builder (Claude API). Each workspace adds its OWN key in Settings > AI assistant (stored encrypted).
+# ai.api.key here is only an optional platform fallback for workspaces without a key; leave empty so customers pay their own usage.
+ai.provider=anthropic
+ai.api.key=
+ai.model=claude-sonnet-5
+ai.daily.limit=30
+ai.daily.limit.own.key=200

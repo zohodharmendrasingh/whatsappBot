@@ -34,7 +34,7 @@
       <div class="ms-nav-section">Workspace</div>
       <@nav "main" "Dashboard" "home" "main"/>
       <@nav "Inbox" "Inbox" "inbox" "Inbox,Conversation" "${unreadConversations!0}"/>
-      <@nav "FindFlow" "Bot Flows" "flow" "FindFlow,EditFlow,EditFlowNode"/>
+      <@nav "FindFlow" "Bot Flows" "flow" "FindFlow,FlowBuilder,EditFlow,EditFlowNode"/>
       <@nav "Templates" "Templates" "template" "Templates"/>
       <@nav "Broadcast" "Broadcasts" "broadcast" "Broadcast"/>
       <@nav "Channels" "WhatsApp Numbers" "phone" "Channels,EditChannel"/>

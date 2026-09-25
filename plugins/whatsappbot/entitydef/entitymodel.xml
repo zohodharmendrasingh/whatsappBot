@@ -34,6 +34,17 @@
         <relation type="one-nofk" rel-entity-name="Party"><key-map field-name="partyId"/></relation>
     </entity>
 
+    <entity entity-name="WaTenantAi" package-name="com.msoftdynamic.whatsapp.saas" title="Workspace's own AI (Claude API) key for the flow builder">
+        <field name="tenantId" type="id"/>
+        <field name="apiKey" type="very-long" encrypt="true"/>
+        <field name="keyHint" type="short-varchar"><description>Last characters of the key, for display</description></field>
+        <field name="model" type="short-varchar"><description>Optional model override</description></field>
+        <field name="updatedBy" type="id-vlong"/>
+        <field name="updatedDate" type="date-time"/>
+        <prim-key field="tenantId"/>
+        <relation type="one" fk-name="WATAI_TNT" rel-entity-name="WaTenant"><key-map field-name="tenantId"/></relation>
+    </entity>
+
     <entity entity-name="WaTenantUser" package-name="com.msoftdynamic.whatsapp.saas" title="Login belonging to a tenant">
         <field name="tenantId" type="id"/>
         <field name="userLoginId" type="id-vlong"/>
@@ -186,6 +197,8 @@
         <field name="nextNodeId" type="id"/>
         <field name="targetFlowId" type="id"/>
         <field name="sequenceNum" type="numeric"/>
+        <field name="posX" type="numeric"><description>Visual builder canvas position</description></field>
+        <field name="posY" type="numeric"/>
         <prim-key field="flowId"/>
         <prim-key field="nodeId"/>
         <relation type="one" fk-name="WANODE_FLW" rel-entity-name="WaFlow"><key-map field-name="flowId"/></relation>

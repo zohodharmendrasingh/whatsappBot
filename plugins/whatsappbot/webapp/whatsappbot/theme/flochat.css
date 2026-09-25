@@ -431,3 +431,16 @@ body #content-messages:after { content: "\00d7"; position: absolute; right: 14px
 body.ms-shell #content-messages { position: fixed; top: 76px; right: 24px; left: auto; margin: 0; z-index: 1000; max-width: 460px; min-width: 280px; padding: 14px 40px 14px 16px; box-shadow: 0 12px 32px rgba(16,24,40,.18); border-radius: 12px; }
 body #content-messages p { display: block !important; }
 body #content-messages p:first-child { display: none !important; }
+
+/* Settings > AI assistant */
+.fc-ai-status { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.fc-ai-status code { background: #eef2f6; border-radius: 5px; padding: 1px 6px; }
+.fc-ai-status small { color: var(--ms-muted); }
+.fc-ai-form { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.fc-ai-form label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; font-size: 13px; }
+.fc-ai-form input { width: 340px; max-width: 100%; }
+.fc-ai-remove { margin-top: 10px; }
+.fc-ai-note { color: var(--ms-muted); }
+.fc-ai-help { margin-top: 14px; font-size: 13.5px; color: #475467; }
+.fc-ai-help summary { cursor: pointer; font-weight: 600; color: var(--ms-navy); }
+.fc-ai-help ol { padding-left: 20px; line-height: 1.7; }

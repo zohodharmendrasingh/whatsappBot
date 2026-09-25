@@ -12,6 +12,17 @@
         <response name="none" type="none"/></request-map>
     <request-map uri="Conversation"><security https="true" auth="true"/><response name="success" type="view" value="Conversation"/></request-map>
     <request-map uri="FindFlow"><security https="true" auth="true"/><response name="success" type="view" value="FindFlow"/></request-map>
+    <request-map uri="FlowBuilder"><security https="true" auth="true"/><response name="success" type="view" value="FlowBuilder"/></request-map>
+    <request-map uri="flowBuilderData"><security https="true" auth="true"/>
+        <event type="java" path="com.msoftdynamic.whatsapp.WaFlowEvents" invoke="graph"/><response name="none" type="none"/></request-map>
+    <request-map uri="flowBuilderSave"><security https="true" auth="true"/>
+        <event type="java" path="com.msoftdynamic.whatsapp.WaFlowEvents" invoke="save"/><response name="none" type="none"/></request-map>
+    <request-map uri="flowBuilderAi"><security https="true" auth="true"/>
+        <event type="java" path="com.msoftdynamic.whatsapp.WaFlowEvents" invoke="ai"/><response name="none" type="none"/></request-map>
+    <request-map uri="flowWizard"><security https="true" auth="true"/>
+        <event type="java" path="com.msoftdynamic.whatsapp.WaFlowEvents" invoke="wizard"/>
+        <response name="success" type="request-redirect" value="FlowBuilder"><redirect-parameter name="flowId"/><redirect-parameter name="created"/></response>
+        <response name="error" type="view" value="FindFlow"/></request-map>
     <request-map uri="EditFlow"><security https="true" auth="true"/><response name="success" type="view" value="EditFlow"/></request-map>
     <request-map uri="EditFlowNode"><security https="true" auth="true"/><response name="success" type="view" value="EditFlowNode"/></request-map>
     <request-map uri="Channels"><security https="true" auth="true"/><response name="success" type="view" value="Channels"/></request-map>
@@ -47,7 +58,7 @@
     <request-map uri="waCompleteEmbeddedSignup"><security https="true" auth="true"/><event type="service" invoke="waCompleteEmbeddedSignup"/>
         <response name="success" type="request-redirect-noparam" value="Channels"/><response name="error" type="view" value="Channels"/></request-map>
     <request-map uri="waCreateFlow"><security https="true" auth="true"/><event type="service" invoke="waCreateFlow"/>
-        <response name="success" type="request-redirect" value="EditFlow"><redirect-parameter name="flowId"/></response><response name="error" type="view" value="FindFlow"/></request-map>
+        <response name="success" type="request-redirect" value="FlowBuilder"><redirect-parameter name="flowId"/></response><response name="error" type="view" value="FindFlow"/></request-map>
     <request-map uri="updateWaFlow"><security https="true" auth="true"/><event type="service" invoke="updateWaFlow"/>
         <response name="success" type="request-redirect" value="EditFlow"><redirect-parameter name="flowId"/></response><response name="error" type="view" value="EditFlow"/></request-map>
     <request-map uri="deleteWaFlow"><security https="true" auth="true"/><event type="service" invoke="deleteWaFlow"/>
@@ -101,6 +112,11 @@
     <request-map uri="removeTeamMember"><security https="true" auth="true"/><event type="service" invoke="removeWaTenantUser"/>
         <response name="success" type="request-redirect-noparam" value="Settings"/><response name="error" type="view" value="Settings"/></request-map>
 
+    <request-map uri="saveAiKey"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaFlowEvents" invoke="saveAiKey"/>
+        <response name="success" type="view" value="Settings"/><response name="error" type="view" value="Settings"/></request-map>
+    <request-map uri="removeAiKey"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaFlowEvents" invoke="removeAiKey"/>
+        <response name="success" type="view" value="Settings"/><response name="error" type="view" value="Settings"/></request-map>
+
     <!-- ===== Billing (PayPal) ===== -->
     <request-map uri="Billing"><security https="true" auth="true"/><response name="success" type="view" value="Billing"/></request-map>
     <request-map uri="paypalCreateOrder"><security https="true" auth="true"/>
@@ -115,6 +131,7 @@
     <view-map name="Inbox" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Inbox"/>
     <view-map name="Conversation" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Conversation"/>
     <view-map name="FindFlow" type="screen" page="component://whatsappbot/widget/WaScreens.xml#FindFlow"/>
+    <view-map name="FlowBuilder" type="screen" page="component://whatsappbot/widget/WaScreens.xml#FlowBuilder"/>
     <view-map name="EditFlow" type="screen" page="component://whatsappbot/widget/WaScreens.xml#EditFlow"/>
     <view-map name="EditFlowNode" type="screen" page="component://whatsappbot/widget/WaScreens.xml#EditFlowNode"/>
     <view-map name="Channels" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Channels"/>
