@@ -2,7 +2,7 @@
 <#assign b = brandName!"FloChat">
 <#assign co = legalName!"Msoft Dynamic Technologies (OPC) Private Limited">
 <#assign mail = supportEmail!"info@msoftdynamic.com">
-<#assign site = "https://" + (brandDomain!"flolink.ai")>
+<#assign site = "https://" + (brandDomain!"flochat.flolink.ai")>
 <#if legalDoc == "terms"><#assign pageTitle = "Terms of Service"><#elseif legalDoc == "deletion"><#assign pageTitle = "Data Deletion"><#else><#assign pageTitle = "Privacy Policy"></#if>
 <#include "component://whatsappbot/template/site/SiteHead.ftl"/>
 <section class="s-legal">

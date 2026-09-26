@@ -66,7 +66,7 @@
 
 <section class="s-section" id="products">
   <div class="s-wrap">
-    <div class="h-center"><span class="h-kicker">${companyName} products</span><h2 class="s-h2">Automation for businesses that run on WhatsApp and Zoho</h2></div>
+    <div class="h-center"><span class="h-kicker">${companyName} products</span><h2 class="s-h2">Software for businesses that run on WhatsApp and Zoho</h2><p class="h-sub"><a href="${productsSiteUrl}">See all products on ${productsSiteUrl?replace("https://","")} &rarr;</a></p></div>
     <div class="h-products">
       <div class="h-product h-product-main">
         <img src="/theme/flochat-logo-dark.svg" alt="FloChat" height="34"/>
@@ -77,6 +77,11 @@
         <div class="h-product-name">Flow<span>Linker</span></div>
         <p>${flowlinkerTagline}</p>
         <a class="s-btn s-btn-ghost" href="${flowlinkerUrl}">Open FlowLinker &rarr;</a>
+      </div>
+      <div class="h-product">
+        <div class="h-product-name">Bill<span>Ease</span></div>
+        <p>${billeaseTagline}</p>
+        <a class="s-btn s-btn-ghost" href="${billeaseUrl}">Open BillEase &rarr;</a>
       </div>
     </div>
   </div>

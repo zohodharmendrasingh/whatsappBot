@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>FloLink – WhatsApp, Zoho and billing software for growing businesses</title>
+<meta name="description" content="FloLink builds FloChat (WhatsApp automation), FlowLinker (Zoho CRM and Books sync) and BillEase (billing and POS). By Msoft Dynamic Technologies."/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f2747'/%3E%3Cpath d='M9 22V10h10M9 16h7' stroke='%2322c55e' stroke-width='3.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='22.5' cy='21.5' r='2.6' fill='%2322c55e'/%3E%3C/svg%3E"/>
+<meta property="og:title" content="FloLink – software for businesses that run on WhatsApp and Zoho"/>
+<meta property="og:description" content="FloChat, FlowLinker and BillEase. One team, three products."/>
+<style>
+:root{--ink:#0f2747;--text:#344054;--muted:#667085;--line:#e4e7ec;--bg:#fff;--alt:#f6f8fb;--green:#16a34a;--green2:#22c55e;--blue:#2563eb;--amber:#d97706;--radius:18px}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+/* nav */
+.nav{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:28px;height:68px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:21px;color:var(--ink);text-decoration:none;letter-spacing:-.02em}
+.logo b{color:var(--green);font-weight:inherit}
+.nav nav{display:flex;gap:24px;margin-left:12px}
+.nav nav a{text-decoration:none;color:var(--text);font-weight:500;font-size:15px}
+.nav nav a:hover{color:var(--ink)}
+.spacer{flex:1}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:12px;font-weight:600;font-size:15px;text-decoration:none;border:1px solid transparent;transition:transform .15s,box-shadow .15s,background .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:var(--green);color:#fff;box-shadow:0 6px 18px rgba(22,163,74,.25)}
+.btn-primary:hover{background:#15803d}
+.btn-ghost{border-color:var(--line);color:var(--ink);background:#fff}
+.btn-ghost:hover{border-color:#cbd5e1}
+.btn-light{background:#fff;color:var(--ink)}
+.btn-outline-light{border-color:rgba(255,255,255,.35);color:#fff}
+/* hero */
+.hero{background:radial-gradient(1000px 500px at 15% -10%,rgba(34,197,94,.22),transparent 60%),radial-gradient(900px 500px at 100% 0,rgba(37,99,235,.25),transparent 60%),#0b1d36;color:#fff;padding:96px 0 110px;text-align:center}
+.kicker{display:inline-block;border:1px solid rgba(134,239,172,.45);background:rgba(34,197,94,.12);color:#bbf7d0;padding:7px 16px;border-radius:999px;font-size:14px;font-weight:600}
+.hero h1{font-size:clamp(36px,6vw,64px);line-height:1.05;letter-spacing:-.035em;margin:22px auto 18px;max-width:900px;font-weight:800}
+.hero h1 em{font-style:normal;color:#4ade80}
+.hero p{font-size:clamp(17px,2vw,20px);color:#cbd5e1;max-width:720px;margin:0 auto 34px}
+.ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:40px}
+.chip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);padding:8px 14px;border-radius:999px;font-size:14px;color:#e2e8f0;text-decoration:none}
+.chip:hover{background:rgba(255,255,255,.12)}
+.dot{width:9px;height:9px;border-radius:50%}
+/* products */
+section{padding:88px 0}
+.alt{background:var(--alt)}
+.head{text-align:center;max-width:720px;margin:0 auto 48px}
+.eyebrow{color:var(--green);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.08em}
+h2{font-size:clamp(28px,4vw,42px);letter-spacing:-.03em;line-height:1.12;color:var(--ink);margin:10px 0 12px}
+.head p{color:var(--muted);font-size:18px;margin:0}
+.products{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{position:relative;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:30px;display:flex;flex-direction:column;gap:16px;transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(15,39,71,.10)}
+.card::before{content:"";position:absolute;inset:0 0 auto 0;height:5px;border-radius:var(--radius) var(--radius) 0 0;background:var(--c)}
+.pico{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 14%,#fff);color:var(--c)}
+.pico svg{width:28px;height:28px}
+.pname{font-size:24px;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin:0}
+.ptag{font-weight:600;color:var(--c);font-size:14px;margin-top:-10px}
+.card p{margin:0;color:var(--text)}
+.card ul{list-style:none;padding:0;margin:0;display:grid;gap:8px;flex:1;align-content:start}
+.card li{display:flex;gap:10px;font-size:15px}
+.card li svg{flex:0 0 18px;height:18px;color:var(--c);margin-top:3px}
+.card .btn{align-self:flex-start}
+.url{font-size:13px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.badge{position:absolute;top:22px;right:22px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:color-mix(in srgb,var(--c) 12%,#fff);color:var(--c)}
+/* why */
+.why{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.why div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px}
+.why h3{margin:10px 0 6px;color:var(--ink);font-size:17px}
+.why p{margin:0;font-size:15px;color:var(--muted)}
+.why svg{width:26px;height:26px;color:var(--green)}
+/* services */
+.svc{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center}
+.svc ul{list-style:none;padding:0;margin:18px 0 26px;display:grid;gap:10px}
+.svc li{display:flex;gap:10px}
+.svc li svg{flex:0 0 20px;height:20px;color:var(--green);margin-top:2px}
+.svc-box{background:linear-gradient(135deg,#0f2747,#12375f);color:#fff;border-radius:22px;padding:34px}
+.svc-box h3{margin:0 0 8px;font-size:22px}
+.svc-box p{color:#cbd5e1;margin:0 0 22px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px}
+.stats div{background:rgba(255,255,255,.07);border-radius:12px;padding:14px}
+.stats b{display:block;font-size:22px;color:#4ade80}
+.stats span{font-size:13px;color:#cbd5e1}
+/* cta + footer */
+.cta{background:#0b1d36;color:#fff;text-align:center;border-radius:24px;padding:56px 24px}
+.cta h2{color:#fff}
+.cta p{color:#cbd5e1;margin:0 0 26px;font-size:18px}
+footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:14px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:28px;justify-content:space-between}
+footer .cols{display:flex;gap:48px;flex-wrap:wrap}
+footer h4{margin:0 0 10px;color:var(--ink);font-size:14px}
+footer a{display:block;text-decoration:none;margin:6px 0}
+footer a:hover{color:var(--ink)}
+@media (max-width:980px){.products{grid-template-columns:1fr}.why{grid-template-columns:1fr 1fr}.svc{grid-template-columns:1fr}}
+@media (max-width:700px){.nav nav{display:none}.why{grid-template-columns:1fr}section{padding:64px 0}.hero{padding:70px 0 80px}.nav .btn{padding:10px 14px}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="/" aria-label="FloLink home">
+      <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#0f2747"/><path d="M9 22V10h10M9 16h7" stroke="#22c55e" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="22.5" cy="21.5" r="2.6" fill="#22c55e"/></svg>
+      <span>Flo<b>Link</b></span>
+    </a>
+    <nav>
+      <a href="#products">Products</a>
+      <a href="#why">Why us</a>
+      <a href="#services">Zoho services</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <span class="spacer"></span>
+    <a class="btn btn-primary" href="#products">Explore products</a>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="wrap">
+    <span class="kicker">WhatsApp · Zoho · Billing</span>
+    <h1>Software that keeps your business <em>flowing</em></h1>
+    <p>Answer customers on WhatsApp, keep Zoho CRM and Zoho Books in sync, and bill at the counter, all from one team that builds and supports every product.</p>
+    <div class="ctas">
+      <a class="btn btn-primary" href="#products">See our products</a>
+      <a class="btn btn-outline-light" href="#contact">Talk to us</a>
+    </div>
+    <div class="chips">
+      <a class="chip" href="https://flochat.flolink.ai"><span class="dot" style="background:#22c55e"></span>FloChat</a>
+      <a class="chip" href="https://app.flolink.ai/app/"><span class="dot" style="background:#3b82f6"></span>FlowLinker</a>
+      <a class="chip" href="https://app.msoftdynamic.com/app/"><span class="dot" style="background:#f59e0b"></span>BillEase</a>
+    </div>
+  </div>
+</section>
+
+<section id="products">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">Our products</span>
+      <h2>Three products, one goal: less busywork</h2>
+      <p>Pick the one you need today. They're built by the same team, so they're ready for you to use together.</p>
+    </div>
+    <div class="products">
+      <article class="card" style="--c:#16a34a">
+        <span class="badge">14-day free trial</span>
+        <div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.5L3 21l2-5.5A8.5 8.5 0 1 1 21 11.5z"/><path d="M8.5 10.5h7M8.5 13.5h4.5"/></svg></div>
+        <div><h3 class="pname">FloChat</h3></div>
+        <div class="ptag">WhatsApp automation</div>
+        <p>Official WhatsApp Business API with an AI agent, no-code chatbots and a shared team inbox.</p>
+        <ul>
+          <li><svg><use href="#i-check"/></svg>AI agent that answers from your own FAQ and website</li>
+          <li><svg><use href="#i-check"/></svg>Shared inbox with assign, notes and quick replies</li>
+          <li><svg><use href="#i-check"/></svg>Broadcasts with delivered, read and reply reports</li>
+          <li><svg><use href="#i-check"/></svg>REST API, webhooks and Zoho integration</li>
+        </ul>
+        <span class="url">flochat.flolink.ai</span>
+        <a class="btn btn-primary" href="https://flochat.flolink.ai">Open FloChat <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
+      </article>
+
+      <article class="card" style="--c:#2563eb">
+        <span class="badge">Free</span>
+        <div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1"/></svg></div>
+        <div><h3 class="pname">FlowLinker</h3></div>
+        <div class="ptag">Zoho CRM ↔ Zoho Books sync</div>
+        <p>Send invoices, products and accounts from Zoho CRM to Zoho Books automatically, with no code.</p>
+        <ul>
+          <li><svg><use href="#i-check"/></svg>Visual workflow builder, set up in about 5 minutes</li>
+          <li><svg><use href="#i-check"/></svg>Real-time webhook triggers</li>
+          <li><svg><use href="#i-check"/></svg>Works in all Zoho data centers</li>
+          <li><svg><use href="#i-check"/></svg>Sync logs with one-click retry</li>
+        </ul>
+        <span class="url">app.flolink.ai</span>
+        <a class="btn btn-ghost" href="https://app.flolink.ai/app/">Open FlowLinker <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
+      </article>
+
+      <article class="card" style="--c:#d97706">
+        <div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></div>
+        <div><h3 class="pname">BillEase</h3></div>
+        <div class="ptag">Billing &amp; POS</div>
+        <p>Cloud billing and point of sale for shops: fast checkout, tax invoices and live stock.</p>
+        <ul>
+          <li><svg><use href="#i-check"/></svg>Barcode checkout with cash, card and UPI</li>
+          <li><svg><use href="#i-check"/></svg>Tax invoices calculated automatically</li>
+          <li><svg><use href="#i-check"/></svg>Stock tracking with low-stock alerts</li>
+          <li><svg><use href="#i-check"/></svg>Daily sales and profit reports, staff roles</li>
+        </ul>
+        <span class="url">app.msoftdynamic.com</span>
+        <a class="btn btn-ghost" href="https://app.msoftdynamic.com/app/">Open BillEase <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="why" class="alt">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">Why FloLink</span>
+      <h2>Built for small teams that move fast</h2>
+    </div>
+    <div class="why">
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg><h3>Live in minutes</h3><p>No IT team needed. Sign up, connect, and you're running.</p></div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg><h3>Zoho experts</h3><p>Built by Zoho Certified Developers who integrate Zoho every day.</p></div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><h3>Secure by default</h3><p>HTTPS everywhere, encrypted keys, and your data stays yours.</p></div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><h3>Real support</h3><p>Talk to the people who build the product, not a ticket queue.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="wrap svc">
+    <div>
+      <span class="eyebrow">Custom work</span>
+      <h2>Need something built on Zoho?</h2>
+      <p>Our parent company, Msoft Dynamic Technologies, builds custom Zoho solutions for clients in India and the US.</p>
+      <ul>
+        <li><svg><use href="#i-check"/></svg>Zoho CRM, Books, Inventory, Creator and Catalyst development</li>
+        <li><svg><use href="#i-check"/></svg>Third-party integrations: Shopify, WooCommerce, QuickBooks, ShipStation, Twilio and more</li>
+        <li><svg><use href="#i-check"/></svg>Zoho Marketplace extensions</li>
+      </ul>
+      <a class="btn btn-ghost" href="https://msoftdynamic.com">Visit msoftdynamic.com <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
+    </div>
+    <div class="svc-box">
+      <h3>One team for products and projects</h3>
+      <p>Buy a product off the shelf or have us tailor it to your process.</p>
+      <div class="stats">
+        <div><b>3</b><span>products in production</span></div>
+        <div><b>5</b><span>Zoho data centers supported</span></div>
+        <div><b>India + US</b><span>clients served</span></div>
+        <div><b>Zoho</b><span>certified developers</span></div>
+      </div>
+      <a class="btn btn-light" href="mailto:info@msoftdynamic.com">info@msoftdynamic.com</a>
+    </div>
+  </div>
+</section>
+
+<section id="contact" style="padding-top:0">
+  <div class="wrap">
+    <div class="cta">
+      <h2>Let's get your business flowing</h2>
+      <p>Start a FloChat trial today, or tell us what you need.</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="https://flochat.flolink.ai/control/signup">Start FloChat free trial</a>
+        <a class="btn btn-outline-light" href="mailto:info@msoftdynamic.com">Email us</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <a class="logo" href="/" style="font-size:18px"><span>Flo<b>Link</b></span></a>
+      <p style="margin:10px 0 0;max-width:320px">A product line of Msoft Dynamic Technologies (OPC) Private Limited, Gwalior, Madhya Pradesh, India.</p>
+      <p style="margin:8px 0 0">&copy; <span id="yr">2026</span> Msoft Dynamic Technologies</p>
+    </div>
+    <div class="cols">
+      <div><h4>Products</h4><a href="https://flochat.flolink.ai">FloChat</a><a href="https://app.flolink.ai/app/">FlowLinker</a><a href="https://app.msoftdynamic.com/app/">BillEase</a></div>
+      <div><h4>Company</h4><a href="https://msoftdynamic.com">msoftdynamic.com</a><a href="mailto:info@msoftdynamic.com">info@msoftdynamic.com</a></div>
+      <div><h4>Legal</h4><a href="https://flochat.flolink.ai/control/privacy">Privacy</a><a href="https://flochat.flolink.ai/control/terms">Terms</a></div>
+    </div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

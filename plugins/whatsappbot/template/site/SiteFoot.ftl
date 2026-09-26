@@ -14,7 +14,7 @@
     <div>
       <h4>${companyName!"FloLink"}</h4>
       <a href="<@ofbizUrl>home</@ofbizUrl>#products">FloChat</a>
-      <a href="${flowlinkerUrl!"https://app.flolink.ai"}">FlowLinker</a>
+      <a href="${flowlinkerUrl!"https://app.flolink.ai/app/"}">FlowLinker</a>
     </div>
     <div>
       <h4>Legal</h4>
@@ -24,7 +24,7 @@
     </div>
     <div>
       <h4>Contact</h4>
-      <a href="https://${brandDomain!"flolink.ai"}">${brandDomain!"flolink.ai"}</a>
+      <a href="https://${brandDomain!"flochat.flolink.ai"}">${brandDomain!"flochat.flolink.ai"}</a>
       <a href="mailto:${supportEmail!"info@msoftdynamic.com"}">${supportEmail!"info@msoftdynamic.com"}</a>
     </div>
   </div>

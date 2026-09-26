@@ -134,23 +134,12 @@ PayPal recurring subscriptions (auto-renew) and refunds webhook, media download/
 to OFBiz content, per-tenant webhooks to push inbound messages to the tenant's systems,
 AI replies on fallback.
 
-## Moving to flolink.ai (main domain)
+## flolink.ai landing page
 
-FloChat runs on **https://flolink.ai** (website + app). `www.` and the old `flochat.flolink.ai` redirect there (`app.flolink.ai` stays FlowLinker on Zoho Catalyst); the
-Meta webhook (`/webhook`), the REST API (`/api/`) and the Zoho callback keep answering on the old address too, so nothing
-breaks while you update settings.
-
-1. **FlowLinker** stays on `app.flolink.ai` (CNAME to Zoho Catalyst) - don't change it. The site links there
-   (`brand.flowlinker.url`, default `https://app.flolink.ai`).
-2. **GoDaddy DNS** (flolink.ai uses GoDaddy nameservers): edit the `@` A record (shows "Parked") → `103.48.51.17`,
-   and turn off Parking/Forwarding if GoDaddy asks. `www` is already a CNAME to `@`. Keep `flochat` A `103.48.51.17`.
-3. **Server**: `sudo bash /opt/flochat/ofbiz/plugins/whatsappbot/deploy/move-to-flolink.sh`
-   (nginx for flolink.ai, www and flochat, HTTPS certificate, OFBiz allowed hosts, `brand.domain`, `brand.app.url`, `zoho.redirect.uri`).
-4. **Meta app (FloChat)**
-   * App settings → Basic: App domains `flolink.ai`; Privacy `https://flolink.ai/control/privacy`;
-     Terms `https://flolink.ai/control/terms`; Data deletion `https://flolink.ai/control/data-deletion`.
-   * Facebook Login for Business → Settings: add `https://flolink.ai/` to Valid OAuth redirect URIs and
-     `https://flolink.ai` to Allowed domains for the JavaScript SDK (needed for "Connect WhatsApp").
-   * WhatsApp → Configuration: Callback URL `https://flolink.ai/webhook` (same verify token).
-5. **Zoho API Console**: add the redirect URI `https://flolink.ai/control/zohoCallback` (keep the old one).
-6. Everyone signs in again once on the new address.
+* **https://flolink.ai** is the product landing page for FloChat, FlowLinker and BillEase: a static page in
+  `deploy/flolink-site/`, served by nginx from `/var/www/flolink`. `www.flolink.ai` redirects to it.
+* **FloChat stays on https://flochat.flolink.ai**, so there's nothing to change in Meta, Zoho or PayPal.
+* **app.flolink.ai** is FlowLinker on Zoho Catalyst (GoDaddy CNAME). **app.msoftdynamic.com** is BillEase.
+* DNS (GoDaddy): `@` A `103.48.51.17`, `www` CNAME `@`, `flochat` A `103.48.51.17`, `app` CNAME Catalyst.
+* Install or update the page: `sudo bash /opt/flochat/plugins/whatsappbot/deploy/setup-flolink-site.sh`
+  (copies the page, writes the nginx config using the existing certificate, and keeps FloChat's address settings).

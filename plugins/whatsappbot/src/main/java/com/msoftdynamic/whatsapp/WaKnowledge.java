@@ -312,7 +312,7 @@ public final class WaKnowledge {
         URI u = checkUrl(url);
         for (int hop = 0; hop < 5; hop++) {
             HttpRequest req = HttpRequest.newBuilder(u).timeout(Duration.ofSeconds(20))
-                    .header("User-Agent", "Mozilla/5.0 (compatible; FloChatBot/1.0; +https://" + WaUtil.prop("brand.domain", "flolink.ai") + ")")
+                    .header("User-Agent", "Mozilla/5.0 (compatible; FloChatBot/1.0; +https://" + WaUtil.prop("brand.domain", "flochat.flolink.ai") + ")")
                     .header("Accept", "text/html,application/xhtml+xml,text/plain,application/pdf;q=0.9,*/*;q=0.5").GET().build();
             HttpResponse<InputStream> res;
             try {
