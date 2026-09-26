@@ -94,6 +94,30 @@ footer .cols{display:flex;gap:48px;flex-wrap:wrap}
 footer h4{margin:0 0 10px;color:var(--ink);font-size:14px}
 footer a{display:block;text-decoration:none;margin:6px 0}
 footer a:hover{color:var(--ink)}
+/* our work */
+.work{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.case{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px;display:flex;flex-direction:column;gap:12px;transition:transform .2s,box-shadow .2s}
+.case:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(15,39,71,.09)}
+.case .ind{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.case h3{margin:0;color:var(--ink);font-size:19px;line-height:1.3}
+.case p{margin:0;font-size:15px}
+.case ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--text);display:grid;gap:4px;flex:1;align-content:start}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.tags span{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:#eef2f7;color:#334155}
+.feature{grid-column:1/-1;display:grid;grid-template-columns:1fr 1.1fr;gap:34px;align-items:center;background:linear-gradient(135deg,#f0fdf4,#eff6ff);border-color:#cfe8d8}
+.flow{display:flex;flex-direction:column;gap:10px;min-width:0}
+.fstep{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.fstep b{flex:0 0 28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--ink);color:#fff;font-size:13px}
+.fstep div{font-size:14.5px}
+.fstep small{display:block;color:var(--muted);font-size:13px}
+.code{background:#0b1d36;color:#e2e8f0;border-radius:12px;padding:14px 16px;font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;overflow-x:auto;white-space:pre;margin:0}
+@media (max-width:700px){.code{font-size:11px}}
+.code .k{color:#4ade80}.code .c{color:#94a3b8}.code .s{color:#fbbf24}
+.caps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:32px}
+.caps div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px}
+.caps h4{margin:0 0 6px;color:var(--ink);font-size:15px}
+.caps p{margin:0;font-size:14px;color:var(--muted)}
+.note{text-align:center;color:var(--muted);font-size:13px;margin-top:22px}
 .yt-wrap{padding:0 0 88px}
 .yt{display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:22px;padding:30px 34px}
 .yt-ico{width:72px;height:72px;border-radius:18px;background:#fee2e2;color:#dc2626;display:grid;place-items:center}
@@ -103,8 +127,8 @@ footer a:hover{color:var(--ink)}
 .btn-yt{background:#dc2626;color:#fff;box-shadow:0 6px 18px rgba(220,38,38,.25)}
 .btn-yt:hover{background:#b91c1c}
 .btn-yt svg{width:20px;height:20px}
-@media (max-width:980px){.products{grid-template-columns:1fr}.why{grid-template-columns:1fr 1fr}.svc{grid-template-columns:1fr}.yt{grid-template-columns:1fr;text-align:left}}
-@media (max-width:700px){.nav nav{display:none}.why{grid-template-columns:1fr}section{padding:64px 0}.hero{padding:70px 0 80px}.nav .btn{padding:10px 14px}}
+@media (max-width:980px){.products{grid-template-columns:1fr}.why{grid-template-columns:1fr 1fr}.svc{grid-template-columns:1fr}.work{grid-template-columns:1fr 1fr}.feature{grid-template-columns:1fr}.caps{grid-template-columns:1fr 1fr}.yt{grid-template-columns:1fr;text-align:left}}
+@media (max-width:700px){.nav nav{display:none}.why{grid-template-columns:1fr}.work,.caps{grid-template-columns:1fr}section{padding:64px 0}.hero{padding:70px 0 80px}.nav .btn{padding:10px 14px}}
 </style>
 </head>
 <body>
@@ -123,6 +147,7 @@ footer a:hover{color:var(--ink)}
       <a href="#products">Products</a>
       <a href="#why">Why us</a>
       <a href="#services">Zoho services</a>
+      <a href="#work">Our work</a>
       <a href="#videos">Videos</a>
       <a href="#contact">Contact</a>
     </nav>
@@ -249,7 +274,89 @@ footer a:hover{color:var(--ink)}
   </div>
 </section>
 
-<section id="videos" class="yt-wrap">
+<section id="work" class="alt">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">Our work</span>
+      <h2>Zoho projects we've delivered</h2>
+      <p>A selection of solutions our team has built. Client names and data are replaced with demo examples.</p>
+    </div>
+    <div class="work">
+      <article class="case feature">
+        <div>
+          <span class="ind">E-commerce · Demo case</span>
+          <h3 style="font-size:24px;margin:8px 0 10px">Shopify orders become Zoho CRM sales orders, automatically</h3>
+          <p>Every new Shopify order is picked up by Zoho Flow and turned into a complete sales order in Zoho CRM: shipping address, order number and every line item matched to CRM products by SKU. Existing CRM workflows then run as usual.</p>
+          <div class="tags" style="margin-top:14px"><span>Shopify</span><span>Zoho Flow</span><span>Deluge</span><span>Zoho CRM</span></div>
+        </div>
+        <div class="flow">
+          <div class="fstep"><b>1</b><div>Order created in Shopify<small>Zoho Flow trigger on the store connection</small></div></div>
+          <div class="fstep"><b>2</b><div>Custom function reads the order<small>Shipping address, line items and vendor filter</small></div></div>
+          <div class="fstep"><b>3</b><div>Products matched by SKU, sales order created<small>Price and quantity per line, CRM workflows triggered</small></div></div>
+<pre class="code"><span class="c">// demo excerpt (Deluge)</span>
+<span class="k">for each</span> item <span class="k">in</span> order.get(<span class="s">"line_items"</span>) {
+  sku = item.get(<span class="s">"sku"</span>);
+  p = zoho.crm.searchRecords(<span class="s">"Products"</span>,
+        <span class="s">"(Product_Code:equals:"</span> + sku + <span class="s">")"</span>);
+  lines.add({<span class="s">"product"</span>: p.get(0).get(<span class="s">"id"</span>),
+             <span class="s">"quantity"</span>: item.get(<span class="s">"quantity"</span>)});
+}
+zoho.crm.createRecord(<span class="s">"Sales_Orders"</span>, so,
+                      {<span class="s">"trigger"</span>: [<span class="s">"workflow"</span>]});</pre>
+        </div>
+      </article>
+      <article class="case">
+        <span class="ind">Distribution · Demo case</span>
+        <h3>XML sales order import for Zoho Books</h3>
+        <p>A web tool on Zoho Catalyst that turns XML order files into Zoho Books sales orders.</p>
+        <ul><li>Upload an XML file from a simple screen</li><li>Checks every required field and format first</li><li>Maps customer, items, quantity, price and tax</li><li>Clear error report for any file that fails</li></ul>
+        <div class="tags"><span>Zoho Catalyst</span><span>Node.js</span><span>Zoho Books API</span><span>OAuth</span></div>
+      </article>
+      <article class="case">
+        <span class="ind">Fitness retail · Demo case</span>
+        <h3>Point of sale built on Zoho Creator</h3>
+        <p>A counter POS for a demo sports-nutrition store, connected to Zoho Books for invoices and payments.</p>
+        <ul><li>Fast checkout screen for staff</li><li>Invoice created in Zoho Books on every sale</li><li>Payments recorded against the invoice</li><li>Items and prices shared with Zoho Books</li></ul>
+        <div class="tags"><span>Zoho Creator</span><span>Zoho Books</span><span>Deluge</span></div>
+      </article>
+      <article class="case">
+        <span class="ind">B2B services · Demo case</span>
+        <h3>Customer portal on Zoho CRM</h3>
+        <p>A self-service portal where customers see their account, quotes and invoices without emailing the team.</p>
+        <ul><li>Customers sign in to their own portal</li><li>Quotes and invoices pulled from Zoho Books</li><li>Requests land in Zoho CRM as records</li><li>Less back-and-forth for the sales team</li></ul>
+        <div class="tags"><span>Zoho CRM</span><span>Zoho Books</span><span>Portals</span></div>
+      </article>
+      <article class="case">
+        <span class="ind">Wholesale · Demo case</span>
+        <h3>UPS shipping labels from CRM and Books</h3>
+        <p>Print UPS shipping labels straight from Zoho CRM and Zoho Books records.</p>
+        <ul><li>Label generated from the order details</li><li>Works from both Zoho CRM and Zoho Books</li><li>Print labels without leaving Zoho</li><li>No copy-paste into the carrier website</li></ul>
+        <div class="tags"><span>UPS API</span><span>Zoho CRM</span><span>Zoho Books</span></div>
+      </article>
+      <article class="case">
+        <span class="ind">Sales operations · Demo case</span>
+        <h3>PDF document parser for leads</h3>
+        <p>A Zoho Creator app that parses, splits and manages PDFs for Zoho CRM leads.</p>
+        <ul><li>Extracts data from uploaded PDFs</li><li>Splits multi-document files automatically</li><li>Keeps documents organised on the lead</li><li>Cuts manual document handling</li></ul>
+        <div class="tags"><span>Zoho Creator</span><span>Zoho CRM</span><span>PDF.co API</span></div>
+      </article>
+      <article class="case">
+        <span class="ind">Research · Demo case</span>
+        <h3>Survey app with a custom widget</h3>
+        <p>A survey application in Zoho Creator with a custom-built widget for a smoother answering experience.</p>
+        <ul><li>Clean, mobile-friendly survey screens</li><li>Custom widget for richer question types</li><li>Responses stored and reported in Creator</li><li>Easy to reuse for new surveys</li></ul>
+        <div class="tags"><span>Zoho Creator</span><span>JavaScript widget</span></div>
+      </article>
+    </div>
+    <div class="head" style="margin:64px auto 0">
+      <h2 style="font-size:clamp(24px,3vw,32px)">What we build on Zoho every day</h2>
+    </div>
+    <div class="caps"><div><h4>Custom buttons</h4><p>Quote to Sales Order to Invoice in one click, plus quotes and orders straight from an account.</p></div><div><h4>Widgets &amp; custom UI</h4><p>Related lists and screens in Zoho CRM, Creator and Books, such as an invoice template designer.</p></div><div><h4>Custom functions</h4><p>Deluge functions in Zoho CRM and Zoho Books for logic that workflows alone cannot handle.</p></div><div><h4>Client scripts</h4><p>Auto-fill fields as users work in Zoho CRM forms.</p></div><div><h4>Blueprints</h4><p>Guided sales and approval processes with actions at every stage.</p></div><div><h4>Zoho Flow</h4><p>Signed Zoho Sign documents filed in CRM, WorkDrive folders created, third-party data pushed in.</p></div><div><h4>CRM to Zoho Projects</h4><p>A new deal creates a project automatically, with the project link saved on the deal.</p></div><div><h4>CRM to Zoho Desk</h4><p>Raise a support ticket from a CRM record with a button or workflow.</p></div></div>
+    <p class="note">All examples use demo data to protect our clients' privacy.</p>
+  </div>
+</section>
+
+<section id="videos" class="yt-wrap" style="padding-top:88px">
   <div class="wrap">
     <div class="yt">
       <div class="yt-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12a31 31 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8zM9.8 15.1V8.9l5.7 3.1z"/></svg></div>
