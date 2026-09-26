@@ -129,6 +129,21 @@
     <request-map uri="kbList"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaAgentEvents" invoke="kbList"/><response name="none" type="none"/></request-map>
     <request-map uri="agentTest" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaAgentEvents" invoke="agentTest" global-transaction="false"/><response name="none" type="none"/></request-map>
 
+    <!-- ===== Add-ons (admin catalog) ===== -->
+    <request-map uri="addonSave" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaAddons" invoke="addonSave"/>
+        <response name="success" type="request-redirect-noparam" value="Plans"/><response name="error" type="view" value="Plans"/></request-map>
+    <request-map uri="addonSeed" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaAddons" invoke="addonSeed"/>
+        <response name="success" type="request-redirect-noparam" value="Plans"/><response name="error" type="view" value="Plans"/></request-map>
+
+    <!-- ===== Developer portal ===== -->
+    <request-map uri="devKeyCreate" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaDevEvents" invoke="devKeyCreate"/><response name="none" type="none"/></request-map>
+    <request-map uri="devKeyRevoke" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaDevEvents" invoke="devKeyRevoke"/><response name="none" type="none"/></request-map>
+    <request-map uri="webhookSave" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaDevEvents" invoke="webhookSave"/><response name="none" type="none"/></request-map>
+    <request-map uri="webhookAction" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaDevEvents" invoke="webhookAction" global-transaction="false"/><response name="none" type="none"/></request-map>
+    <request-map uri="webhookDeliveries"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaDevEvents" invoke="webhookDeliveries"/><response name="none" type="none"/></request-map>
+    <request-map uri="webhookRedeliver" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaDevEvents" invoke="webhookRedeliver" global-transaction="false"/><response name="none" type="none"/></request-map>
+    <request-map uri="devTry" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaDevEvents" invoke="devTry" global-transaction="false"/><response name="none" type="none"/></request-map>
+
     <!-- ===== Public website (no login) ===== -->
     <request-map uri="home"><security https="true" auth="false"/><response name="success" type="view" value="Home"/></request-map>
     <request-map uri="privacy"><security https="true" auth="false"/><response name="success" type="view" value="Privacy"/></request-map>

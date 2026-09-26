@@ -23,8 +23,56 @@
     <div class="fc-bill-secure"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> Secure checkout by PayPal. Pay with your PayPal balance or any debit or credit card.</div>
   </div>
 
+  <#if parameters.addonPaid?has_content>
+    <div class="fc-bill-ok">Add-on active. Thank you! Your new limits are shown below.</div>
+  </#if>
   <#if parameters.paid?has_content>
     <div class="fc-bill-ok">Payment received. Your ${(currentPlan.planName)!} plan is active until ${(currentTenant.subscriptionThruDate?string("dd MMM yyyy"))!}. Thank you!</div>
+  </#if>
+
+  <#if limitUsage??>
+  <div class="fc-usage">
+    <#list [["MESSAGES","Messages this month","messages"],["CHANNELS","WhatsApp numbers","numbers"],["FLOWS","Bot flows","flows"]] as u>
+      <#assign x = limitUsage[u[0]]>
+      <div class="fc-use<#if x.full> full<#elseif (x.pct >= 80)> warn</#if>">
+        <span>${u[1]}</span>
+        <b>${x.used?string(",##0")}<small> / <#if x.limit??>${x.limit?string(",##0")}<#else>unlimited</#if></small></b>
+        <#if x.limit??><i class="fc-use-bar"><em style="width:${x.pct}%"></em></i></#if>
+        <small><#if (x.extra > 0) && x.limit??>includes ${x.extra?string(",##0")} from add-ons<#elseif x.full>Limit reached<#elseif (x.pct >= 80)>Almost used up<#else>&nbsp;</#if></small>
+        <#if x.limit?? && (x.pct >= 80) && addons?filter(a -> a.type == u[0])?has_content><a class="fc-use-buy" href="#addons" data-addon-type="${u[0]}">Buy more ${u[2]}</a></#if>
+      </div>
+    </#list>
+  </div>
+  </#if>
+
+  <#if addons?has_content>
+  <div class="fc-bill-head" id="addons"><h2>Add-ons</h2><span class="fc-muted2">Need a bit more without changing your plan? Buy only what you need.</span></div>
+  <div class="fc-addons">
+    <#list addons as a>
+      <label class="fc-addon" data-type="${a.type}">
+        <input type="radio" name="fcAddon" value="${a.addonId}" data-price="${a.price?c}" data-cur="${a.currency}" <#if addonFocus == a.addonId>checked</#if>/>
+        <span class="fc-addon-ico"><#if a.type == "MESSAGES">💬<#elseif a.type == "CHANNELS">📱<#else>🤖</#if></span>
+        <span class="fc-addon-main"><b>${a.name}</b><small>${a.description!""}</small></span>
+        <span class="fc-addon-price"><#if a.currency == "USD">$<#elseif a.currency == "INR">&#8377;<#else>${a.currency} </#if>${a.price?string("0.00")}<small><#if a.type == "MESSAGES">this month<#else>30 days</#if></small></span>
+      </label>
+    </#list>
+  </div>
+  <div class="fc-pay fc-addon-pay">
+    <#if !isOwner>
+      <p class="fc-note">Only the workspace owner can buy add-ons.</p>
+    <#elseif !paypalConfigured>
+      <p class="fc-note">Online payment is being set up. Please contact <a href="mailto:${supportEmail!"info@msoftdynamic.com"}">${supportEmail!"info@msoftdynamic.com"}</a>.</p>
+    <#else>
+      <div class="fc-pay-summary"><label>How many <select id="fcPacks"><#list 1..10 as n><option value="${n}">${n}</option></#list></select></label>
+        &nbsp; You pay <strong id="fcAddonTotal">–</strong> <span id="fcAddonFor" class="fc-muted2"></span></div>
+      <div id="fcAddonMsg" class="fc-msg" role="alert" hidden></div>
+      <div id="paypal-addon-buttons" class="fc-pp"></div>
+    </#if>
+  </div>
+  <#if activeAddons?has_content>
+    <div class="fc-active-addons"><b>Active add-ons</b>
+      <ul><#list activeAddons as t><li>${addonNames[t.addonId]!t.addonId} &middot; +${t.quantity?string(",##0")} <#if t.addonType == "MESSAGES">messages<#elseif t.addonType == "CHANNELS">number<#if (t.quantity > 1)>s</#if><#else>flows</#if> &middot; until ${t.thruDate?string("dd MMM yyyy")}</li></#list></ul></div>
+  </#if>
   </#if>
 
   <div class="fc-bill-head">
@@ -78,7 +126,7 @@
         <#list payments as pay>
           <tr>
             <td>${pay.createdDate?string("dd MMM yyyy")}</td>
-            <td>${planNames[pay.planId!]!pay.planId!}</td>
+            <td><#if pay.addonId?has_content>Add-on: ${addonNames[pay.addonId]!pay.addonId}<#if (pay.packs!1) gt 1> ×${pay.packs}</#if><#else>${planNames[pay.planId!]!pay.planId!}</#if></td>
             <td><#if pay.periodFromDate?has_content>${pay.periodFromDate?string("dd MMM yyyy")} &ndash; ${pay.periodThruDate?string("dd MMM yyyy")}<#else>${pay.months!1} month<#if (pay.months!1) != 1>s</#if></#if></td>
             <td><@money pay.currencyUomId!"USD" pay.amount!0/></td>
             <td><#switch pay.statusId!><#case "COMPLETED"><span class="ms-pill ms-pill-green">Paid</span><#break><#case "PENDING"><span class="ms-pill ms-pill-amber">Pending</span><#break><#default><span class="ms-pill ms-pill-red">Failed</span></#switch></td>
@@ -172,7 +220,62 @@
   s.onload = function () {
     rerender = function () { msg.hidden = true; renderButtons(); };
     renderButtons();
+    addonButtons();
   };
+  // ---- add-ons
+  var abox = document.getElementById('paypal-addon-buttons'), amsg = document.getElementById('fcAddonMsg'), aButtons = null, agen = 0;
+  function addon() { var r = document.querySelector('input[name=fcAddon]:checked'); return r; }
+  function packs() { var p = document.getElementById('fcPacks'); return p ? p.value : '1'; }
+  function ashow(text, ok) { amsg.hidden = false; amsg.className = 'fc-msg' + (ok ? ' ok' : ''); amsg.textContent = text; }
+  function arefresh() {
+    document.querySelectorAll('.fc-addon').forEach(function (l) { l.classList.toggle('sel', l.querySelector('input').checked); });
+    var a = addon(), t = document.getElementById('fcAddonTotal');
+    if (!t) { return; }
+    if (!a) { t.textContent = '–'; document.getElementById('fcAddonFor').textContent = 'choose an add-on above'; return; }
+    var total = (parseFloat(a.dataset.price) * parseInt(packs(), 10)).toFixed(2);
+    t.textContent = (a.dataset.cur === 'USD' ? '$' : a.dataset.cur === 'INR' ? '\u20b9' : a.dataset.cur + ' ') + total;
+    document.getElementById('fcAddonFor').textContent = 'for ' + (packs() !== '1' ? packs() + ' x ' : '') + a.closest('.fc-addon').querySelector('b').textContent;
+  }
+  function addonButtons() {
+    if (!abox || !window.paypal) { return; }
+    var my = ++agen, old = aButtons; aButtons = null;
+    (old && old.close ? old.close().catch(function () {}) : Promise.resolve()).then(function () {
+      if (my !== agen) { return; }
+      abox.innerHTML = '';
+      if (!addon()) { return; }
+      aButtons = paypal.Buttons({
+        style: { layout: 'vertical', shape: 'rect', label: 'pay', height: 45 },
+        createOrder: function () {
+          amsg.hidden = true;
+          return post('<@ofbizUrl>paypalCreateOrder</@ofbizUrl>', { addonId: addon().value, packs: packs() }).then(function (d) {
+            if (!d.orderId) { throw new Error(d.error || 'Could not start the payment.'); }
+            return d.orderId;
+          });
+        },
+        onApprove: function (data, actions) {
+          ashow('Confirming your payment...', true);
+          return post('<@ofbizUrl>paypalCaptureOrder</@ofbizUrl>', { orderId: data.orderID }).then(function (d) {
+            if (d.restart) { ashow(d.error); return actions.restart(); }
+            if (d.ok) { window.location.href = '<@ofbizUrl>Billing?addonPaid=Y</@ofbizUrl>'; return; }
+            if (d.pending) { ashow(d.message, true); return; }
+            ashow(d.error || 'The payment could not be completed.');
+          });
+        },
+        onCancel: function () { ashow('Payment cancelled. You have not been charged.'); },
+        onError: function (err) { ashow((err && err.message) ? err.message : 'The payment could not be completed.'); }
+      });
+      aButtons.render('#paypal-addon-buttons');
+    });
+  }
+  document.querySelectorAll('input[name=fcAddon]').forEach(function (r) { r.addEventListener('change', function () { arefresh(); addonButtons(); }); });
+  var pk = document.getElementById('fcPacks'); if (pk) { pk.addEventListener('change', function () { arefresh(); addonButtons(); }); }
+  document.querySelectorAll('[data-addon-type]').forEach(function (a) {
+    a.addEventListener('click', function () {
+      var r = document.querySelector('.fc-addon[data-type="' + a.dataset.addonType + '"] input');
+      if (r) { r.checked = true; arefresh(); if (window.paypal) { addonButtons(); } }
+    });
+  });
+  arefresh();
   document.head.appendChild(s);
 })();
 </script>

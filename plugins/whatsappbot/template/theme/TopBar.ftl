@@ -46,7 +46,7 @@
       <div class="ms-nav-section">Settings</div>
       <@nav "Settings" "Team &amp; Profile" "settings" "Settings"/>
       <@nav "Billing" "Plan &amp; Billing" "card" "Billing"/>
-      <@nav "ApiKeys" "API &amp; Integrations" "key" "ApiKeys"/>
+      <@nav "ApiKeys" "Developers" "key" "ApiKeys"/>
     </#if>
     <#if (isWaAdmin!"N") == "Y">
       <div class="ms-nav-section ms-admin-section">Platform admin</div>
@@ -58,13 +58,14 @@
   </nav>
   <#if currentTenant?has_content && currentPlan?has_content>
     <#assign used = (currentUsage.messagesOut)!0>
-    <#assign quota = (currentPlan.maxMessagesPerMonth)!0>
+    <#assign quota = currentMsgLimit!0>
     <div class="ms-plan-card">
       <div class="ms-plan-name">${currentPlan.planName!} plan<#if currentTenant.statusId! == "WA_TNT_TRIAL"> &middot; Trial</#if></div>
       <#if (quota > 0)>
         <#assign pct = ((used * 100) / quota)?round>
         <div class="ms-meter"><span style="width:${[pct,100]?min}%"></span></div>
         <div class="ms-plan-sub">${used} / ${quota} messages this month</div>
+        <#if (pct >= 80)><a class="ms-plan-cta" href="<@ofbizUrl>Billing</@ofbizUrl>#addons">Buy more messages</a></#if>
       <#else>
         <div class="ms-plan-sub">${used} messages this month &middot; unlimited</div>
       </#if>

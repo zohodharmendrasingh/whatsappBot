@@ -1,6 +1,6 @@
 <div id="footer-offset"></div>
 <div id="footer" class="msoft-footer">
-    <span>&copy; ${nowTimestamp?string("yyyy")} ${brandName!"FloChat"} &middot; ${brandDomain!"flochat.flolink.ai"}</span>
+    <span>&copy; ${nowTimestamp?string("yyyy")} ${brandName!"FloChat"} &middot; ${brandDomain!"flolink.ai"}</span>
     <span>Need help? <a href="mailto:${supportEmail!"info@msoftdynamic.com"}">${supportEmail!"info@msoftdynamic.com"}</a></span>
 </div>
 </div>

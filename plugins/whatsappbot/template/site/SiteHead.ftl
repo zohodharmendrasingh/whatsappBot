@@ -17,6 +17,7 @@
   <div class="s-wrap s-nav-in">
     <a href="<@ofbizUrl>home</@ofbizUrl>" class="s-logo"><img src="/theme/flochat-logo-dark.svg" alt="FloChat" height="36"/></a>
     <nav class="s-links">
+      <a href="<@ofbizUrl>home</@ofbizUrl>#products">Products</a>
       <a href="<@ofbizUrl>home</@ofbizUrl>#features">Features</a>
       <a href="<@ofbizUrl>home</@ofbizUrl>#how">How it works</a>
       <a href="<@ofbizUrl>home</@ofbizUrl>#pricing">Pricing</a>

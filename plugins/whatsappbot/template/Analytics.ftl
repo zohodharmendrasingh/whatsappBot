@@ -1,5 +1,5 @@
 <#-- Analytics dashboard -->
-<link rel="stylesheet" href="/theme/crm.css?v=4"/>
+<link rel="stylesheet" href="/theme/crm.css?v=5"/>
 <#if !analyticsTzKnown>
 <script>(function(){try{var z=Intl.DateTimeFormat().resolvedOptions().timeZone;if(z){var u=new URL(location.href);u.searchParams.set('tz',z);location.replace(u.toString());}}catch(e){}})();</script>
 </#if>

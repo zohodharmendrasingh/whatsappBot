@@ -680,65 +680,87 @@ public final class WaCrmEvents {
             if (w == null) {
                 return error(response, 403, "Please log in to a workspace.");
             }
-            GenericValue ch = channelOf(delegator, w, p(request, "channelId"));
-            if (ch == null) {
-                return error(response, 400, "Choose the WhatsApp number to send from.");
+            Map<String, String> f = new java.util.HashMap<>();
+            for (String k : List.of("channelId", "templateId", "audienceType", "tags", "excludeTags", "sendAt", "campaignName")) {
+                f.put(k, p(request, k));
             }
-            GenericValue tpl = UtilValidate.isEmpty(p(request, "templateId")) ? null
-                    : EntityQuery.use(delegator).from("WaTemplate").where("templateId", p(request, "templateId")).queryOne();
-            if (tpl == null || !ch.getString("channelId").equals(tpl.getString("channelId"))) {
-                return error(response, 400, "Choose an approved template of this WhatsApp number.");
+            f.put("bodyParams", request.getParameter("bodyParams"));
+            f.put("numbers", request.getParameter("numbers"));
+            String[] r = createCampaign(delegator, dispatcher, w.tenantId, w.userId, f);
+            if (r[1] != null) {
+                return error(response, 400, r[1]);
             }
-            if (!"APPROVED".equals(tpl.getString("metaStatus"))) {
-                return error(response, 400, "This template is not approved by Meta yet.");
-            }
-            String type = p(request, "audienceType");
-            if (!List.of("TAGS", "ALL", "NUMBERS").contains(type)) {
-                return error(response, 400, "Choose who should get this broadcast.");
-            }
-            if ("TAGS".equals(type) && WaContacts.parseTags(p(request, "tags")).isEmpty()) {
-                return error(response, 400, "Pick at least one tag.");
-            }
-            int needed = placeholders(tpl.getString("bodyText"));
-            String bodyParams = request.getParameter("bodyParams");
-            List<String> givenList = UtilValidate.isEmpty(bodyParams) ? List.of() : WaUtil.splitParams(bodyParams);
-            int given = givenList.size();
-            if (needed == given && givenList.stream().anyMatch(v -> v.trim().isEmpty())) {
-                return error(response, 400, "Fill in every template value.");
-            }
-            if (needed != given) {
-                return error(response, 400, "This template needs " + needed + " value" + (needed == 1 ? "" : "s") + " ({{1}}"
-                        + (needed > 1 ? "…{{" + needed + "}}" : "") + "). Fill in every value.");
-            }
-            Map<String, Object> est = WaCampaigns.estimate(delegator, ch, type, p(request, "tags"), p(request, "excludeTags"), request.getParameter("numbers"));
-            if (((Long) est.get("eligible")) <= 0) {
-                return error(response, 400, "Nobody to send to: no opted-in contacts match this audience.");
-            }
-            long now = System.currentTimeMillis();
-            long sendAt = parseLong(p(request, "sendAt"), 0L);
-            boolean later = sendAt > now + 60_000L;
-            if (later && sendAt > now + 60L * 24 * 3600 * 1000) {
-                return error(response, 400, "You can schedule up to 60 days ahead.");
-            }
-            String name = p(request, "campaignName");
-            String id = delegator.getNextSeqId("WaCampaign");
-            GenericValue cmp = delegator.makeValue("WaCampaign", UtilMisc.toMap("campaignId", id, "tenantId", w.tenantId,
-                    "channelId", ch.getString("channelId"),
-                    "campaignName", UtilValidate.isEmpty(name) ? tpl.getString("templateName") + " " + new SimpleDateFormat("d MMM").format(new java.util.Date()) : cut(name, 100),
-                    "templateId", tpl.getString("templateId"), "templateName", tpl.getString("templateName"),
-                    "languageCode", tpl.getString("languageCode"), "bodyParams", UtilValidate.isEmpty(bodyParams) ? null : bodyParams,
-                    "audienceType", type, "audienceTags", String.join(",", WaContacts.parseTags(p(request, "tags"))),
-                    "excludeTags", String.join(",", WaContacts.parseTags(p(request, "excludeTags"))),
-                    "numbers", "NUMBERS".equals(type) ? request.getParameter("numbers") : null,
-                    "statusId", "SCHEDULED", "scheduledDate", new Timestamp(later ? sendAt : now),
-                    "createdBy", w.userId, "createdDate", UtilDateTime.nowTimestamp()));
-            cmp.create();
-            start(dispatcher, id, later ? sendAt : 0L);
-            return json(response, 200, WaUtil.JSON.createObjectNode().put("ok", true).put("campaignId", id).put("scheduled", later));
+            return json(response, 200, WaUtil.JSON.createObjectNode().put("ok", true).put("campaignId", r[0]).put("scheduled", "Y".equals(r[2])));
         } catch (Exception e) {
             Debug.logError(e, MODULE);
             return error(response, 500, "Could not create the broadcast.");
         }
+    }
+
+    /**
+     * Validate and create a broadcast, then start it now or schedule it. Used by the Broadcast page and the REST API.
+     * Fields: channelId, templateId, bodyParams (| separated), audienceType TAGS|ALL|NUMBERS, tags, excludeTags, numbers,
+     * sendAt (epoch millis, empty = now), campaignName.
+     * @return [campaignId, error, "Y" if scheduled]
+     */
+    public static String[] createCampaign(Delegator delegator, LocalDispatcher dispatcher, String tenantId, String userId,
+                                          Map<String, String> f) throws Exception {
+        GenericValue ch = UtilValidate.isEmpty(f.get("channelId")) ? null
+                : EntityQuery.use(delegator).from("WaChannel").where("channelId", f.get("channelId")).queryOne();
+        if (ch == null || !tenantId.equals(ch.getString("tenantId"))) {
+            return new String[] {null, "Choose the WhatsApp number to send from.", null};
+        }
+        GenericValue tpl = UtilValidate.isEmpty(f.get("templateId")) ? null
+                : EntityQuery.use(delegator).from("WaTemplate").where("templateId", f.get("templateId")).queryOne();
+        if (tpl == null || !ch.getString("channelId").equals(tpl.getString("channelId"))) {
+            return new String[] {null, "Choose an approved template of this WhatsApp number.", null};
+        }
+        if (!"APPROVED".equals(tpl.getString("metaStatus"))) {
+            return new String[] {null, "This template is not approved by Meta yet.", null};
+        }
+        String type = f.get("audienceType");
+        if (!List.of("TAGS", "ALL", "NUMBERS").contains(type)) {
+            return new String[] {null, "Choose who should get this broadcast.", null};
+        }
+        if ("TAGS".equals(type) && WaContacts.parseTags(f.get("tags")).isEmpty()) {
+            return new String[] {null, "Pick at least one tag.", null};
+        }
+        int needed = placeholders(tpl.getString("bodyText"));
+        String bodyParams = f.get("bodyParams");
+        List<String> givenList = UtilValidate.isEmpty(bodyParams) ? List.of() : WaUtil.splitParams(bodyParams);
+        int given = givenList.size();
+        if (needed == given && givenList.stream().anyMatch(v -> v.trim().isEmpty())) {
+            return new String[] {null, "Fill in every template value.", null};
+        }
+        if (needed != given) {
+            return new String[] {null, "This template needs " + needed + " value" + (needed == 1 ? "" : "s") + " ({{1}}"
+                    + (needed > 1 ? "…{{" + needed + "}}" : "") + "). Fill in every value.", null};
+        }
+        Map<String, Object> est = WaCampaigns.estimate(delegator, ch, type, f.get("tags"), f.get("excludeTags"), f.get("numbers"));
+        if (((Long) est.get("eligible")) <= 0) {
+            return new String[] {null, "Nobody to send to: no opted-in contacts match this audience.", null};
+        }
+        long now = System.currentTimeMillis();
+        long sendAt = parseLong(f.get("sendAt"), 0L);
+        boolean later = sendAt > now + 60_000L;
+        if (later && sendAt > now + 60L * 24 * 3600 * 1000) {
+            return new String[] {null, "You can schedule up to 60 days ahead.", null};
+        }
+        String name = f.get("campaignName");
+        String id = delegator.getNextSeqId("WaCampaign");
+        GenericValue cmp = delegator.makeValue("WaCampaign", UtilMisc.toMap("campaignId", id, "tenantId", tenantId,
+                "channelId", ch.getString("channelId"),
+                "campaignName", UtilValidate.isEmpty(name) ? tpl.getString("templateName") + " " + new SimpleDateFormat("d MMM").format(new java.util.Date()) : cut(name, 100),
+                "templateId", tpl.getString("templateId"), "templateName", tpl.getString("templateName"),
+                "languageCode", tpl.getString("languageCode"), "bodyParams", UtilValidate.isEmpty(bodyParams) ? null : bodyParams,
+                "audienceType", type, "audienceTags", String.join(",", WaContacts.parseTags(f.get("tags"))),
+                "excludeTags", String.join(",", WaContacts.parseTags(f.get("excludeTags"))),
+                "numbers", "NUMBERS".equals(type) ? f.get("numbers") : null,
+                "statusId", "SCHEDULED", "scheduledDate", new Timestamp(later ? sendAt : now),
+                "createdBy", userId, "createdDate", UtilDateTime.nowTimestamp()));
+        cmp.create();
+        start(dispatcher, id, later ? sendAt : 0L);
+        return new String[] {id, null, later ? "Y" : "N"};
     }
 
     private static void start(LocalDispatcher dispatcher, String campaignId, long at) throws Exception {

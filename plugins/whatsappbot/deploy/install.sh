@@ -2,14 +2,14 @@
 # FloChat one-time server install (Ubuntu 22.04 / 24.04, run as root).
 # The GitHub repo holds the complete OFBiz 24.09 with the FloChat plugin in plugins/whatsappbot.
 #
-#   sudo GH_TOKEN=<github token> DOMAIN=flochat.flolink.ai EMAIL=info@msoftdynamic.com bash install.sh
+#   sudo GH_TOKEN=<github token> DOMAIN=flolink.ai EMAIL=info@msoftdynamic.com bash install.sh
 #
 # GH_TOKEN: a GitHub personal access token with read access to the private repo.
 # Before running: point the domain's DNS A record at this server (needed for the SSL certificate).
 # Optional env: REPO (default zohodharmendrasingh/whatsappBot), BRANCH (main), SKIP_SSL=1
 set -euo pipefail
 
-DOMAIN=${DOMAIN:?Set DOMAIN, e.g. DOMAIN=flochat.flolink.ai}
+DOMAIN=${DOMAIN:?Set DOMAIN, e.g. DOMAIN=flolink.ai}
 EMAIL=${EMAIL:?Set EMAIL for the SSL certificate}
 REPO=${REPO:-zohodharmendrasingh/whatsappBot}
 BRANCH=${BRANCH:-main}
@@ -61,7 +61,7 @@ sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'" |
 
 say "Allowing https://$DOMAIN in OFBiz"
 SECP=framework/security/config/security.properties
-grep -q "^host-headers-allowed=.*$DOMAIN" $SECP || sed -i "s/^host-headers-allowed=\(.*\)/host-headers-allowed=\1,$DOMAIN/" $SECP
+grep -Eq "^host-headers-allowed=(.*,)?${DOMAIN//./\\.}(,|$)" $SECP || sed -i "s/^host-headers-allowed=\(.*\)/host-headers-allowed=\1,$DOMAIN/" $SECP
 
 if [ ! -f $BASE/.data-loaded ]; then
   say "Building and loading data (first run: 10-20 minutes)"

@@ -56,17 +56,41 @@ public final class WaBillingEvents {
             }
             String planId = request.getParameter("planId");
             int months = "12".equals(request.getParameter("months")) ? 12 : 1;
-            GenericValue plan = UtilValidate.isEmpty(planId) ? null
-                    : EntityQuery.use(delegator).from("WaPlan").where("planId", planId).queryOne();
-            if (plan == null || !"Y".equals(plan.getString("isActive"))) {
-                return json(response, 400, out.put("error", "Please choose a plan."));
+            String addonId = request.getParameter("addonId");
+            GenericValue plan = null;
+            GenericValue addon = null;
+            int packs = 1;
+            BigDecimal amount;
+            String currency;
+            if (UtilValidate.isNotEmpty(addonId)) {
+                addon = EntityQuery.use(delegator).from("WaAddon").where("addonId", addonId).queryOne();
+                if (addon == null || !"Y".equals(addon.getString("isActive"))) {
+                    return json(response, 400, out.put("error", "Please choose an add-on."));
+                }
+                try {
+                    packs = Integer.parseInt(String.valueOf(request.getParameter("packs")));
+                } catch (NumberFormatException e) {
+                    packs = 1;
+                }
+                if (packs < 1 || packs > WaAddons.MAX_PACKS) {
+                    return json(response, 400, out.put("error", "Choose between 1 and " + WaAddons.MAX_PACKS + "."));
+                }
+                amount = WaAddons.priceFor(addon, packs);
+                currency = UtilValidate.isNotEmpty(addon.getString("currencyUomId")) ? addon.getString("currencyUomId") : WaUtil.prop("paypal.currency", "USD");
+                months = 1;
+            } else {
+                plan = UtilValidate.isEmpty(planId) ? null
+                        : EntityQuery.use(delegator).from("WaPlan").where("planId", planId).queryOne();
+                if (plan == null || !"Y".equals(plan.getString("isActive"))) {
+                    return json(response, 400, out.put("error", "Please choose a plan."));
+                }
+                amount = priceFor(plan, months);
+                currency = UtilValidate.isNotEmpty(plan.getString("currencyUomId")) ? plan.getString("currencyUomId")
+                        : WaUtil.prop("paypal.currency", "USD");
             }
-            BigDecimal amount = priceFor(plan, months);
             if (amount.signum() <= 0) {
-                return json(response, 400, out.put("error", "This plan has no price. Please contact support."));
+                return json(response, 400, out.put("error", "This has no price. Please contact support."));
             }
-            String currency = UtilValidate.isNotEmpty(plan.getString("currencyUomId")) ? plan.getString("currencyUomId")
-                    : WaUtil.prop("paypal.currency", "USD");
             GenericValue tenant = EntityQuery.use(delegator).from("WaTenant").where("tenantId", tenantId).queryOne();
             String brand = WaUtil.prop("brand.name", "FloChat");
             String paymentId = delegator.getNextSeqId("WaPayment");
@@ -77,8 +101,9 @@ public final class WaBillingEvents {
             pu.put("reference_id", paymentId);
             pu.put("custom_id", tenantId);
             pu.put("invoice_id", "FC-" + paymentId);
-            pu.put("description", cut(brand + " " + plan.getString("planName") + " plan - "
-                    + (months == 12 ? "12 months" : "1 month") + " - " + tenant.getString("tenantName"), 127));
+            pu.put("description", cut(addon != null
+                    ? brand + " add-on: " + addon.getString("addonName") + (packs > 1 ? " x" + packs : "") + " - " + tenant.getString("tenantName")
+                    : brand + " " + plan.getString("planName") + " plan - " + (months == 12 ? "12 months" : "1 month") + " - " + tenant.getString("tenantName"), 127));
             pu.putObject("amount").put("currency_code", currency).put("value", amount.toPlainString());
             ObjectNode ctx = order.putObject("payment_source").putObject("paypal").putObject("experience_context");
             ctx.put("brand_name", cut(brand, 127));
@@ -94,7 +119,9 @@ public final class WaBillingEvents {
             GenericValue pay = delegator.makeValue("WaPayment");
             pay.set("paymentId", paymentId);
             pay.set("tenantId", tenantId);
-            pay.set("planId", planId);
+            pay.set("planId", addon != null ? null : planId);
+            pay.set("addonId", addon != null ? addonId : null);
+            pay.set("packs", addon != null ? (long) packs : null);
             pay.set("months", (long) months);
             pay.set("amount", amount);
             pay.set("currencyUomId", currency);
@@ -183,7 +210,11 @@ public final class WaBillingEvents {
                 pay.set("statusId", "COMPLETED");
                 pay.set("completedDate", now);
                 pay.store();
-                applyPayment(delegator, pay, now);
+                if (UtilValidate.isNotEmpty(pay.getString("addonId"))) {
+                    WaAddons.activate(delegator, pay);
+                } else {
+                    applyPayment(delegator, pay, now);
+                }
                 return json(response, 200, done(out, delegator, tenantId));
             }
         } catch (GenericEntityException e) {

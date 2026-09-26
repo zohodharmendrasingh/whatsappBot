@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="/theme/crm.css?v=4"/>
+<link rel="stylesheet" href="/theme/crm.css?v=5"/>
 <#if contact??>
 <#assign chatSt = contact.chatStatus!"OPEN">
 <#macro keep><input type="hidden" name="contactId" value="${contact.contactId}"/><input type="hidden" name="tab" value="${inboxTab!"all"}"/><input type="hidden" name="st" value="${inboxSt!"active"}"/></#macro>
@@ -70,5 +70,5 @@
 </details>
 <ul id="cxQuickReplies" hidden data-first="${contactFirstName!""}" data-manage="<@ofbizUrl>Settings</@ofbizUrl>#replies"><#list quickReplies![] as r><li data-sc="${r.shortcut}">${r.body}</li></#list></ul>
 <script>(function(){var c=document.getElementById('waChat'); if(c){c.scrollTop=c.scrollHeight;}})();</script>
-<script src="/js/crm.js?v=4"></script>
+<script src="/js/crm.js?v=5"></script>
 </#if>

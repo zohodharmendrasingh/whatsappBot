@@ -1,0 +1,1052 @@
+{
+ "openapi": "3.0.3",
+ "info": {
+  "title": "FloChat WhatsApp API",
+  "version": "1.0",
+  "description": "Send WhatsApp messages, manage contacts and run broadcasts from your own systems (Zoho, Shopify, your website or app).\n\nAuthenticate every call with your API key in the `X-Api-Key` header (or `Authorization: Bearer <key>`). Create keys on the Developers page. All times are ISO 8601 in UTC. Errors return `{\"success\": false, \"error\": \"message\", \"code\": \"...\"}`. Limit: 120 requests per minute per key."
+ },
+ "servers": [
+  {
+   "url": "{{BASE_URL}}"
+  }
+ ],
+ "components": {
+  "securitySchemes": {
+   "ApiKey": {
+    "type": "apiKey",
+    "in": "header",
+    "name": "X-Api-Key"
+   }
+  }
+ },
+ "security": [
+  {
+   "ApiKey": []
+  }
+ ],
+ "tags": [
+  {
+   "name": "Account"
+  },
+  {
+   "name": "Messages"
+  },
+  {
+   "name": "Contacts"
+  },
+  {
+   "name": "Templates"
+  },
+  {
+   "name": "Broadcasts"
+  }
+ ],
+ "paths": {
+  "/v1/account": {
+   "get": {
+    "tags": [
+     "Account"
+    ],
+    "summary": "Your workspace, plan, usage and WhatsApp numbers",
+    "operationId": "getAccount",
+    "description": "Good first call to check that your key works. Shows messages used this month against your limit (plan + add-ons).",
+    "responses": {
+     "200": {
+      "description": "Workspace",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": true,
+         "workspaceId": "DEMO",
+         "name": "Shree Jewellers",
+         "plan": "Growth",
+         "status": "active",
+         "paidUntil": "2026-10-26T00:00:00Z",
+         "usage": {
+          "messages": {
+           "used": 1520,
+           "limit": 10000
+          },
+          "channels": {
+           "used": 1,
+           "limit": 2
+          },
+          "flows": {
+           "used": 4,
+           "limit": 15
+          }
+         },
+         "numbers": [
+          {
+           "channelId": "10000",
+           "phone": "+91 98765 43210",
+           "name": "Shree Jewellers",
+           "active": true
+          }
+         ]
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong API key",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": false,
+         "error": "Invalid or missing API key. Send it in the X-Api-Key header.",
+         "code": "unauthorized"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/messages": {
+   "post": {
+    "tags": [
+     "Messages"
+    ],
+    "summary": "Send a message",
+    "operationId": "sendMessage",
+    "description": "Send a **template** at any time, or **text / image** within 24 hours of the customer's last message (WhatsApp rule). Template values `params` fill {{1}}, {{2}}... in order. Uses your first active number unless you give `channelId`. New numbers are added to your contacts.",
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "required": [
+         "to"
+        ],
+        "properties": {
+         "to": {
+          "type": "string",
+          "description": "Customer's WhatsApp number with country code",
+          "example": "919812345678"
+         },
+         "channelId": {
+          "type": "string",
+          "description": "Which of your WhatsApp numbers sends it (optional)"
+         },
+         "text": {
+          "type": "string",
+          "description": "Text message (24h window only)"
+         },
+         "image": {
+          "type": "object",
+          "properties": {
+           "url": {
+            "type": "string"
+           },
+           "caption": {
+            "type": "string"
+           }
+          }
+         },
+         "template": {
+          "type": "object",
+          "properties": {
+           "name": {
+            "type": "string"
+           },
+           "language": {
+            "type": "string",
+            "example": "en"
+           },
+           "params": {
+            "type": "array",
+            "items": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        }
+       },
+       "examples": {
+        "template": {
+         "summary": "Template (any time)",
+         "value": {
+          "to": "919812345678",
+          "template": {
+           "name": "order_update",
+           "language": "en",
+           "params": [
+            "Ravi",
+            "#A-1024"
+           ]
+          }
+         }
+        },
+        "text": {
+         "summary": "Text (within 24h)",
+         "value": {
+          "to": "919812345678",
+          "text": "Your order #A-1024 is ready for pickup."
+         }
+        },
+        "image": {
+         "summary": "Image (within 24h)",
+         "value": {
+          "to": "919812345678",
+          "image": {
+           "url": "https://example.com/offer.jpg",
+           "caption": "Diwali offer"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Sent to WhatsApp",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": true,
+         "messageId": "10230",
+         "wamid": "wamid.HBgMOTE5ODEyMzQ1Njc4FQIAERgS",
+         "contactId": "10021"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Invalid request",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": false,
+         "error": "'to' must be a full international number, e.g. 919876543210.",
+         "code": "invalid_number"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong API key",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": false,
+         "error": "Invalid or missing API key. Send it in the X-Api-Key header.",
+         "code": "unauthorized"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "WhatsApp or your plan refused it",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": false,
+         "error": "The 24 hour window is closed: send an approved template instead.",
+         "code": "window_closed"
+        }
+       }
+      }
+     },
+     "429": {
+      "description": "Too many requests (120 per minute per key)",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": false,
+         "error": "Too many requests. Try again in 20 seconds.",
+         "code": "rate_limited"
+        }
+       }
+      }
+     }
+    }
+   },
+   "get": {
+    "tags": [
+     "Messages"
+    ],
+    "summary": "List messages (newest first)",
+    "operationId": "listMessages",
+    "parameters": [
+     {
+      "name": "contactId",
+      "in": "query",
+      "schema": {
+       "type": "string"
+      },
+      "description": "Only this contact's chat"
+     },
+     {
+      "name": "before",
+      "in": "query",
+      "schema": {
+       "type": "string"
+      },
+      "description": "ISO time, for paging back"
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 50,
+       "maximum": 200
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Messages",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": true,
+         "messages": [
+          {
+           "messageId": "10230",
+           "contactId": "10021",
+           "direction": "OUT",
+           "type": "template",
+           "text": "[template order_update] Ravi | #A-1024",
+           "status": "delivered",
+           "sentBy": "API",
+           "wamid": "wamid.HBgM...",
+           "createdAt": "2026-09-26T10:15:00Z"
+          }
+         ]
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong API key",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": false,
+         "error": "Invalid or missing API key. Send it in the X-Api-Key header.",
+         "code": "unauthorized"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/contacts": {
+   "get": {
+    "tags": [
+     "Contacts"
+    ],
+    "summary": "List or search contacts",
+    "operationId": "listContacts",
+    "parameters": [
+     {
+      "name": "q",
+      "in": "query",
+      "schema": {
+       "type": "string"
+      },
+      "description": "Name, number, email or custom field"
+     },
+     {
+      "name": "tag",
+      "in": "query",
+      "schema": {
+       "type": "string"
+      }
+     },
+     {
+      "name": "optIn",
+      "in": "query",
+      "schema": {
+       "type": "boolean"
+      }
+     },
+     {
+      "name": "page",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 1
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "default": 50,
+       "maximum": 200
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Contacts",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": true,
+         "page": 1,
+         "hasMore": false,
+         "contacts": [
+          {
+           "contactId": "10021",
+           "phone": "+919812345678",
+           "waId": "919812345678",
+           "name": "Ravi Kumar",
+           "email": "ravi@example.com",
+           "optIn": true,
+           "channelId": "10000",
+           "chatStatus": "OPEN",
+           "assignedTo": null,
+           "botPaused": false,
+           "lastMessageAt": "2026-09-26T10:15:00Z",
+           "createdAt": "2026-09-01T08:00:00Z",
+           "tags": [
+            "vip",
+            "gold"
+           ],
+           "fields": {
+            "city": "Gwalior"
+           },
+           "variables": {
+            "visitDate": "5 Oct"
+           }
+          }
+         ]
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong API key",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": false,
+         "error": "Invalid or missing API key. Send it in the X-Api-Key header.",
+         "code": "unauthorized"
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "Contacts"
+    ],
+    "summary": "Create or update a contact by phone",
+    "operationId": "upsertContact",
+    "description": "If the number already exists it is updated. `tags` replaces all tags; use `addTags` / `removeTags` to change some. `fields` are your custom fields (create them on the Contacts page). Only add people who agreed to hear from you.",
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "required": [
+         "phone"
+        ],
+        "properties": {
+         "phone": {
+          "type": "string"
+         },
+         "name": {
+          "type": "string"
+         },
+         "email": {
+          "type": "string"
+         },
+         "channelId": {
+          "type": "string"
+         },
+         "tags": {
+          "type": "array",
+          "items": {
+           "type": "string"
+          }
+         },
+         "addTags": {
+          "type": "array",
+          "items": {
+           "type": "string"
+          }
+         },
+         "removeTags": {
+          "type": "array",
+          "items": {
+           "type": "string"
+          }
+         },
+         "fields": {
+          "type": "object",
+          "additionalProperties": {
+           "type": "string"
+          }
+         },
+         "optIn": {
+          "type": "boolean"
+         }
+        }
+       },
+       "example": {
+        "phone": "+91 98123 45678",
+        "name": "Ravi Kumar",
+        "email": "ravi@example.com",
+        "addTags": [
+         "vip"
+        ],
+        "fields": {
+         "city": "Gwalior"
+        },
+        "optIn": true
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Created",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": true,
+         "created": true,
+         "contact": {
+          "contactId": "10021",
+          "phone": "+919812345678",
+          "waId": "919812345678",
+          "name": "Ravi Kumar",
+          "email": "ravi@example.com",
+          "optIn": true,
+          "channelId": "10000",
+          "chatStatus": "OPEN",
+          "assignedTo": null,
+          "botPaused": false,
+          "lastMessageAt": "2026-09-26T10:15:00Z",
+          "createdAt": "2026-09-01T08:00:00Z",
+          "tags": [
+           "vip",
+           "gold"
+          ],
+          "fields": {
+           "city": "Gwalior"
+          },
+          "variables": {
+           "visitDate": "5 Oct"
+          }
+         }
+        }
+       }
+      }
+     },
+     "200": {
+      "description": "Updated",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": true,
+         "created": false,
+         "contact": {
+          "contactId": "10021",
+          "phone": "+919812345678",
+          "waId": "919812345678",
+          "name": "Ravi Kumar",
+          "email": "ravi@example.com",
+          "optIn": true,
+          "channelId": "10000",
+          "chatStatus": "OPEN",
+          "assignedTo": null,
+          "botPaused": false,
+          "lastMessageAt": "2026-09-26T10:15:00Z",
+          "createdAt": "2026-09-01T08:00:00Z",
+          "tags": [
+           "vip",
+           "gold"
+          ],
+          "fields": {
+           "city": "Gwalior"
+          },
+          "variables": {
+           "visitDate": "5 Oct"
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Invalid",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": false,
+         "error": "Unknown custom field(s): birthday. Create them on the Contacts page first (Custom fields).",
+         "code": "unknown_field"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong API key",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": false,
+         "error": "Invalid or missing API key. Send it in the X-Api-Key header.",
+         "code": "unauthorized"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/contacts/{contactId}": {
+   "parameters": [
+    {
+     "name": "contactId",
+     "in": "path",
+     "required": true,
+     "schema": {
+      "type": "string"
+     }
+    }
+   ],
+   "get": {
+    "tags": [
+     "Contacts"
+    ],
+    "summary": "Get one contact",
+    "operationId": "getContact",
+    "responses": {
+     "200": {
+      "description": "Contact",
+      "content": {
+       "application/json": {
+        "example": {
+         "contactId": "10021",
+         "phone": "+919812345678",
+         "waId": "919812345678",
+         "name": "Ravi Kumar",
+         "email": "ravi@example.com",
+         "optIn": true,
+         "channelId": "10000",
+         "chatStatus": "OPEN",
+         "assignedTo": null,
+         "botPaused": false,
+         "lastMessageAt": "2026-09-26T10:15:00Z",
+         "createdAt": "2026-09-01T08:00:00Z",
+         "tags": [
+          "vip",
+          "gold"
+         ],
+         "fields": {
+          "city": "Gwalior"
+         },
+         "variables": {
+          "visitDate": "5 Oct"
+         }
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not found",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": false,
+         "error": "Contact not found.",
+         "code": "not_found"
+        }
+       }
+      }
+     }
+    }
+   },
+   "patch": {
+    "tags": [
+     "Contacts"
+    ],
+    "summary": "Update a contact",
+    "operationId": "updateContact",
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "example": {
+        "removeTags": [
+         "new"
+        ],
+        "addTags": [
+         "customer"
+        ],
+        "fields": {
+         "city": "Indore"
+        }
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Updated",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": true,
+         "created": false,
+         "contact": {
+          "contactId": "10021",
+          "phone": "+919812345678",
+          "waId": "919812345678",
+          "name": "Ravi Kumar",
+          "email": "ravi@example.com",
+          "optIn": true,
+          "channelId": "10000",
+          "chatStatus": "OPEN",
+          "assignedTo": null,
+          "botPaused": false,
+          "lastMessageAt": "2026-09-26T10:15:00Z",
+          "createdAt": "2026-09-01T08:00:00Z",
+          "tags": [
+           "vip",
+           "gold"
+          ],
+          "fields": {
+           "city": "Gwalior"
+          },
+          "variables": {
+           "visitDate": "5 Oct"
+          }
+         }
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not found",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": false,
+         "error": "Contact not found.",
+         "code": "not_found"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/templates": {
+   "get": {
+    "tags": [
+     "Templates"
+    ],
+    "summary": "Your WhatsApp templates",
+    "operationId": "listTemplates",
+    "description": "Templates synced from Meta. Only `APPROVED` ones can be sent. `params` is how many {{n}} values the body needs.",
+    "responses": {
+     "200": {
+      "description": "Templates",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": true,
+         "templates": [
+          {
+           "templateId": "10000",
+           "channelId": "10000",
+           "name": "order_update",
+           "language": "en",
+           "category": "UTILITY",
+           "status": "APPROVED",
+           "body": "Hi {{1}}, your order {{2}} is shipped.",
+           "params": 2
+          }
+         ]
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong API key",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": false,
+         "error": "Invalid or missing API key. Send it in the X-Api-Key header.",
+         "code": "unauthorized"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/broadcasts": {
+   "post": {
+    "tags": [
+     "Broadcasts"
+    ],
+    "summary": "Send or schedule a broadcast",
+    "operationId": "createBroadcast",
+    "description": "Sends an approved template to contacts with tags, all contacts or a list of numbers. Opted-out contacts are skipped. Values can use `{{name}}` and custom fields, e.g. `{{city|your city}}`. Leave out `sendAt` to send now.",
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "example": {
+        "name": "Diwali offer",
+        "template": {
+         "name": "diwali_offer",
+         "language": "en",
+         "params": [
+          "{{name|friend}}",
+          "20%"
+         ]
+        },
+        "audience": {
+         "tags": [
+          "vip",
+          "gold"
+         ],
+         "excludeTags": [
+          "staff"
+         ]
+        },
+        "sendAt": "2026-10-20T10:00:00+05:30"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Created",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": true,
+         "broadcastId": "10007",
+         "name": "Diwali offer",
+         "template": "diwali_offer",
+         "status": "scheduled",
+         "scheduledAt": "2026-10-20T04:30:00Z",
+         "startedAt": null,
+         "completedAt": null,
+         "error": null,
+         "stats": {
+          "total": 0,
+          "pending": 0,
+          "sent": 0,
+          "delivered": 0,
+          "read": 0,
+          "replied": 0,
+          "failed": 0,
+          "skipped": 0
+         }
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Could not create",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": false,
+         "error": "Nobody to send to: no opted-in contacts match this audience.",
+         "code": "invalid_broadcast"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong API key",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": false,
+         "error": "Invalid or missing API key. Send it in the X-Api-Key header.",
+         "code": "unauthorized"
+        }
+       }
+      }
+     }
+    }
+   },
+   "get": {
+    "tags": [
+     "Broadcasts"
+    ],
+    "summary": "Recent broadcasts",
+    "operationId": "listBroadcasts",
+    "responses": {
+     "200": {
+      "description": "Broadcasts",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": true,
+         "broadcasts": [
+          {
+           "success": true,
+           "broadcastId": "10007",
+           "name": "Diwali offer",
+           "template": "diwali_offer",
+           "status": "scheduled",
+           "scheduledAt": "2026-10-20T04:30:00Z",
+           "startedAt": null,
+           "completedAt": null,
+           "error": null,
+           "stats": {
+            "total": 0,
+            "pending": 0,
+            "sent": 0,
+            "delivered": 0,
+            "read": 0,
+            "replied": 0,
+            "failed": 0,
+            "skipped": 0
+           }
+          }
+         ]
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/broadcasts/{broadcastId}": {
+   "get": {
+    "tags": [
+     "Broadcasts"
+    ],
+    "summary": "Broadcast status and results",
+    "operationId": "getBroadcast",
+    "parameters": [
+     {
+      "name": "broadcastId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Broadcast",
+      "content": {
+       "application/json": {
+        "example": {
+         "success": true,
+         "broadcastId": "10007",
+         "name": "Diwali offer",
+         "template": "diwali_offer",
+         "status": "done",
+         "scheduledAt": "2026-10-20T04:30:00Z",
+         "startedAt": null,
+         "completedAt": null,
+         "error": null,
+         "stats": {
+          "total": 250,
+          "pending": 0,
+          "sent": 248,
+          "delivered": 240,
+          "read": 190,
+          "replied": 31,
+          "failed": 2,
+          "skipped": 0
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "x-webhooks": {
+  "about": "Add a webhook URL on the Developers page. FloChat POSTs JSON events to it and signs each one: header X-FloChat-Signature: t=<unix time>,v1=<hex HMAC-SHA256 of '<t>.<raw body>' with your webhook secret>. Reply with any 2xx within 15 seconds; failed deliveries are retried after 30 s, 2 min and 10 min.",
+  "events": {
+   "message.received": {
+    "id": "evt_k2x9",
+    "event": "message.received",
+    "createdAt": "2026-09-26T10:15:00Z",
+    "workspaceId": "DEMO",
+    "data": {
+     "messageId": "10231",
+     "wamid": "wamid.HBgM...",
+     "type": "text",
+     "text": "Is my order ready?",
+     "buttonId": null,
+     "contact": {
+      "contactId": "10021",
+      "phone": "+919812345678",
+      "name": "Ravi Kumar",
+      "channelId": "10000"
+     }
+    }
+   },
+   "message.status": {
+    "event": "message.status",
+    "data": {
+     "messageId": "10230",
+     "wamid": "wamid.HBgM...",
+     "contactId": "10021",
+     "status": "read",
+     "error": null,
+     "broadcastId": null
+    }
+   },
+   "contact.created": {
+    "event": "contact.created",
+    "data": {
+     "contactId": "10022",
+     "phone": "+919800000001",
+     "name": "Neha",
+     "channelId": "10000",
+     "source": "CHAT"
+    }
+   },
+   "conversation.handoff": {
+    "event": "conversation.handoff",
+    "data": {
+     "contact": {
+      "contactId": "10021",
+      "phone": "+919812345678",
+      "name": "Ravi Kumar"
+     },
+     "reason": "AI agent handed over: customer asked for a person"
+    }
+   },
+   "broadcast.completed": {
+    "event": "broadcast.completed",
+    "data": {
+     "broadcastId": "10007",
+     "name": "Diwali offer",
+     "status": "DONE",
+     "stats": {
+      "total": 250,
+      "sent": 248,
+      "delivered": 240,
+      "read": 190,
+      "replied": 31,
+      "failed": 2
+     }
+    }
+   }
+  }
+ }
+}

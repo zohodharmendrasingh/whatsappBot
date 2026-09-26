@@ -1,5 +1,5 @@
 <#-- AI Agent: answers customers from the business's own knowledge, hands over when unsure -->
-<link rel="stylesheet" href="/theme/crm.css?v=4"/>
+<link rel="stylesheet" href="/theme/crm.css?v=5"/>
 <#macro srcIcon t><#if t == "URL">🌐<#elseif t == "TEXT">📝<#else>📄</#if></#macro>
 <div class="cx ag" id="agPage" data-owner="<#if isOwner>Y<#else>N</#if>"
      data-save-url="<@ofbizUrl>agentSave</@ofbizUrl>" data-upload-url="<@ofbizUrl>kbUpload</@ofbizUrl>" data-url-url="<@ofbizUrl>kbAddUrl</@ofbizUrl>"
@@ -127,4 +127,4 @@
   </div>
   <div class="cx-toast" id="cxToast"></div>
 </div>
-<script src="/js/crm.js?v=4"></script>
+<script src="/js/crm.js?v=5"></script>

@@ -32,7 +32,8 @@ public class WaRawBodyFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
-        if (!"POST".equalsIgnoreCase(req.getMethod())) {
+        String m = req.getMethod();
+        if (!"POST".equalsIgnoreCase(m) && !"PATCH".equalsIgnoreCase(m) && !"PUT".equalsIgnoreCase(m)) {
             chain.doFilter(request, response);
             return;
         }

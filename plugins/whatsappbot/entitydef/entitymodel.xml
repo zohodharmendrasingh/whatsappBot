@@ -34,6 +34,85 @@
         <relation type="one-nofk" rel-entity-name="Party"><key-map field-name="partyId"/></relation>
     </entity>
 
+    <entity entity-name="WaAddon" package-name="com.msoftdynamic.whatsapp.saas" title="Add-on a workspace can buy on top of its plan">
+        <field name="addonId" type="id"/>
+        <field name="addonName" type="name"/>
+        <field name="description" type="description"/>
+        <field name="addonType" type="short-varchar"><description>MESSAGES (this calendar month), CHANNELS, FLOWS (30 days)</description></field>
+        <field name="quantity" type="numeric"/>
+        <field name="price" type="currency-amount"/>
+        <field name="currencyUomId" type="id"/>
+        <field name="isActive" type="indicator"/>
+        <field name="sequenceNum" type="numeric"/>
+        <prim-key field="addonId"/>
+    </entity>
+
+    <entity entity-name="WaTenantAddon" package-name="com.msoftdynamic.whatsapp.saas" title="Add-on bought by a workspace">
+        <field name="tenantAddonId" type="id"/>
+        <field name="tenantId" type="id"/>
+        <field name="addonId" type="id"/>
+        <field name="addonType" type="short-varchar"/>
+        <field name="quantity" type="numeric"><description>Total extra units (pack quantity x packs)</description></field>
+        <field name="fromDate" type="date-time"/>
+        <field name="thruDate" type="date-time"/>
+        <field name="paymentId" type="id"/>
+        <field name="createdBy" type="id-vlong"/>
+        <field name="createdDate" type="date-time"/>
+        <prim-key field="tenantAddonId"/>
+        <relation type="one" fk-name="WATADD_TNT" rel-entity-name="WaTenant"><key-map field-name="tenantId"/></relation>
+        <index name="WATADD_TNT"><index-field name="tenantId"/><index-field name="thruDate"/></index>
+    </entity>
+
+    <entity entity-name="WaWebhook" package-name="com.msoftdynamic.whatsapp.saas" title="Outgoing webhook of a workspace (developer portal)">
+        <field name="webhookId" type="id"/>
+        <field name="tenantId" type="id"/>
+        <field name="url" type="very-long"/>
+        <field name="secret" type="very-long" encrypt="true"/>
+        <field name="events" type="long-varchar"><description>Comma list, * = all</description></field>
+        <field name="description" type="description"/>
+        <field name="isActive" type="indicator"/>
+        <field name="lastStatus" type="short-varchar"/>
+        <field name="lastDeliveryDate" type="date-time"/>
+        <field name="failCount" type="numeric"/>
+        <field name="createdBy" type="id-vlong"/>
+        <field name="createdDate" type="date-time"/>
+        <prim-key field="webhookId"/>
+        <relation type="one" fk-name="WAWHK_TNT" rel-entity-name="WaTenant"><key-map field-name="tenantId"/></relation>
+    </entity>
+
+    <entity entity-name="WaWebhookDelivery" package-name="com.msoftdynamic.whatsapp.saas" title="One delivery of an outgoing webhook">
+        <field name="deliveryId" type="id"/>
+        <field name="webhookId" type="id"/>
+        <field name="tenantId" type="id"/>
+        <field name="eventType" type="short-varchar"/>
+        <field name="payload" type="very-long"/>
+        <field name="statusId" type="short-varchar"><description>OK, RETRYING, FAILED</description></field>
+        <field name="statusCode" type="numeric"/>
+        <field name="responseText" type="very-long"/>
+        <field name="attempts" type="numeric"/>
+        <field name="durationMs" type="numeric"/>
+        <field name="createdDate" type="date-time"/>
+        <field name="lastAttemptDate" type="date-time"/>
+        <prim-key field="deliveryId"/>
+        <index name="WAWHD_WHK"><index-field name="webhookId"/><index-field name="createdDate"/></index>
+        <index name="WAWHD_TNT"><index-field name="tenantId"/><index-field name="createdDate"/></index>
+    </entity>
+
+    <entity entity-name="WaApiLog" package-name="com.msoftdynamic.whatsapp.saas" title="REST API request log (developer portal)">
+        <field name="logId" type="id"/>
+        <field name="tenantId" type="id"/>
+        <field name="apiKeyId" type="id"/>
+        <field name="method" type="very-short"/>
+        <field name="path" type="long-varchar"/>
+        <field name="statusCode" type="numeric"/>
+        <field name="durationMs" type="numeric"/>
+        <field name="errorText" type="long-varchar"/>
+        <field name="clientIp" type="short-varchar"/>
+        <field name="createdDate" type="date-time"/>
+        <prim-key field="logId"/>
+        <index name="WAAPIL_TNT"><index-field name="tenantId"/><index-field name="createdDate"/></index>
+    </entity>
+
     <entity entity-name="WaTenantAi" package-name="com.msoftdynamic.whatsapp.saas" title="Workspace's own AI (Claude API) key for the flow builder">
         <field name="tenantId" type="id"/>
         <field name="provider" type="short-varchar"><description>anthropic (Claude) or openai</description></field>
@@ -169,6 +248,8 @@
         <field name="captureStatus" type="id"/>
         <field name="payerEmail" type="email"/>
         <field name="failureReason" type="description"/>
+        <field name="addonId" type="id"><description>Set when the payment is for an add-on instead of a plan</description></field>
+        <field name="packs" type="numeric"/>
         <field name="periodFromDate" type="date-time"/>
         <field name="periodThruDate" type="date-time"/>
         <field name="createdByUserLogin" type="id-vlong"/>

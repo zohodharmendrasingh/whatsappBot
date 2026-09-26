@@ -644,6 +644,227 @@
     $('#agTestClear').addEventListener('click', function () { hist = []; chat.innerHTML = ''; });
   }
 
+  // ============================================================ Developer portal
+  var dv = $('#dvPage');
+  if (dv) { initDev(dv); }
+
+  function initDev(root) {
+    var U = root.dataset;
+    function tab(name) {
+      if (!$('.dv-pane[data-pane="' + name + '"]', root)) { name = 'overview'; }
+      $$('.dv-tabs a', root).forEach(function (a) { a.classList.toggle('on', a.getAttribute('data-tab') === name); });
+      $$('.dv-pane', root).forEach(function (p) { p.hidden = p.getAttribute('data-pane') !== name; });
+      if (name === 'reference') { loadSpec(); }
+    }
+    $$('.dv-tabs a, [data-go]', root).forEach(function (a) {
+      a.addEventListener('click', function (e) { e.preventDefault(); var t = a.getAttribute('data-tab') || a.getAttribute('data-go'); history.replaceState(null, '', '#' + t); tab(t); window.scrollTo(0, 0); });
+    });
+    tab((location.hash || '').replace('#', '') || U.tab);
+    document.addEventListener('click', function (e) {
+      var c = e.target.closest('[data-copy]');
+      if (!c) { return; }
+      var el = document.querySelector(c.getAttribute('data-copy'));
+      var txt = el ? (el.value || el.textContent) : '';
+      (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function () { toast('Copied'); }, function () {
+        var r = document.createRange(); r.selectNodeContents(el); var sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); toast('Press Ctrl+C to copy');
+      });
+    });
+    // ---- keys
+    var kf = $('#dvKeyForm');
+    if (kf) {
+      kf.addEventListener('submit', function (e) {
+        e.preventDefault();
+        post(U.keyCreate, { description: kf.description.value }).then(function (d) {
+          if (!d.ok) { toast(d.error); return; }
+          $('#dvNewKeyVal').textContent = d.key; $('#dvNewKey').hidden = false; kf.reset();
+          toast('Key created. Copy it now.');
+        });
+      });
+    }
+    $$('[data-revoke]', root).forEach(function (b) {
+      b.addEventListener('click', function () {
+        if (!confirm('Revoke this key? Apps using it stop working immediately.')) { return; }
+        post(U.keyRevoke, { apiKeyId: b.getAttribute('data-revoke') }).then(function (d) { if (!d.ok) { toast(d.error); return; } location.hash = 'keys'; location.reload(); });
+      });
+    });
+    // ---- webhooks
+    var hm = $('#dvHookModal'), hf = $('#dvHookForm');
+    function openHook(li) {
+      hf.reset(); showErr($('#dvHookErr'));
+      $('#dvHookTitle').textContent = li ? 'Edit webhook' : 'Add webhook';
+      hf.webhookId.value = li ? li.dataset.id : '';
+      if (li) {
+        hf.url.value = li.dataset.url; hf.description.value = li.dataset.desc;
+        var ev = li.dataset.events.split(',');
+        $$('input[name=events]', hf).forEach(function (c) { c.checked = ev.indexOf(c.value) >= 0 || li.dataset.events === '*'; });
+      }
+      openModal(hm);
+    }
+    var hn = $('#dvHookNew'); if (hn) { hn.addEventListener('click', function () { openHook(null); }); }
+    $$('[data-hook-edit]', root).forEach(function (b) { b.addEventListener('click', function () { openHook(b.closest('li')); }); });
+    hf.addEventListener('submit', function (e) {
+      e.preventDefault(); showErr($('#dvHookErr'));
+      post(U.hookSave, { webhookId: hf.webhookId.value, url: hf.url.value, description: hf.description.value,
+        events: $$('input[name=events]:checked', hf).map(function (c) { return c.value; }) }).then(function (d) {
+        if (!d.ok) { showErr($('#dvHookErr'), d.error); return; }
+        closeModal(hm);
+        if (d.secret) { $('#dvNewSecretVal').textContent = d.secret; $('#dvNewSecret').hidden = false; toast('Webhook added. Copy the signing secret.'); }
+        else { location.hash = 'webhooks'; location.reload(); }
+      });
+    });
+    $$('[data-hook-do]', root).forEach(function (b) {
+      b.addEventListener('click', function () {
+        var li = b.closest('li'), act = b.getAttribute('data-hook-do');
+        if (act === 'delete' && !confirm('Delete this webhook and its delivery history?')) { return; }
+        if (act === 'rotate' && !confirm('Create a new signing secret? The old one stops working right away.')) { return; }
+        var box = $('.dv-test', li);
+        if (act === 'test') { box.hidden = false; box.innerHTML = '<span class="ag-spin"></span> Sending a test event…'; }
+        post(U.hookAction, { webhookId: li.dataset.id, do: act }).then(function (d) {
+          if (act === 'test') {
+            if (d.error && !('status' in d)) { box.innerHTML = '<span class="cx-danger">' + esc(d.error) + '</span>'; return; }
+            box.innerHTML = (d.ok ? '✅ Your server answered <b>' + d.status + '</b>' : '❌ ' + (d.status ? 'Your server answered <b>' + d.status + '</b>' : 'No answer'))
+              + ' in ' + d.ms + ' ms' + (d.response ? '<pre class="dv-code dv-small">' + esc(d.response) + '</pre>' : '');
+            return;
+          }
+          if (!d.ok) { toast(d.error); return; }
+          if (d.secret) { $('#dvNewSecretVal').textContent = d.secret; $('#dvNewSecret').hidden = false; toast('New secret created. Copy it now.'); return; }
+          location.hash = 'webhooks'; location.reload();
+        });
+      });
+    });
+    $$('[data-hook-log]', root).forEach(function (b) {
+      b.addEventListener('click', function () {
+        var id = b.closest('li').dataset.id;
+        get(U.hookDeliveries + '?webhookId=' + encodeURIComponent(id)).then(function (d) {
+          if (!d.ok) { toast(d.error); return; }
+          $('#dvDelList').innerHTML = d.deliveries.length ? d.deliveries.map(function (x) {
+            return '<details class="dv-del"><summary><span class="cx-pill ' + (x.status === 'OK' ? 'cx-pill-green' : x.status === 'RETRYING' ? 'cx-st-SENDING' : 'cx-pill-red') + '">' + (x.code || 'ERR') + '</span> <code>' + esc(x.event) + '</code> <span class="cx-muted">' + esc(x.at) + ' &middot; ' + x.ms + ' ms &middot; attempt ' + x.attempts + '</span>'
+              + (U.owner === 'Y' ? ' <button type="button" class="cx-link" data-redeliver="' + x.deliveryId + '">Resend</button>' : '') + '</summary>'
+              + '<b>Payload</b><pre class="dv-code dv-small">' + esc(pretty(x.payload)) + '</pre><b>Your response</b><pre class="dv-code dv-small">' + esc(x.response || '') + '</pre></details>';
+          }).join('') : '<p class="cx-muted">No deliveries yet.</p>';
+          $$('[data-redeliver]', $('#dvDelList')).forEach(function (r) {
+            r.addEventListener('click', function (e) {
+              e.preventDefault();
+              post(U.hookRedeliver, { deliveryId: r.getAttribute('data-redeliver') }).then(function (d2) { toast(d2.ok ? 'Delivered (' + d2.status + ')' : 'Failed (' + (d2.status || d2.error) + ')'); });
+            });
+          });
+          openModal($('#dvDelModal'));
+        });
+      });
+    });
+    function pretty(t) { try { return JSON.stringify(JSON.parse(t), null, 2); } catch (e) { return t || ''; } }
+
+    // ---- API reference (from the OpenAPI file) + Try it
+    var spec = null;
+    function md(t) { return esc(t || '').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\n\n/g, '<br><br>'); }
+    function loadSpec() {
+      if (spec) { return; }
+      fetch(U.spec, { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (s) { spec = s; renderRef(); })
+        .catch(function () { $('#dvDocs').innerHTML = '<p class="cx-danger">Could not load the API description.</p>'; });
+    }
+    function exampleOf(op) {
+      var c = op.requestBody && op.requestBody.content && op.requestBody.content['application/json'];
+      if (!c) { return null; }
+      if (c.example) { return c.example; }
+      if (c.examples) { var k = Object.keys(c.examples)[0]; return c.examples[k].value; }
+      return null;
+    }
+    function samples(method, url, body) {
+      var js = body ? JSON.stringify(body) : null, jp = body ? JSON.stringify(body, null, 2) : null;
+      var up = method.toUpperCase();
+      var curl = 'curl' + (up !== 'GET' ? ' -X ' + up : '') + ' "' + url + '" \\\n  -H "X-Api-Key: YOUR_KEY"' + (js ? ' \\\n  -H "Content-Type: application/json" \\\n  -d \'' + js.replace(/'/g, "'\\''") + '\'' : '');
+      var node = 'const res = await fetch("' + url + '", {\n  method: "' + up + '",\n  headers: { "X-Api-Key": process.env.FLOCHAT_KEY' + (js ? ', "Content-Type": "application/json"' : '') + ' }' + (js ? ',\n  body: JSON.stringify(' + jp.replace(/\n/g, '\n  ') + ')' : '') + '\n});\nconsole.log(await res.json());';
+      var py = 'import requests\n\nr = requests.' + method.toLowerCase() + '(\n    "' + url + '",\n    headers={"X-Api-Key": FLOCHAT_KEY},' + (js ? '\n    json=' + jp.replace(/true/g, 'True').replace(/false/g, 'False').replace(/null/g, 'None').replace(/\n/g, '\n    ') + ',' : '') + '\n)\nprint(r.status_code, r.json())';
+      var php = '$ch = curl_init("' + url + '");\ncurl_setopt_array($ch, [\n  CURLOPT_CUSTOMREQUEST => "' + up + '",\n  CURLOPT_RETURNTRANSFER => true,\n  CURLOPT_HTTPHEADER => ["X-Api-Key: " . getenv("FLOCHAT_KEY"), "Content-Type: application/json"],' + (js ? "\n  CURLOPT_POSTFIELDS => '" + js.replace(/'/g, "\\'") + "'," : '') + '\n]);\n$response = json_decode(curl_exec($ch), true);';
+      var deluge = (js ? 'body = ' + js.replace(/\{\{/g, '{ {').replace(/}}/g, '} }') + ';\n' : '') + 'headers = Map();\nheaders.put("X-Api-Key", "YOUR_KEY");' + (js ? '\nheaders.put("Content-Type", "application/json");' : '') + '\nresponse = invokeurl\n[\n  url: "' + url + '"\n  type: ' + (up === 'PATCH' ? 'PATCH' : up) + (js ? '\n  parameters: body.toString()' : '') + '\n  headers: headers\n];\ninfo response;';
+      return [['cURL', curl], ['Node.js', node], ['Python', py], ['PHP', php], ['Zoho Deluge', deluge]];
+    }
+    function renderRef() {
+      var base = (spec.servers && spec.servers[0] && spec.servers[0].url) || '';
+      var nav = [], docs = ['<div class="cx-card dv-op"><h3>' + esc(spec.info.title) + '</h3><p>' + md(spec.info.description) + '</p></div>'];
+      var tags = (spec.tags || []).map(function (t) { return t.name; });
+      tags.forEach(function (tag) {
+        nav.push('<b>' + esc(tag) + '</b>');
+        Object.keys(spec.paths).forEach(function (path) {
+          var item = spec.paths[path];
+          ['get', 'post', 'patch'].forEach(function (m) {
+            var op = item[m]; if (!op || (op.tags || [])[0] !== tag) { return; }
+            var id = op.operationId, params = (item.parameters || []).concat(op.parameters || []);
+            nav.push('<a href="#op-' + id + '" data-op="' + id + '"><span class="dv-m dv-' + m + '">' + m.toUpperCase() + '</span>' + esc(op.summary) + '</a>');
+            var body = exampleOf(op), url = base + path;
+            var h = '<div class="cx-card dv-op" id="op-' + id + '"><div class="dv-op-head"><span class="dv-m dv-' + m + '">' + m.toUpperCase() + '</span><code>' + esc(path) + '</code></div>'
+              + '<h3>' + esc(op.summary) + '</h3>' + (op.description ? '<p>' + md(op.description) + '</p>' : '');
+            if (params.length) {
+              h += '<table class="cx-table dv-params"><thead><tr><th>Parameter</th><th>In</th><th>Description</th></tr></thead><tbody>' + params.map(function (p) {
+                return '<tr><td><code>' + esc(p.name) + '</code>' + (p.required ? ' <small class="cx-danger">required</small>' : '') + '</td><td class="cx-muted">' + esc(p['in']) + '</td><td>' + esc(p.description || (p.schema && p.schema['default'] !== undefined ? 'default ' + p.schema['default'] : '')) + '</td></tr>';
+              }).join('') + '</tbody></table>';
+            }
+            if (op.requestBody) {
+              var sch = op.requestBody.content['application/json'].schema;
+              if (sch && sch.properties) {
+                h += '<table class="cx-table dv-params"><thead><tr><th>Body field</th><th>Type</th><th>Description</th></tr></thead><tbody>' + Object.keys(sch.properties).map(function (k) {
+                  var pr = sch.properties[k];
+                  return '<tr><td><code>' + esc(k) + '</code>' + ((sch.required || []).indexOf(k) >= 0 ? ' <small class="cx-danger">required</small>' : '') + '</td><td class="cx-muted">' + esc(pr.type || '') + '</td><td>' + esc(pr.description || '') + '</td></tr>';
+                }).join('') + '</tbody></table>';
+              }
+            }
+            var smp = samples(m, url.replace(/\{(\w+)\}/g, ':$1'), body);
+            h += '<div class="dv-samples"><div class="cx-seg">' + smp.map(function (x, i) { return '<a href="#" data-sample="' + i + '" class="' + (i === 0 ? 'on' : '') + '">' + x[0] + '</a>'; }).join('') + '</div>'
+              + smp.map(function (x, i) { return '<pre class="dv-code"' + (i ? ' hidden' : '') + ' data-sample-body="' + i + '">' + esc(x[1]) + '</pre>'; }).join('') + '</div>';
+            var rs = op.responses || {};
+            h += '<details class="dv-resp"><summary>Responses: ' + Object.keys(rs).map(function (c) { return '<span class="cx-pill ' + (c < 300 ? 'cx-pill-green' : 'cx-pill-red') + '">' + c + '</span>'; }).join(' ') + '</summary>'
+              + Object.keys(rs).map(function (c) {
+                var ex = rs[c].content && rs[c].content['application/json'] && rs[c].content['application/json'].example;
+                return '<p><b>' + c + '</b> ' + esc(rs[c].description) + '</p>' + (ex ? '<pre class="dv-code dv-small">' + esc(JSON.stringify(ex, null, 2)) + '</pre>' : '');
+              }).join('') + '</details>';
+            h += '<details class="dv-try"><summary>▶ Try it with your workspace</summary><p class="cx-hint">Runs for real on your workspace (messages are really sent). No key needed here.</p>'
+              + '<div class="dv-try-row"><span class="dv-m dv-' + m + '">' + m.toUpperCase() + '</span><input type="text" class="dv-try-path" value="' + esc(path.replace(/\{(\w+)\}/g, '')) + '"/></div>'
+              + (m !== 'get' ? '<textarea class="dv-try-body" rows="8" spellcheck="false">' + esc(body ? JSON.stringify(body, null, 2) : '{}') + '</textarea>' : '')
+              + '<button type="button" class="cx-btn cx-btn-primary" data-try="' + m + '">Send request</button><div class="dv-try-out"></div></details></div>';
+            docs.push(h);
+          });
+        });
+      });
+      // webhooks section
+      var wh = spec['x-webhooks'];
+      if (wh) {
+        nav.push('<b>Webhooks</b><a href="#op-webhooks" data-op="webhooks">Events &amp; verifying</a>');
+        var verify = [['Node.js', "const crypto = require('crypto');\n\n// req.rawBody = the exact bytes we sent\nfunction verify(req, secret) {\n  const sig = req.headers['x-flochat-signature'] || '';\n  const [t, v1] = sig.split(',').map(p => p.split('=')[1]);\n  const expected = crypto.createHmac('sha256', secret).update(t + '.' + req.rawBody).digest('hex');\n  const fresh = Math.abs(Date.now() / 1000 - Number(t)) < 300;\n  return fresh && crypto.timingSafeEqual(Buffer.from(v1 || ''), Buffer.from(expected));\n}"],
+          ['PHP', "$raw = file_get_contents('php://input');\n$sig = $_SERVER['HTTP_X_FLOCHAT_SIGNATURE'] ?? '';\nparse_str(str_replace(',', '&', $sig), $p);\n$expected = hash_hmac('sha256', $p['t'] . '.' . $raw, getenv('FLOCHAT_WEBHOOK_SECRET'));\nif (!hash_equals($expected, $p['v1'] ?? '') || abs(time() - (int)$p['t']) > 300) {\n  http_response_code(401); exit;\n}\n$event = json_decode($raw, true);"],
+          ['Python', "import hmac, hashlib, time\n\ndef verify(raw_body: bytes, header: str, secret: str) -> bool:\n    parts = dict(p.split('=', 1) for p in header.split(','))\n    expected = hmac.new(secret.encode(), (parts['t'] + '.').encode() + raw_body, hashlib.sha256).hexdigest()\n    return hmac.compare_digest(expected, parts.get('v1', '')) and abs(time.time() - int(parts['t'])) < 300"]];
+        var hh = '<div class="cx-card dv-op" id="op-webhooks"><h3>Webhooks: events &amp; verifying</h3><p>' + md(wh.about) + '</p>'
+          + '<div class="dv-samples"><div class="cx-seg">' + verify.map(function (x, i) { return '<a href="#" data-sample="' + i + '" class="' + (i === 0 ? 'on' : '') + '">' + x[0] + '</a>'; }).join('') + '</div>'
+          + verify.map(function (x, i) { return '<pre class="dv-code"' + (i ? ' hidden' : '') + ' data-sample-body="' + i + '">' + esc(x[1]) + '</pre>'; }).join('') + '</div>';
+        Object.keys(wh.events).forEach(function (ev) { hh += '<details class="dv-resp"><summary><code>' + esc(ev) + '</code></summary><pre class="dv-code dv-small">' + esc(JSON.stringify(wh.events[ev], null, 2)) + '</pre></details>'; });
+        docs.push(hh + '</div>');
+      }
+      $('#dvNav').innerHTML = nav.join('');
+      $('#dvDocs').innerHTML = docs.join('');
+      $$('#dvNav a').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); var t = document.getElementById('op-' + a.getAttribute('data-op')); if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }); });
+      $$('.dv-samples').forEach(function (box) {
+        $$('[data-sample]', box).forEach(function (a) {
+          a.addEventListener('click', function (e) {
+            e.preventDefault();
+            $$('[data-sample]', box).forEach(function (x) { x.classList.toggle('on', x === a); });
+            $$('[data-sample-body]', box).forEach(function (p) { p.hidden = p.getAttribute('data-sample-body') !== a.getAttribute('data-sample'); });
+          });
+        });
+      });
+      $$('[data-try]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var box = b.closest('.dv-try'), out = $('.dv-try-out', box), ta = $('.dv-try-body', box);
+          if (ta) { try { JSON.parse(ta.value); } catch (e) { out.innerHTML = '<p class="cx-danger">The body is not valid JSON: ' + esc(e.message) + '</p>'; return; } }
+          b.disabled = true; out.innerHTML = '<span class="ag-spin"></span> Sending…';
+          post(U['try'], { method: b.getAttribute('data-try').toUpperCase(), path: $('.dv-try-path', box).value.trim(), body: ta ? ta.value : '' }).then(function (d) {
+            b.disabled = false;
+            if (!d.ok) { out.innerHTML = '<p class="cx-danger">' + esc(d.error) + '</p>'; return; }
+            out.innerHTML = '<p><span class="cx-pill ' + (d.status < 300 ? 'cx-pill-green' : 'cx-pill-red') + '">' + d.status + '</span> <span class="cx-muted">' + d.ms + ' ms</span></p><pre class="dv-code dv-small">' + esc(JSON.stringify(d.body, null, 2)) + '</pre>';
+          });
+        });
+      });
+    }
+  }
+
   // ============================================================ Settings: saved replies
   var qrs = $('#cxQrSettings');
   if (qrs) {

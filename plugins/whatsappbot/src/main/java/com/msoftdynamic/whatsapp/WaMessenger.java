@@ -241,6 +241,7 @@ public final class WaMessenger {
             c.set("unreadCount", 0L);
             c.set("createdDate", UtilDateTime.nowTimestamp());
             c.create();
+            WaWebhooks.contactCreated(delegator, c);
         } else if (UtilValidate.isNotEmpty(profileName) && !profileName.equals(c.getString("profileName"))) {
             c.set("profileName", profileName);
             c.store();

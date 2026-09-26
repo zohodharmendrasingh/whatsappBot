@@ -1,7 +1,7 @@
 # FloChat — WhatsApp automation SaaS (Apache OFBiz 24.09 plugin, PostgreSQL)
 
 Multi-tenant WhatsApp chatbot platform built as an OFBiz plugin (`plugins/whatsappbot`).
-FloChat (https://flochat.flolink.ai) runs one platform, each customer business is a **tenant** with its own
+FloChat (https://flolink.ai) runs one platform, each customer business is a **tenant** with its own
 WhatsApp numbers, bot flows, inbox, templates, API keys and plan limits.
 
 ## What's inside
@@ -17,7 +17,7 @@ WhatsApp numbers, bot flows, inbox, templates, API keys and plan limits.
 
 ## SaaS experience
 
-* **Public website** at `https://flochat.flolink.ai/` (`/control/home`): landing page, pricing read live from
+* **Public website** at `https://flolink.ai/` (`/control/home`): landing page, pricing read live from
   the Plans table, FAQ, and **self sign-up** (`/control/signup`). Sign-up creates a trial workspace
   (`saas.trial.days`, default 14), the owner login (email) and a starter "Welcome menu" bot, then signs the owner in.
   Spam guards: hidden honeypot field + `saas.signup.max.per.hour` per IP. Turn off with `saas.signup.enabled=false`.
@@ -33,13 +33,13 @@ WhatsApp numbers, bot flows, inbox, templates, API keys and plan limits.
 The private GitHub repo `zohodharmendrasingh/whatsappBot` holds the complete OFBiz 24.09 with this plugin
 in `plugins/whatsappbot`, including its settings.
 
-1. Point the DNS A record of `flochat.flolink.ai` at the server.
+1. Point the DNS A record of `flolink.ai` at the server.
 2. Create a GitHub token with read access to the repo (GitHub > Settings > Developer settings > Fine-grained tokens).
 3. On the server:
    ```bash
    curl -fsSL -H "Authorization: token <GH_TOKEN>" \
      https://raw.githubusercontent.com/zohodharmendrasingh/whatsappBot/main/plugins/whatsappbot/deploy/install.sh -o install.sh
-   sudo GH_TOKEN=<GH_TOKEN> DOMAIN=flochat.flolink.ai EMAIL=info@msoftdynamic.com bash install.sh
+   sudo GH_TOKEN=<GH_TOKEN> DOMAIN=flolink.ai EMAIL=info@msoftdynamic.com bash install.sh
    ```
    Installs Java 17, PostgreSQL, nginx and an SSL certificate, clones the repo to `/opt/flochat/ofbiz`, creates the
    database from `entityengine.xml`, loads the data and starts the `flochat` service.
@@ -72,7 +72,7 @@ The PostgreSQL JDBC driver is added by `plugins/whatsappbot/build.gradle`, so th
 
 1. developers.facebook.com → your app → WhatsApp. Put App ID / App Secret in
    `plugins/whatsappbot/config/whatsappbot.properties` (`meta.app.id`, `meta.app.secret`).
-2. Webhook: Callback URL `https://flochat.flolink.ai/webhook`, Verify token = `webhook.verify.token`,
+2. Webhook: Callback URL `https://flolink.ai/webhook`, Verify token = `webhook.verify.token`,
    subscribe to **messages**. Meta requires HTTPS with a valid certificate (use Nginx + Let's Encrypt
    in front of OFBiz on the VPS).
 3. Tenants add numbers from **WhatsApp Numbers**:
@@ -133,3 +133,24 @@ Schedule `waPurgeWebhookLogs` daily (Webtools → Job Scheduler), `daysToKeep` d
 PayPal recurring subscriptions (auto-renew) and refunds webhook, media download/upload
 to OFBiz content, per-tenant webhooks to push inbound messages to the tenant's systems,
 AI replies on fallback.
+
+## Moving to flolink.ai (main domain)
+
+FloChat runs on **https://flolink.ai** (website + app). `www.`, `app.` and the old `flochat.flolink.ai` redirect there; the
+Meta webhook (`/webhook`), the REST API (`/api/`) and the Zoho callback keep answering on the old address too, so nothing
+breaks while you update settings.
+
+1. **FlowLinker first**: in Zoho Catalyst add the custom domain `flowlinker.flolink.ai` for the FlowLinker app and create its
+   CNAME in Cloudflare. (The site links to it; change `brand.flowlinker.url` if you pick another address.)
+2. **Cloudflare DNS**: `flolink.ai`, `www.flolink.ai`, `app.flolink.ai` → A record `103.48.51.17`, **DNS only (grey cloud)**.
+   Keep `flochat.flolink.ai` pointing to the server.
+3. **Server**: `sudo bash /opt/flochat/ofbiz/plugins/whatsappbot/deploy/move-to-flolink.sh`
+   (nginx for all four names, HTTPS certificate, OFBiz allowed hosts, `brand.domain`, `brand.app.url`, `zoho.redirect.uri`).
+4. **Meta app (FloChat)**
+   * App settings → Basic: App domains `flolink.ai`; Privacy `https://flolink.ai/control/privacy`;
+     Terms `https://flolink.ai/control/terms`; Data deletion `https://flolink.ai/control/data-deletion`.
+   * Facebook Login for Business → Settings: add `https://flolink.ai/` to Valid OAuth redirect URIs and
+     `https://flolink.ai` to Allowed domains for the JavaScript SDK (needed for "Connect WhatsApp").
+   * WhatsApp → Configuration: Callback URL `https://flolink.ai/webhook` (same verify token).
+5. **Zoho API Console**: add the redirect URI `https://flolink.ai/control/zohoCallback` (keep the old one).
+6. Everyone signs in again once on the new address.

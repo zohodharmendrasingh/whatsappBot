@@ -13,7 +13,7 @@
       <#if currentPlan?has_content><#if (currentPlan.currencyUomId!"USD") == "USD">$<#elseif (currentPlan.currencyUomId!"") == "INR">&#8377;<#else>${currentPlan.currencyUomId!} </#if>${(currentPlan.monthlyPrice!0)?string(",##0")}/month</#if>
     </p>
   </div>
-  <#assign used = (currentUsage.messagesOut)!0><#assign quota = (currentPlan.maxMessagesPerMonth)!0>
+  <#assign used = (currentUsage.messagesOut)!0><#assign quota = currentMsgLimit!0>
   <div>
     <div class="msoft-muted">Messages sent this month: <strong>${used}</strong><#if (quota > 0)> of ${quota}</#if></div>
     <div class="msoft-muted" style="font-size:1.2rem;margin-top:4px">WhatsApp fees are billed by Meta to your WhatsApp Business Account. <a href="https://developers.facebook.com/docs/whatsapp/pricing" target="_blank" rel="noopener">Meta pricing</a></div>

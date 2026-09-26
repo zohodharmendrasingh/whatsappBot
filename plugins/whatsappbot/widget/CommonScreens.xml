@@ -39,6 +39,7 @@
                                         </or>
                                     </condition>
                                     <widgets>
+                                        <platform-specific><html><html-template location="component://whatsappbot/template/LimitBanner.ftl"/></html></platform-specific>
                                         <decorator-section-include name="body"/>
                                     </widgets>
                                     <fail-widgets><label style="h3">${uiLabelMap.WaNoTenant}</label></fail-widgets>

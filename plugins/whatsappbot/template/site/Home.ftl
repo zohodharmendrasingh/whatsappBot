@@ -25,7 +25,7 @@
   </div>
   <div class="s-wrap h-shot-wrap">
     <div class="h-browser">
-      <div class="h-browser-bar"><i></i><i></i><i></i><span>flochat.flolink.ai</span></div>
+      <div class="h-browser-bar"><i></i><i></i><i></i><span>${brandDomain}</span></div>
       <img src="/theme/img/app-dashboard.jpg" alt="Dashboard showing conversations, message volume and delivery rate" width="1600" height="956"/>
     </div>
   </div>
@@ -64,18 +64,36 @@
   </div>
 </section>
 
+<section class="s-section" id="products">
+  <div class="s-wrap">
+    <div class="h-center"><span class="h-kicker">${companyName} products</span><h2 class="s-h2">Automation for businesses that run on WhatsApp and Zoho</h2></div>
+    <div class="h-products">
+      <div class="h-product h-product-main">
+        <img src="/theme/flochat-logo-dark.svg" alt="FloChat" height="34"/>
+        <p><b>WhatsApp automation.</b> AI agent and no-code chatbots, a shared team inbox, broadcasts with read and reply reports, and an open API.</p>
+        <a class="s-btn s-btn-primary" href="<@ofbizUrl>signup</@ofbizUrl>">Start ${trialDays}-day free trial</a>
+      </div>
+      <div class="h-product">
+        <div class="h-product-name">Flow<span>Linker</span></div>
+        <p>${flowlinkerTagline}</p>
+        <a class="s-btn s-btn-ghost" href="${flowlinkerUrl}">Open FlowLinker &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="s-section s-alt" id="features">
   <div class="s-wrap">
     <div class="h-center"><span class="h-kicker">Everything included</span><h2 class="s-h2">One platform for sales and support on WhatsApp</h2></div>
     <div class="h-grid">
-      <div class="h-card"><div class="h-ico"><@ico "bot"/></div><h3>Chatbot flows</h3><p>Automate FAQs, catalogues, bookings and lead capture.</p></div>
+      <div class="h-card"><div class="h-ico"><@ico "bot"/></div><h3>AI agent</h3><p>Answers from your price list, FAQ and website, and hands over to your team when unsure.</p></div>
+      <div class="h-card"><div class="h-ico"><@ico "bot"/></div><h3>Chatbot flows</h3><p>Automate FAQs, catalogues, bookings and lead capture. Or let AI build the bot for you.</p></div>
       <div class="h-card"><div class="h-ico"><@ico "inbox"/></div><h3>Shared inbox</h3><p>Your whole team answers from one screen, with clear ownership.</p></div>
-      <div class="h-card"><div class="h-ico"><@ico "broadcast"/></div><h3>Broadcasts</h3><p>Send approved templates for offers, reminders and order updates.</p></div>
-      <div class="h-card"><div class="h-ico"><@ico "api"/></div><h3>REST API</h3><p>Send messages from Zoho, your website or any system with an API key.</p></div>
+      <div class="h-card"><div class="h-ico"><@ico "broadcast"/></div><h3>Broadcasts</h3><p>Send offers to tagged customers now or later, and see who read and replied.</p></div>
+      <div class="h-card"><div class="h-ico"><@ico "api"/></div><h3>Developer API</h3><p>REST API, signed webhooks and a developer portal with ready-made code for Zoho, Node, PHP and Python.</p></div>
       <div class="h-card"><div class="h-ico"><@ico "chart"/></div><h3>Analytics</h3><p>Track volume, delivery and read rates, and chats waiting for a reply.</p></div>
       <div class="h-card"><div class="h-ico"><@ico "team"/></div><h3>Team roles</h3><p>Owners manage settings and billing. Agents focus on customers.</p></div>
       <div class="h-card"><div class="h-ico"><@ico "shield"/></div><h3>Secure</h3><p>Signed webhooks, encrypted tokens and fully separate workspaces.</p></div>
-      <div class="h-card"><div class="h-ico"><@ico "clock"/></div><h3>24/7 replies</h3><p>Customers get an answer at midnight, and your team picks up in the morning.</p></div>
     </div>
   </div>
 </section>
@@ -92,7 +110,7 @@
 <pre class="h-code"><span class="c">// Send an order update from Zoho Deluge</span>
 resp = <span class="k">invokeurl</span>
 [
-  url: <span class="s">"https://flochat.flolink.ai/api/v1/messages"</span>
+  url: <span class="s">"https://${brandDomain}/api/v1/messages"</span>
   type: POST
   headers: {<span class="s">"X-Api-Key"</span>: <span class="s">"wab_..."</span>}
   parameters: {<span class="s">"to"</span>: <span class="s">"919826012345"</span>,

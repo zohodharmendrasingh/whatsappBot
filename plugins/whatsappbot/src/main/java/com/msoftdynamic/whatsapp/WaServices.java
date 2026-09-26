@@ -263,9 +263,10 @@ public final class WaServices {
             return "Unknown tenant " + tenantId;
         }
         GenericValue plan = tenant.getRelatedOne("WaPlan", false);
-        Long max = plan == null ? null : plan.getLong(planField);
+        Long max = WaAddons.limit(delegator, plan, tenantId, WaAddons.typeForPlanField(planField));
         if (max != null && max > 0 && WaUtil.countWhere(delegator, entity, "tenantId", tenantId) >= max) {
-            return "Plan " + plan.getString("planName") + " allows only " + max + " (" + planField + "). Please upgrade.";
+            String what = "maxChannels".equals(planField) ? "WhatsApp number" : "bot flow";
+            return "Your plan allows " + max + " " + what + (max == 1 ? "" : "s") + ". Buy an add-on in Plan & Billing or upgrade your plan to add more.";
         }
         return null;
     }
@@ -835,6 +836,7 @@ public final class WaServices {
         msg.set("createdDate", now);
         msg.create();
         WaUtil.incrementUsage(delegator, channel.getString("tenantId"), false);
+        WaWebhooks.messageReceived(delegator, msg, contact, replyId);
 
         WaMessenger.markRead(channel, wamid);
         // one message per customer at a time, so parallel webhook jobs can't interleave flow state
@@ -885,6 +887,7 @@ public final class WaServices {
                 if (UtilValidate.isNotEmpty(msg.getString("campaignId"))) {
                     WaCampaigns.onStatus(delegator, msg, status, msg.getString("errorText"));
                 }
+                WaWebhooks.messageStatus(delegator, msg);
             }
         } catch (GenericEntityException e) {
             Debug.logError(e, MODULE);

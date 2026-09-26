@@ -21,3 +21,20 @@ context.isOwner = tenantId && userLogin && WaUtil.getTenantRole(delegator, tenan
 context.payments = tenantId ? EntityQuery.use(delegator).from("WaPayment").where("tenantId", tenantId)
         .orderBy("-createdDate").maxRows(25).queryList().findAll { it.statusId != "CREATED" } : []
 context.planNames = plans.collectEntries { [(it.planId): it.planName] }
+
+// ---- add-ons: catalog, what this workspace uses, and what it bought
+def addons = EntityQuery.use(delegator).from("WaAddon").where("isActive", "Y").orderBy("sequenceNum", "addonName").queryList()
+context.addons = addons.collect { a ->
+    [addonId: a.addonId, name: a.addonName, description: a.description, type: a.addonType, quantity: a.quantity,
+     price: a.price ?: 0, currency: a.currencyUomId ?: "USD"]
+}
+context.addonNames = addons.collectEntries { [(it.addonId): it.addonName] } + EntityQuery.use(delegator).from("WaAddon").queryList().collectEntries { [(it.addonId): it.addonName] }
+if (tenantId) {
+    context.limitUsage = com.msoftdynamic.whatsapp.WaAddons.usage(delegator, tenantId)
+    def now = org.apache.ofbiz.base.util.UtilDateTime.nowTimestamp()
+    context.activeAddons = EntityQuery.use(delegator).from("WaTenantAddon").where(
+            org.apache.ofbiz.entity.condition.EntityCondition.makeCondition("tenantId", tenantId),
+            org.apache.ofbiz.entity.condition.EntityCondition.makeCondition("thruDate", org.apache.ofbiz.entity.condition.EntityOperator.GREATER_THAN, now))
+            .orderBy("thruDate").queryList()
+}
+context.addonFocus = parameters.addon ?: ""

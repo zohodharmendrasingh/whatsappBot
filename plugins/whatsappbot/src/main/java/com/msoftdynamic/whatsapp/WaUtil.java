@@ -179,7 +179,7 @@ public final class WaUtil {
             return label("WaTenantInactive", locale);
         }
         GenericValue plan = tenant.getRelatedOne("WaPlan", true);
-        Long max = plan == null ? null : plan.getLong("maxMessagesPerMonth");
+        Long max = WaAddons.limit(delegator, plan, tenantId, "MESSAGES");
         if (max != null && max > 0) {
             GenericValue usage = EntityQuery.use(delegator).from("WaUsage")
                     .where("tenantId", tenantId, "periodId", currentPeriod()).queryOne();

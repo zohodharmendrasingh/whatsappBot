@@ -33,6 +33,7 @@ if (cur) {
     globalContext.currentUsage = EntityQuery.use(delegator).from("WaUsage")
             .where("tenantId", cur, "periodId", WaUtil.currentPeriod()).queryOne()
     globalContext.currentPlan = globalContext.currentTenant?.getRelatedOne("WaPlan", true)
+    globalContext.currentMsgLimit = com.msoftdynamic.whatsapp.WaAddons.limit(delegator, globalContext.currentPlan, cur, "MESSAGES")
 }
 def base = WaUtil.prop("brand.app.url", "")
 if (!base) base = request ? (request.scheme + "://" + request.serverName + ((request.serverPort in [80, 443]) ? "" : ":" + request.serverPort)) : ""
@@ -41,7 +42,7 @@ globalContext.appUrl = base
 globalContext.webhookUrl = base + "/webhook"
 globalContext.apiBaseUrl = base + "/api/v1"
 globalContext.brandName = WaUtil.prop("brand.name", "FloChat")
-globalContext.brandDomain = WaUtil.prop("brand.domain", "flochat.flolink.ai")
+globalContext.brandDomain = WaUtil.prop("brand.domain", "flolink.ai")
 globalContext.supportEmail = WaUtil.prop("brand.support.email", "info@msoftdynamic.com")
 globalContext.metaAppId = WaUtil.prop("meta.app.id", "")
 globalContext.metaSignupConfigId = WaUtil.prop("meta.embedded.signup.config.id", "")

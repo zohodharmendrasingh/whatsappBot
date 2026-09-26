@@ -225,6 +225,7 @@ public final class BotEngine {
                 contact.set("botPaused", "Y");
                 contact.set("chatStatus", "OPEN");
                 endRun(curFlow, "HANDOFF");
+                WaWebhooks.handoff(delegator, contact, "Flow step: talk to agent");
                 clearState();
                 return;
             case "WA_NODE_ZOHO":
@@ -344,6 +345,7 @@ public final class BotEngine {
         contact.set("chatStatus", "OPEN");
         clearState();
         WaCrmEvents.addSystemNote(delegator, channel.getString("tenantId"), contact.getString("contactId"), "AI", note);
+        WaWebhooks.handoff(delegator, contact, note);
     }
 
     // ------------------------------------------------------------------ flow runs (analytics)

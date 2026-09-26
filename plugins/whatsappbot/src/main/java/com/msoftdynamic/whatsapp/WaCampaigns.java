@@ -271,6 +271,7 @@ public final class WaCampaigns {
             cmp.set("statusId", "DONE");
             cmp.set("completedDate", UtilDateTime.nowTimestamp());
             cmp.store();
+            WaWebhooks.broadcastCompleted(delegator, cmp);
         }
         return ServiceUtil.returnSuccess();
     }

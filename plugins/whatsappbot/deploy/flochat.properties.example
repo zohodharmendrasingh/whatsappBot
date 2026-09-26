@@ -3,8 +3,8 @@
 # The file is re-read automatically a few seconds after you save it.
 
 # ---- Public address
-brand.app.url=https://flochat.flolink.ai
-brand.domain=flochat.flolink.ai
+brand.app.url=https://flolink.ai
+brand.domain=flolink.ai
 brand.support.email=info@msoftdynamic.com
 
 # ---- Meta / WhatsApp (developers.facebook.com > FloChat app)
@@ -34,10 +34,10 @@ ai.daily.limit.own.key=200
 
 # Zoho (CRM, Books, Inventory, People). ONE FloChat client from api-console.zoho.com (Server-based Application)
 # serves every customer; each workspace connects its own Zoho account in Settings > Zoho.
-# Redirect URL to register in the Zoho API Console: https://flochat.flolink.ai/control/zohoCallback
+# Redirect URL to register in the Zoho API Console: https://flolink.ai/control/zohoCallback
 # Enable other data centres in the client's Settings tab; if they have different secrets, add zoho.client.secret.in / .eu / ...
 zoho.client.id=
 zoho.client.secret=
-zoho.redirect.uri=https://flochat.flolink.ai/control/zohoCallback
+zoho.redirect.uri=https://flolink.ai/control/zohoCallback
 # Country code assumed for phone numbers saved in Zoho without one (default: taken from the business's WhatsApp number)
 zoho.default.country.code=

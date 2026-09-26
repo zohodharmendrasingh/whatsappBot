@@ -20,7 +20,7 @@ import org.apache.ofbiz.service.LocalDispatcher;
 import org.apache.ofbiz.webapp.WebAppUtil;
 
 /**
- * Meta WhatsApp Cloud API webhook: https://flochat.flolink.ai/webhook
+ * Meta WhatsApp Cloud API webhook: https://flolink.ai/webhook
  * GET  = subscription verification (hub.challenge)
  * POST = events. Signature is verified on the raw body, payload is stored,
  *        200 is returned at once and processing happens asynchronously.

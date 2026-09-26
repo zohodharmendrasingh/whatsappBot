@@ -377,19 +377,19 @@
     <screen name="ApiKeys">
         <section>
             <actions>
-                <set field="titleProperty" value="WaApiIntegrations"/>
+                <set field="titleProperty" value="WaDevelopers"/>
                 <set field="headerItem" value="ApiKeys"/>
                 <script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/WaTenantContext.groovy"/>
-
+<script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/DevData.groovy"/>
             </actions>
             <widgets>
                 <decorator-screen name="WaDecorator" location="component://whatsappbot/widget/CommonScreens.xml">
                     <decorator-section name="body">
 <section>
                             <condition><not><if-empty field="currentTenantId"/></not></condition>
-                            <widgets><screenlet title="New key"><include-form name="CreateApiKey" location="component://whatsappbot/widget/WaForms.xml"/></screenlet></widgets>
+                            <widgets><platform-specific><html><html-template location="component://whatsappbot/template/Developers.ftl"/></html></platform-specific></widgets>
                             <fail-widgets><label style="h3">Select a tenant in the top bar to add records.</label></fail-widgets>
-                        </section><screenlet title="${uiLabelMap.WaApiKeys}"><include-grid name="ListApiKeys" location="component://whatsappbot/widget/WaForms.xml"/></screenlet><platform-specific><html><html-template location="component://whatsappbot/template/ApiHelp.ftl"/></html></platform-specific>
+                        </section>
                     </decorator-section>
                 </decorator-screen>
             </widgets>
@@ -435,12 +435,12 @@
                 <set field="titleProperty" value="WaPlansPricing"/>
                 <set field="headerItem" value="Plans"/>
                 <script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/WaTenantContext.groovy"/>
-
+<entity-condition entity-name="WaAddon" list="allAddons"><order-by field-name="sequenceNum"/><order-by field-name="addonName"/></entity-condition>
             </actions>
             <widgets>
                 <decorator-screen name="WaAdminDecorator" location="component://whatsappbot/widget/CommonScreens.xml">
                     <decorator-section name="body">
-<screenlet title="${uiLabelMap.WaPlans}"><include-form name="ListPlans" location="component://whatsappbot/widget/WaForms.xml"/></screenlet><screenlet title="New plan"><include-form name="CreatePlan" location="component://whatsappbot/widget/WaForms.xml"/></screenlet>
+<screenlet title="${uiLabelMap.WaPlans}"><include-form name="ListPlans" location="component://whatsappbot/widget/WaForms.xml"/></screenlet><screenlet title="New plan"><include-form name="CreatePlan" location="component://whatsappbot/widget/WaForms.xml"/></screenlet><screenlet title="Add-ons"><platform-specific><html><html-template location="component://whatsappbot/template/AdminAddons.ftl"/></html></platform-specific></screenlet>
                     </decorator-section>
                 </decorator-screen>
             </widgets>
