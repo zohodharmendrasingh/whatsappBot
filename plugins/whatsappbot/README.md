@@ -140,10 +140,11 @@ FloChat runs on **https://flolink.ai** (website + app). `www.`, `app.` and the o
 Meta webhook (`/webhook`), the REST API (`/api/`) and the Zoho callback keep answering on the old address too, so nothing
 breaks while you update settings.
 
-1. **FlowLinker first**: in Zoho Catalyst add the custom domain `flowlinker.flolink.ai` for the FlowLinker app and create its
-   CNAME in Cloudflare. (The site links to it; change `brand.flowlinker.url` if you pick another address.)
-2. **Cloudflare DNS**: `flolink.ai`, `www.flolink.ai`, `app.flolink.ai` → A record `103.48.51.17`, **DNS only (grey cloud)**.
-   Keep `flochat.flolink.ai` pointing to the server.
+1. **FlowLinker**: in Zoho Catalyst add the custom domain `flowlinker.flolink.ai` for the FlowLinker app and create its
+   CNAME in GoDaddy DNS. (The site links to it; change `brand.flowlinker.url` if you pick another address.)
+2. **GoDaddy DNS** (flolink.ai uses GoDaddy nameservers): turn off Parking/Forwarding, replace the two `@` A records
+   (GoDaddy parking IPs 15.197.148.33 / 3.33.130.190) with one `@` A record `103.48.51.17`, add `app` A `103.48.51.17`.
+   `www` is already a CNAME to `@`. Keep `flochat` A `103.48.51.17`.
 3. **Server**: `sudo bash /opt/flochat/ofbiz/plugins/whatsappbot/deploy/move-to-flolink.sh`
    (nginx for all four names, HTTPS certificate, OFBiz allowed hosts, `brand.domain`, `brand.app.url`, `zoho.redirect.uri`).
 4. **Meta app (FloChat)**
