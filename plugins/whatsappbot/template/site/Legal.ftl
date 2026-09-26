@@ -73,7 +73,7 @@
       <ul>
         <li>You must follow the WhatsApp Business Terms of Service, WhatsApp Business Messaging Policy and WhatsApp Commerce Policy.</li>
         <li>You must have your end customers' opt-in before messaging them and honour opt-out requests (for example STOP).</li>
-        <li>Meta charges for conversations directly to your WhatsApp Business Account; these charges are not included in ${b} plans.</li>
+        <li>WhatsApp messaging fees are set by Meta and billed by Meta directly to your WhatsApp Business Account, using the payment method you add in Meta Business Manager. Meta charges per template message delivered (marketing, utility and authentication); replies sent within 24 hours of a customer's message are free. These fees are not included in ${b} plans, and the message limits in ${b} plans are ${b} usage limits, not Meta credits.</li>
         <li>Meta may restrict or ban numbers that break its policies. We are not responsible for Meta's decisions.</li>
       </ul>
 

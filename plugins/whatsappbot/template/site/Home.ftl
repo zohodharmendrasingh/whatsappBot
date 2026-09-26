@@ -118,7 +118,7 @@ resp = <span class="k">invokeurl</span>
 <section class="s-section" id="pricing">
   <div class="s-wrap">
     <div class="h-center"><span class="h-kicker">Pricing</span><h2 class="s-h2">Simple plans that grow with you</h2>
-    <p class="s-sub">Every plan starts with a ${trialDays}-day free trial. Pay monthly, or yearly and get ${yearlyFree} months free. Prices in USD, paid securely with PayPal or card.</p></div>
+    <p class="s-sub">Every plan starts with a ${trialDays}-day free trial. Pay monthly, or yearly and get ${yearlyFree} months free. Prices in USD, paid securely with PayPal or card. WhatsApp fees are billed separately by Meta.</p></div>
     <div class="s-plans">
       <#list plans as p>
         <div class="s-plan<#if p?index == 1> s-plan-featured</#if>">
@@ -144,7 +144,7 @@ resp = <span class="k">invokeurl</span>
     <div class="h-center"><h2 class="s-h2">Frequently asked questions</h2></div>
     <details><summary>What do I need to get started?</summary><p>A phone number for WhatsApp Business and a Facebook Business account. We walk you through connecting both inside the app.</p></details>
     <details><summary>Can I keep using WhatsApp on my phone?</summary><p>A number connected to the WhatsApp Business Platform is managed from this app instead of the phone app. Many businesses use a dedicated number for this.</p></details>
-    <details><summary>Are WhatsApp message charges included?</summary><p>No. Meta charges per conversation and bills your WhatsApp Business Account directly. Our plans cover the platform.</p></details>
+    <details><summary>Are WhatsApp message charges included?</summary><p>No. Meta bills WhatsApp fees directly to your own WhatsApp Business Account. Bot replies within 24 hours of a customer's message are free; Meta charges only for template messages you start, such as marketing broadcasts, reminders and OTPs, at rates that depend on the customer's country (<a href="https://developers.facebook.com/docs/whatsapp/pricing" target="_blank" rel="noopener">see Meta's pricing</a>). Our plans cover the ${brandName!"FloChat"} platform.</p></details>
     <details><summary>How do I pay?</summary><p>After your trial, open Plan &amp; Billing in the app and pay with PayPal or any debit or credit card through PayPal. Choose monthly or yearly billing. Prices are in USD.</p></details>
     <details><summary>Can my team reply to customers?</summary><p>Yes. Invite team members as agents. The bot answers common questions and hands the chat to your team when needed.</p></details>
     <details><summary>Can I connect Zoho or my own software?</summary><p>Yes. Use the REST API with an API key from Zoho CRM, Zoho Flow, your website or any other system.</p></details>

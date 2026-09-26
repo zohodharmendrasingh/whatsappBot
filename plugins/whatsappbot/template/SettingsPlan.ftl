@@ -16,6 +16,7 @@
   <#assign used = (currentUsage.messagesOut)!0><#assign quota = (currentPlan.maxMessagesPerMonth)!0>
   <div>
     <div class="msoft-muted">Messages sent this month: <strong>${used}</strong><#if (quota > 0)> of ${quota}</#if></div>
+    <div class="msoft-muted" style="font-size:1.2rem;margin-top:4px">WhatsApp fees are billed by Meta to your WhatsApp Business Account. <a href="https://developers.facebook.com/docs/whatsapp/pricing" target="_blank" rel="noopener">Meta pricing</a></div>
     <#if (quota > 0)><div class="ms-meter"><span style="width:${[((used * 100) / quota)?round,100]?min}%"></span></div></#if>
   </div>
   <a class="s-btn-upgrade smallSubmit" href="<@ofbizUrl>Billing</@ofbizUrl>"><#if currentTenant.statusId! == "WA_TNT_ACTIVE">Change plan or renew<#else>Upgrade now</#if></a>

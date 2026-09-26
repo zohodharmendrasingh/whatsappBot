@@ -55,6 +55,8 @@
     </#list>
   </div>
 
+  <p class="fc-note fc-meta-note"><strong>WhatsApp fees are billed by Meta, not by ${brandName!"FloChat"}.</strong> Meta charges your own WhatsApp Business Account for template messages you start (marketing, utility, authentication). Bot replies within 24 hours of a customer's message are free. Add a payment method in Meta Business Manager &rarr; WhatsApp Manager &rarr; Payment settings. The message limit above is your ${brandName!"FloChat"} usage limit. <a href="https://developers.facebook.com/docs/whatsapp/pricing" target="_blank" rel="noopener">Meta pricing</a></p>
+
   <div class="fc-pay">
     <#if !isOwner>
       <p class="fc-note">Only the workspace owner can change the plan or pay. Ask your owner to open Plan &amp; Billing.</p>
