@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>FloLink – WhatsApp, Zoho and billing software for growing businesses</title>
-<meta name="description" content="FloLink builds FloChat (WhatsApp automation), FlowLinker (Zoho CRM and Books sync) and BillEase (billing and POS). By Msoft Dynamic Technologies."/>
+<title>FloLink by Msoft Dynamic – Zoho services, integrations and business software</title>
+<meta name="description" content="Zoho Certified Developers for Zoho CRM, Books, Inventory, Creator and Catalyst: customisation, integrations, migration, Marketplace extensions and support. Plus FloChat, FlowLinker and BillEase. By Msoft Dynamic Technologies."/>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f2747'/%3E%3Cpath d='M9 22V10h10M9 16h7' stroke='%2322c55e' stroke-width='3.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='22.5' cy='21.5' r='2.6' fill='%2322c55e'/%3E%3C/svg%3E"/>
 <meta property="og:title" content="FloLink – software for businesses that run on WhatsApp and Zoho"/>
 <link rel="me" href="https://www.youtube.com/@Msoftdynamic"/>
@@ -102,6 +102,17 @@ footer a:hover{color:var(--ink)}
 .card .shot{margin:-6px 0 4px}
 .case .shot{margin-bottom:4px}
 .feature .shot{margin-top:18px;box-shadow:0 14px 30px rgba(15,39,71,.12)}
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.svc-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px;transition:transform .2s,box-shadow .2s,border-color .2s}
+.svc-card:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(15,39,71,.09);border-color:color-mix(in srgb,var(--c) 40%,#fff)}
+.svc-card h3{margin:14px 0 6px;color:var(--ink);font-size:18px}
+.svc-card p{margin:0;color:var(--muted);font-size:15px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;counter-reset:s}
+.step{position:relative;background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px}
+.step b{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:var(--green);color:#fff;font-size:16px}
+.step h3{margin:14px 0 6px;color:var(--ink);font-size:17px}
+.step p{margin:0;font-size:14.5px;color:var(--muted)}
+.hero .chip{cursor:default}
 /* our work */
 .work{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
 .case{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px;display:flex;flex-direction:column;gap:12px;transition:transform .2s,box-shadow .2s}
@@ -135,8 +146,8 @@ footer a:hover{color:var(--ink)}
 .btn-yt{background:#dc2626;color:#fff;box-shadow:0 6px 18px rgba(220,38,38,.25)}
 .btn-yt:hover{background:#b91c1c}
 .btn-yt svg{width:20px;height:20px}
-@media (max-width:980px){.products{grid-template-columns:1fr}.why{grid-template-columns:1fr 1fr}.svc{grid-template-columns:1fr}.work{grid-template-columns:1fr 1fr}.feature{grid-template-columns:1fr}.caps{grid-template-columns:1fr 1fr}.yt{grid-template-columns:1fr;text-align:left}}
-@media (max-width:700px){.nav nav{display:none}.why{grid-template-columns:1fr}.work,.caps{grid-template-columns:1fr}section{padding:64px 0}.hero{padding:70px 0 80px}.nav .btn{padding:10px 14px}}
+@media (max-width:980px){.products{grid-template-columns:1fr}.why{grid-template-columns:1fr 1fr}.svc{grid-template-columns:1fr}.svc-grid{grid-template-columns:1fr 1fr}.steps{grid-template-columns:1fr 1fr}.work{grid-template-columns:1fr 1fr}.feature{grid-template-columns:1fr}.caps{grid-template-columns:1fr 1fr}.yt{grid-template-columns:1fr;text-align:left}}
+@media (max-width:700px){.nav nav{display:none}.why{grid-template-columns:1fr}.work,.caps,.svc-grid,.steps{grid-template-columns:1fr}section{padding:64px 0}.hero{padding:70px 0 80px}.nav .btn{padding:10px 14px}}
 </style>
 </head>
 <body>
@@ -152,135 +163,53 @@ footer a:hover{color:var(--ink)}
       <span>Flo<b>Link</b></span>
     </a>
     <nav>
-      <a href="#products">Products</a>
-      <a href="#why">Why us</a>
       <a href="#services">Zoho services</a>
       <a href="#work">Our work</a>
+      <a href="#products">Products</a>
+      <a href="#process">How we work</a>
       <a href="#videos">Videos</a>
       <a href="#contact">Contact</a>
     </nav>
     <span class="spacer"></span>
-    <a class="btn btn-primary" href="#products">Explore products</a>
+    <a class="btn btn-primary" href="#contact">Free consultation</a>
   </div>
 </header>
 
 <main>
 <section class="hero">
   <div class="wrap">
-    <span class="kicker">WhatsApp · Zoho · Billing</span>
-    <h1>Software that keeps your business <em>flowing</em></h1>
-    <p>Answer customers on WhatsApp, keep Zoho CRM and Zoho Books in sync, and bill at the counter, all from one team that builds and supports every product.</p>
+    <span class="kicker">Zoho Certified Developers · India &amp; US</span>
+    <h1>Zoho services that keep your business <em>flowing</em></h1>
+    <p>We set up, customise and connect Zoho CRM, Books, Inventory, Creator and Catalyst to the way you work, and build ready-made products for WhatsApp, Zoho sync and billing.</p>
     <div class="ctas">
-      <a class="btn btn-primary" href="#products">See our products</a>
-      <a class="btn btn-outline-light" href="#contact">Talk to us</a>
+      <a class="btn btn-primary" href="#services">Explore Zoho services</a>
+      <a class="btn btn-outline-light" href="mailto:info@msoftdynamic.com?subject=Zoho%20consultation">Book a free consultation</a>
     </div>
-    <div class="chips">
-      <a class="chip" href="https://flochat.flolink.ai"><span class="dot" style="background:#22c55e"></span>FloChat</a>
-      <a class="chip" href="https://app.flolink.ai/app/"><span class="dot" style="background:#3b82f6"></span>FlowLinker</a>
-      <a class="chip" href="https://app.msoftdynamic.com/app/"><span class="dot" style="background:#f59e0b"></span>BillEase</a>
-    </div>
-  </div>
-</section>
-
-<section id="products">
-  <div class="wrap">
-    <div class="head">
-      <span class="eyebrow">Our products</span>
-      <h2>Three products, one goal: less busywork</h2>
-      <p>Pick the one you need today. They're built by the same team, so they're ready for you to use together.</p>
-    </div>
-    <div class="products">
-      <article class="card" style="--c:#16a34a">
-        <img class="shot" src="img/flochat.webp" alt="FloChat dashboard with demo data" loading="lazy" width="1200" height="750"/>
-        <span class="badge">14-day free trial</span>
-        <div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.5L3 21l2-5.5A8.5 8.5 0 1 1 21 11.5z"/><path d="M8.5 10.5h7M8.5 13.5h4.5"/></svg></div>
-        <div><h3 class="pname">FloChat</h3></div>
-        <div class="ptag">WhatsApp automation</div>
-        <p>Official WhatsApp Business API with an AI agent, no-code chatbots and a shared team inbox.</p>
-        <ul>
-          <li><svg><use href="#i-check"/></svg>AI agent that answers from your own FAQ and website</li>
-          <li><svg><use href="#i-check"/></svg>Shared inbox with assign, notes and quick replies</li>
-          <li><svg><use href="#i-check"/></svg>Broadcasts with delivered, read and reply reports</li>
-          <li><svg><use href="#i-check"/></svg>REST API, webhooks and Zoho integration</li>
-        </ul>
-        <span class="url">flochat.flolink.ai</span>
-        <a class="btn btn-primary" href="https://flochat.flolink.ai">Open FloChat <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
-      </article>
-
-      <article class="card" style="--c:#2563eb">
-        <img class="shot" src="img/flowlinker.webp" alt="FlowLinker dashboard with demo data" loading="lazy" width="1200" height="750"/>
-        <span class="badge">Free</span>
-        <div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1"/></svg></div>
-        <div><h3 class="pname">FlowLinker</h3></div>
-        <div class="ptag">Zoho CRM ↔ Zoho Books sync</div>
-        <p>Send invoices, products and accounts from Zoho CRM to Zoho Books automatically, with no code.</p>
-        <ul>
-          <li><svg><use href="#i-check"/></svg>Visual workflow builder, set up in about 5 minutes</li>
-          <li><svg><use href="#i-check"/></svg>Real-time webhook triggers</li>
-          <li><svg><use href="#i-check"/></svg>Works in all Zoho data centers</li>
-          <li><svg><use href="#i-check"/></svg>Sync logs with one-click retry</li>
-        </ul>
-        <span class="url">app.flolink.ai</span>
-        <a class="btn btn-ghost" href="https://app.flolink.ai/app/">Open FlowLinker <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
-      </article>
-
-      <article class="card" style="--c:#d97706">
-        <img class="shot" src="img/billease.webp" alt="BillEase billing screen with demo data" loading="lazy" width="1200" height="750"/>
-        <div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></div>
-        <div><h3 class="pname">BillEase</h3></div>
-        <div class="ptag">Billing &amp; POS</div>
-        <p>Cloud billing and point of sale for shops: fast checkout, tax invoices and live stock.</p>
-        <ul>
-          <li><svg><use href="#i-check"/></svg>Barcode checkout with cash, card and UPI</li>
-          <li><svg><use href="#i-check"/></svg>Tax invoices calculated automatically</li>
-          <li><svg><use href="#i-check"/></svg>Stock tracking with low-stock alerts</li>
-          <li><svg><use href="#i-check"/></svg>Daily sales and profit reports, staff roles</li>
-        </ul>
-        <span class="url">app.msoftdynamic.com</span>
-        <a class="btn btn-ghost" href="https://app.msoftdynamic.com/app/">Open BillEase <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
-      </article>
-    </div>
-  </div>
-</section>
-
-<section id="why" class="alt">
-  <div class="wrap">
-    <div class="head">
-      <span class="eyebrow">Why FloLink</span>
-      <h2>Built for small teams that move fast</h2>
-    </div>
-    <div class="why">
-      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg><h3>Live in minutes</h3><p>No IT team needed. Sign up, connect, and you're running.</p></div>
-      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg><h3>Zoho experts</h3><p>Built by Zoho Certified Developers who integrate Zoho every day.</p></div>
-      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><h3>Secure by default</h3><p>HTTPS everywhere, encrypted keys, and your data stays yours.</p></div>
-      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><h3>Real support</h3><p>Talk to the people who build the product, not a ticket queue.</p></div>
-    </div>
+    <div class="chips"><span class="chip"><span class="dot" style="background:#22c55e"></span>Zoho CRM</span><span class="chip"><span class="dot" style="background:#3b82f6"></span>Zoho Books</span><span class="chip"><span class="dot" style="background:#f59e0b"></span>Zoho Inventory</span><span class="chip"><span class="dot" style="background:#a855f7"></span>Zoho Creator</span><span class="chip"><span class="dot" style="background:#ef4444"></span>Zoho Catalyst</span><span class="chip"><span class="dot" style="background:#14b8a6"></span>Zoho Flow</span><span class="chip"><span class="dot" style="background:#22c55e"></span>Zoho Desk</span><span class="chip"><span class="dot" style="background:#3b82f6"></span>Zoho Projects</span><span class="chip"><span class="dot" style="background:#f59e0b"></span>Zoho Sign</span><span class="chip"><span class="dot" style="background:#a855f7"></span>Zoho WorkDrive</span></div>
   </div>
 </section>
 
 <section id="services">
-  <div class="wrap svc">
-    <div>
-      <span class="eyebrow">Custom work</span>
-      <h2>Need something built on Zoho?</h2>
-      <p>Our parent company, Msoft Dynamic Technologies, builds custom Zoho solutions for clients in India and the US.</p>
-      <ul>
-        <li><svg><use href="#i-check"/></svg>Zoho CRM, Books, Inventory, Creator and Catalyst development</li>
-        <li><svg><use href="#i-check"/></svg>Third-party integrations: Shopify, WooCommerce, QuickBooks, ShipStation, Twilio and more</li>
-        <li><svg><use href="#i-check"/></svg>Zoho Marketplace extensions</li>
-      </ul>
-      <a class="btn btn-ghost" href="https://msoftdynamic.com">Visit msoftdynamic.com <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">Zoho services</span>
+      <h2>Everything you need from a Zoho expert team</h2>
+      <p>From a single custom button to a full implementation, our Zoho Certified Developers build it, connect it and support it.</p>
     </div>
-    <div class="svc-box">
-      <h3>One team for products and projects</h3>
-      <p>Buy a product off the shelf or have us tailor it to your process.</p>
-      <div class="stats">
-        <div><b>3</b><span>products in production</span></div>
-        <div><b>5</b><span>Zoho data centers supported</span></div>
-        <div><b>India + US</b><span>clients served</span></div>
-        <div><b>Zoho</b><span>certified developers</span></div>
-      </div>
-      <a class="btn btn-light" href="mailto:info@msoftdynamic.com">info@msoftdynamic.com</a>
+    <div class="svc-grid">
+      <div class="svc-card" style="--c:#16a34a"><div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M17 8h4M19 6v4"/></svg></div><h3>Zoho CRM customisation</h3><p>Modules, layouts, blueprints, custom buttons, client scripts, widgets and Deluge functions that match your sales process.</p></div>
+      <div class="svc-card" style="--c:#2563eb"><div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></div><h3>Zoho Books &amp; Inventory</h3><p>Setup, invoice templates, custom functions, workflows, GST/VAT and stock, connected to CRM and your store.</p></div>
+      <div class="svc-card" style="--c:#7c3aed"><div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 13h3M8 16h6"/></svg></div><h3>Zoho Creator apps</h3><p>Custom apps on Creator: point of sale, customer portals, surveys, document tools and internal dashboards.</p></div>
+      <div class="svc-card" style="--c:#dc2626"><div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 .5-9 6 6 0 0 0-11.7 1.5A4 4 0 0 0 7 19z"/></svg></div><h3>Zoho Catalyst development</h3><p>Serverless apps and tools on Catalyst in Node.js: data import tools, dashboards, APIs and scheduled jobs.</p></div>
+      <div class="svc-card" style="--c:#d97706"><div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1"/></svg></div><h3>Third-party integrations</h3><p>Shopify, WooCommerce, QuickBooks, ShipStation, UPS, Twilio, WhatsApp, EDI over SFTP and e-invoicing.</p></div>
+      <div class="svc-card" style="--c:#0891b2"><div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M17.5 14v7M14 17.5h7"/></svg></div><h3>Zoho Marketplace extensions</h3><p>We design, build and publish extensions and widgets for the Zoho Marketplace, including review and listing.</p></div>
+      <div class="svc-card" style="--c:#14b8a6"><div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M4 12h16M4 18h8"/><path d="M17 3l3 3-3 3"/></svg></div><h3>Zoho Flow &amp; automation</h3><p>Cross-app automation with Zoho Flow and Deluge: signed documents filed, folders created, data pushed between apps.</p></div>
+      <div class="svc-card" style="--c:#9333ea"><div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/><path d="M18 15l3 3-3 3"/></svg></div><h3>Data migration</h3><p>Move data from spreadsheets, XML/CSV files and other systems into Zoho, validated and mapped field by field.</p></div>
+      <div class="svc-card" style="--c:#475569"><div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div><h3>Support &amp; maintenance</h3><p>Ongoing fixes, changes and training after go-live, so your Zoho setup keeps up with your business.</p></div>
+    </div>
+    <div class="ctas" style="margin-top:34px">
+      <a class="btn btn-primary" href="mailto:info@msoftdynamic.com?subject=Zoho%20project%20enquiry">Discuss your Zoho project</a>
+      <a class="btn btn-ghost" href="https://msoftdynamic.com">Visit msoftdynamic.com <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
     </div>
   </div>
 </section>
@@ -374,6 +303,108 @@ zoho.crm.createRecord(<span class="s">"Sales_Orders"</span>, so,
   </div>
 </section>
 
+<section id="products">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">Our products</span>
+      <h2>Three products, one goal: less busywork</h2>
+      <p>Pick the one you need today. They're built by the same team, so they're ready for you to use together.</p>
+    </div>
+    <div class="products">
+      <article class="card" style="--c:#16a34a">
+        <img class="shot" src="img/flochat.webp" alt="FloChat dashboard with demo data" loading="lazy" width="1200" height="750"/>
+        <span class="badge">14-day free trial</span>
+        <div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.5L3 21l2-5.5A8.5 8.5 0 1 1 21 11.5z"/><path d="M8.5 10.5h7M8.5 13.5h4.5"/></svg></div>
+        <div><h3 class="pname">FloChat</h3></div>
+        <div class="ptag">WhatsApp automation</div>
+        <p>Official WhatsApp Business API with an AI agent, no-code chatbots and a shared team inbox.</p>
+        <ul>
+          <li><svg><use href="#i-check"/></svg>AI agent that answers from your own FAQ and website</li>
+          <li><svg><use href="#i-check"/></svg>Shared inbox with assign, notes and quick replies</li>
+          <li><svg><use href="#i-check"/></svg>Broadcasts with delivered, read and reply reports</li>
+          <li><svg><use href="#i-check"/></svg>REST API, webhooks and Zoho integration</li>
+        </ul>
+        <span class="url">flochat.flolink.ai</span>
+        <a class="btn btn-primary" href="https://flochat.flolink.ai">Open FloChat <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
+      </article>
+
+      <article class="card" style="--c:#2563eb">
+        <img class="shot" src="img/flowlinker.webp" alt="FlowLinker dashboard" loading="lazy" width="1200" height="750"/>
+        <span class="badge">Free</span>
+        <div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1"/></svg></div>
+        <div><h3 class="pname">FlowLinker</h3></div>
+        <div class="ptag">Zoho CRM ↔ Zoho Books sync</div>
+        <p>Send invoices, products and accounts from Zoho CRM to Zoho Books automatically, with no code.</p>
+        <ul>
+          <li><svg><use href="#i-check"/></svg>Visual workflow builder, set up in about 5 minutes</li>
+          <li><svg><use href="#i-check"/></svg>Real-time webhook triggers</li>
+          <li><svg><use href="#i-check"/></svg>Works in all Zoho data centers</li>
+          <li><svg><use href="#i-check"/></svg>Sync logs with one-click retry</li>
+        </ul>
+        <span class="url">app.flolink.ai</span>
+        <a class="btn btn-ghost" href="https://app.flolink.ai/app/">Open FlowLinker <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
+      </article>
+
+      <article class="card" style="--c:#d97706">
+        <img class="shot" src="img/billease-dashboard.webp" alt="BillEase dashboard with demo data" loading="lazy" width="1200" height="750"/>
+        <div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></div>
+        <div><h3 class="pname">BillEase</h3></div>
+        <div class="ptag">Billing &amp; POS</div>
+        <p>Cloud billing and point of sale for shops: fast checkout, tax invoices and live stock.</p>
+        <ul>
+          <li><svg><use href="#i-check"/></svg>Barcode checkout with cash, card and UPI</li>
+          <li><svg><use href="#i-check"/></svg>Tax invoices calculated automatically</li>
+          <li><svg><use href="#i-check"/></svg>Stock tracking with low-stock alerts</li>
+          <li><svg><use href="#i-check"/></svg>Daily sales and profit reports, staff roles</li>
+        </ul>
+        <span class="url">app.msoftdynamic.com</span>
+        <a class="btn btn-ghost" href="https://app.msoftdynamic.com/app/">Open BillEase <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="why" class="alt">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">Why Msoft Dynamic</span>
+      <h2>Built for growing businesses</h2>
+    </div>
+    <div class="why">
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg><h3>Fast delivery</h3><p>Focused projects delivered in clear milestones you can see.</p></div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg><h3>Zoho experts</h3><p>Built by Zoho Certified Developers who integrate Zoho every day.</p></div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><h3>Secure by default</h3><p>HTTPS everywhere, encrypted keys, and your data stays yours.</p></div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><h3>Real support</h3><p>Talk to the people who build the product, not a ticket queue.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="process">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">How we work</span>
+      <h2>From first call to go-live</h2>
+    </div>
+    <div class="steps"><div class="step"><b>1</b><h3>Discover</h3><p>A free call to understand your process, your Zoho apps and what should change.</p></div><div class="step"><b>2</b><h3>Plan &amp; quote</h3><p>A clear scope, timeline and quote before any work starts.</p></div><div class="step"><b>3</b><h3>Build &amp; test</h3><p>We build in a sandbox, show you progress and test with your real scenarios.</p></div><div class="step"><b>4</b><h3>Launch &amp; support</h3><p>Go-live, training for your team and ongoing support when you need it.</p></div></div>
+    <div class="svc" style="margin-top:56px">
+      <div>
+        <h2 style="font-size:clamp(24px,3vw,32px)">One team for services and products</h2>
+        <p>Buy one of our products off the shelf, or have us tailor Zoho to your process. Either way you work directly with the developers who build it.</p>
+        <ul>
+          <li><svg><use href="#i-check"/></svg>Zoho Certified Developers</li>
+          <li><svg><use href="#i-check"/></svg>Clients in India and the US</li>
+          <li><svg><use href="#i-check"/></svg>Every Zoho data center supported</li>
+        </ul>
+      </div>
+      <div class="svc-box">
+        <h3>Tell us what you need</h3>
+        <p>Share your Zoho setup and the problem to solve. We'll reply with the next steps.</p>
+        <a class="btn btn-light" href="mailto:info@msoftdynamic.com?subject=Zoho%20project%20enquiry">info@msoftdynamic.com</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="videos" class="yt-wrap" style="padding-top:88px">
   <div class="wrap">
     <div class="yt">
@@ -392,10 +423,10 @@ zoho.crm.createRecord(<span class="s">"Sales_Orders"</span>, so,
   <div class="wrap">
     <div class="cta">
       <h2>Let's get your business flowing</h2>
-      <p>Start a FloChat trial today, or tell us what you need.</p>
+      <p>Book a free Zoho consultation, or start a FloChat trial today.</p>
       <div class="ctas">
-        <a class="btn btn-primary" href="https://flochat.flolink.ai/control/signup">Start FloChat free trial</a>
-        <a class="btn btn-outline-light" href="mailto:info@msoftdynamic.com">Email us</a>
+        <a class="btn btn-primary" href="mailto:info@msoftdynamic.com?subject=Zoho%20consultation">Book a free consultation</a>
+        <a class="btn btn-outline-light" href="https://flochat.flolink.ai/control/signup">Start FloChat free trial</a>
       </div>
     </div>
   </div>
@@ -406,11 +437,12 @@ zoho.crm.createRecord(<span class="s">"Sales_Orders"</span>, so,
   <div class="wrap">
     <div>
       <a class="logo" href="/" style="font-size:18px"><span>Flo<b>Link</b></span></a>
-      <p style="margin:10px 0 0;max-width:320px">A product line of Msoft Dynamic Technologies (OPC) Private Limited, Gwalior, Madhya Pradesh, India.</p>
+      <p style="margin:10px 0 0;max-width:320px">Zoho services and business software by Msoft Dynamic Technologies (OPC) Private Limited, Gwalior, Madhya Pradesh, India.</p>
       <p style="margin:8px 0 0">&copy; <span id="yr">2026</span> Msoft Dynamic Technologies</p>
     </div>
     <div class="cols">
       <div><h4>Products</h4><a href="https://flochat.flolink.ai">FloChat</a><a href="https://app.flolink.ai/app/">FlowLinker</a><a href="https://app.msoftdynamic.com/app/">BillEase</a></div>
+      <div><h4>Zoho services</h4><a href="#services">CRM customisation</a><a href="#services">Books &amp; Inventory</a><a href="#services">Creator &amp; Catalyst</a><a href="#services">Integrations</a></div>
       <div><h4>Company</h4><a href="https://msoftdynamic.com">msoftdynamic.com</a><a href="mailto:info@msoftdynamic.com">info@msoftdynamic.com</a><a href="https://www.youtube.com/@Msoftdynamic" target="_blank" rel="noopener">YouTube</a></div>
       <div><h4>Legal</h4><a href="https://flochat.flolink.ai/control/privacy">Privacy</a><a href="https://flochat.flolink.ai/control/terms">Terms</a></div>
     </div>
