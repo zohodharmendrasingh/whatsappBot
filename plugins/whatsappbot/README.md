@@ -1,7 +1,7 @@
 # FloChat — WhatsApp automation SaaS (Apache OFBiz 24.09 plugin, PostgreSQL)
 
 Multi-tenant WhatsApp chatbot platform built as an OFBiz plugin (`plugins/whatsappbot`).
-FloChat (https://flolink.ai) runs one platform, each customer business is a **tenant** with its own
+FloChat (https://flochat.flolink.ai) runs one platform, each customer business is a **tenant** with its own
 WhatsApp numbers, bot flows, inbox, templates, API keys and plan limits.
 
 ## What's inside
@@ -17,7 +17,7 @@ WhatsApp numbers, bot flows, inbox, templates, API keys and plan limits.
 
 ## SaaS experience
 
-* **Public website** at `https://flolink.ai/` (`/control/home`): landing page, pricing read live from
+* **Public website** at `https://flochat.flolink.ai/` (`/control/home`): landing page, pricing read live from
   the Plans table, FAQ, and **self sign-up** (`/control/signup`). Sign-up creates a trial workspace
   (`saas.trial.days`, default 14), the owner login (email) and a starter "Welcome menu" bot, then signs the owner in.
   Spam guards: hidden honeypot field + `saas.signup.max.per.hour` per IP. Turn off with `saas.signup.enabled=false`.
@@ -33,13 +33,13 @@ WhatsApp numbers, bot flows, inbox, templates, API keys and plan limits.
 The private GitHub repo `zohodharmendrasingh/whatsappBot` holds the complete OFBiz 24.09 with this plugin
 in `plugins/whatsappbot`, including its settings.
 
-1. Point the DNS A record of `flolink.ai` at the server.
+1. Point the DNS A record of `flochat.flolink.ai` at the server.
 2. Create a GitHub token with read access to the repo (GitHub > Settings > Developer settings > Fine-grained tokens).
 3. On the server:
    ```bash
    curl -fsSL -H "Authorization: token <GH_TOKEN>" \
      https://raw.githubusercontent.com/zohodharmendrasingh/whatsappBot/main/plugins/whatsappbot/deploy/install.sh -o install.sh
-   sudo GH_TOKEN=<GH_TOKEN> DOMAIN=flolink.ai EMAIL=info@msoftdynamic.com bash install.sh
+   sudo GH_TOKEN=<GH_TOKEN> DOMAIN=flochat.flolink.ai EMAIL=info@msoftdynamic.com bash install.sh
    ```
    Installs Java 17, PostgreSQL, nginx and an SSL certificate, clones the repo to `/opt/flochat/ofbiz`, creates the
    database from `entityengine.xml`, loads the data and starts the `flochat` service.
@@ -72,7 +72,7 @@ The PostgreSQL JDBC driver is added by `plugins/whatsappbot/build.gradle`, so th
 
 1. developers.facebook.com → your app → WhatsApp. Put App ID / App Secret in
    `plugins/whatsappbot/config/whatsappbot.properties` (`meta.app.id`, `meta.app.secret`).
-2. Webhook: Callback URL `https://flolink.ai/webhook`, Verify token = `webhook.verify.token`,
+2. Webhook: Callback URL `https://flochat.flolink.ai/webhook`, Verify token = `webhook.verify.token`,
    subscribe to **messages**. Meta requires HTTPS with a valid certificate (use Nginx + Let's Encrypt
    in front of OFBiz on the VPS).
 3. Tenants add numbers from **WhatsApp Numbers**:
