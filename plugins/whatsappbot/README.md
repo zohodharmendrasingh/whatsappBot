@@ -136,17 +136,16 @@ AI replies on fallback.
 
 ## Moving to flolink.ai (main domain)
 
-FloChat runs on **https://flolink.ai** (website + app). `www.`, `app.` and the old `flochat.flolink.ai` redirect there; the
+FloChat runs on **https://flolink.ai** (website + app). `www.` and the old `flochat.flolink.ai` redirect there (`app.flolink.ai` stays FlowLinker on Zoho Catalyst); the
 Meta webhook (`/webhook`), the REST API (`/api/`) and the Zoho callback keep answering on the old address too, so nothing
 breaks while you update settings.
 
-1. **FlowLinker**: in Zoho Catalyst add the custom domain `flowlinker.flolink.ai` for the FlowLinker app and create its
-   CNAME in GoDaddy DNS. (The site links to it; change `brand.flowlinker.url` if you pick another address.)
-2. **GoDaddy DNS** (flolink.ai uses GoDaddy nameservers): turn off Parking/Forwarding, replace the two `@` A records
-   (GoDaddy parking IPs 15.197.148.33 / 3.33.130.190) with one `@` A record `103.48.51.17`, add `app` A `103.48.51.17`.
-   `www` is already a CNAME to `@`. Keep `flochat` A `103.48.51.17`.
+1. **FlowLinker** stays on `app.flolink.ai` (CNAME to Zoho Catalyst) - don't change it. The site links there
+   (`brand.flowlinker.url`, default `https://app.flolink.ai`).
+2. **GoDaddy DNS** (flolink.ai uses GoDaddy nameservers): edit the `@` A record (shows "Parked") → `103.48.51.17`,
+   and turn off Parking/Forwarding if GoDaddy asks. `www` is already a CNAME to `@`. Keep `flochat` A `103.48.51.17`.
 3. **Server**: `sudo bash /opt/flochat/ofbiz/plugins/whatsappbot/deploy/move-to-flolink.sh`
-   (nginx for all four names, HTTPS certificate, OFBiz allowed hosts, `brand.domain`, `brand.app.url`, `zoho.redirect.uri`).
+   (nginx for flolink.ai, www and flochat, HTTPS certificate, OFBiz allowed hosts, `brand.domain`, `brand.app.url`, `zoho.redirect.uri`).
 4. **Meta app (FloChat)**
    * App settings → Basic: App domains `flolink.ai`; Privacy `https://flolink.ai/control/privacy`;
      Terms `https://flolink.ai/control/terms`; Data deletion `https://flolink.ai/control/data-deletion`.

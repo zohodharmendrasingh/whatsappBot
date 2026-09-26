@@ -10,7 +10,7 @@ context.isLoggedIn = userLogin != null
 context.brandName = WaUtil.prop("brand.name", "FloChat")
 context.brandDomain = WaUtil.prop("brand.domain", "flolink.ai")
 context.companyName = WaUtil.prop("brand.company.name", "FloLink")
-context.flowlinkerUrl = WaUtil.prop("brand.flowlinker.url", "https://flowlinker.flolink.ai")
+context.flowlinkerUrl = WaUtil.prop("brand.flowlinker.url", "https://app.flolink.ai")
 context.flowlinkerTagline = WaUtil.prop("brand.flowlinker.tagline", "Connect your business apps with Zoho and automate the work between them, without code.")
 context.supportEmail = WaUtil.prop("brand.support.email", "info@msoftdynamic.com")
 context.yearlyFree = 12 - WaUtil.propInt("paypal.yearly.months.charged", 10)
