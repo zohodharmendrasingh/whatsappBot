@@ -488,6 +488,162 @@
     ta.addEventListener('blur', function () { setTimeout(function () { box.hidden = true; }, 150); });
   }
 
+  // ============================================================ AI Agent page
+  var ag = $('#agPage');
+  if (ag) { initAgent(ag); }
+
+  function initAgent(root) {
+    var U = root.dataset;
+    function reload() { setTimeout(function () { window.location.reload(); }, 500); }
+    // tabs
+    $$('.ag-tabs a', root).forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        $$('.ag-tabs a', root).forEach(function (x) { x.classList.toggle('on', x === a); });
+        $$('.ag-pane', root).forEach(function (p) { p.hidden = p.getAttribute('data-pane') !== a.getAttribute('data-tab'); });
+        showErr($('#agAddErr'));
+      });
+    });
+    // on / off
+    var en = $('#agEnabled');
+    if (en) {
+      en.addEventListener('change', function () {
+        post(U.saveUrl, { enabled: en.checked ? 'Y' : 'N' }).then(function (d) {
+          if (!d.ok) { en.checked = !en.checked; toast(d.error); return; }
+          var st = $('#agState'); st.textContent = d.enabled ? 'On' : 'Off';
+          st.className = 'cx-pill ' + (d.enabled ? 'cx-pill-green' : 'cx-st-CANCELLED');
+          toast(d.enabled ? 'AI agent is on. It now answers your customers.' : 'AI agent is off.');
+        });
+      });
+    }
+    // settings
+    var sf = $('#agSettings');
+    if (sf && root.dataset.owner === 'Y') {
+      sf.addEventListener('submit', function (e) {
+        e.preventDefault();
+        post(U.saveUrl, { instructions: sf.instructions.value, handoffMessage: sf.handoffMessage.value,
+          answerInMenus: sf.answerInMenus.checked ? 'Y' : 'N', maxPerDay: sf.maxPerDay.value }).then(function (d) {
+          if (!d.ok) { toast(d.error); return; }
+          var s = $('#agSaved'); s.hidden = false; setTimeout(function () { s.hidden = true; }, 2500);
+        });
+      });
+    }
+    // file upload (raw body, one file at a time)
+    var fileIn = $('#agFile'), list = $('#agUploads'), drop = $('#agDrop');
+    function upload(files) {
+      var chain = Promise.resolve(), any = false;
+      Array.prototype.forEach.call(files, function (f) {
+        var li = document.createElement('li');
+        li.innerHTML = '<span class="ag-spin"></span> <b>' + esc(f.name) + '</b> <small class="cx-muted">reading…</small>';
+        list.appendChild(li);
+        chain = chain.then(function () {
+          if (f.size > 10 * 1024 * 1024) { li.innerHTML = '❌ <b>' + esc(f.name) + '</b> <small class="cx-danger">too big (max 10 MB)</small>'; return; }
+          return fetch(U.uploadUrl + '?fileName=' + encodeURIComponent(f.name), { method: 'POST', credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/octet-stream' }, body: f })
+            .then(function (r) { return r.json(); }).catch(function () { return { ok: false, error: 'Upload failed. Please try again.' }; })
+            .then(function (d) {
+              if (d.ok) { any = true; li.innerHTML = '✅ <b>' + esc(f.name) + '</b> <small class="cx-muted">' + Math.round(d.chars / 100) / 10 + 'k characters added</small>'; }
+              else { li.innerHTML = '❌ <b>' + esc(f.name) + '</b> <small class="cx-danger">' + esc(d.error) + '</small>'; }
+            });
+        });
+      });
+      chain.then(function () { if (any) { toast('Knowledge updated'); setTimeout(function () { window.location.reload(); }, 1500); } });
+    }
+    if (fileIn) {
+      fileIn.addEventListener('change', function () { upload(fileIn.files); fileIn.value = ''; });
+      ['dragover', 'dragenter'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('on'); }); });
+      ['dragleave', 'drop'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('on'); }); });
+      drop.addEventListener('drop', function (e) { upload(e.dataTransfer.files); });
+    }
+    // website
+    var uf = $('#agUrlForm');
+    uf.addEventListener('submit', function (e) {
+      e.preventDefault(); showErr($('#agAddErr'));
+      var b = uf.querySelector('button'); b.disabled = true;
+      post(U.urlUrl, { url: uf.url.value, pages: uf.pages.value }).then(function (d) {
+        b.disabled = false;
+        if (!d.ok) { showErr($('#agAddErr'), d.error); return; }
+        toast('Reading the website… this can take a minute.'); reload();
+      });
+    });
+    // notes
+    var tf = $('#agTextForm');
+    tf.addEventListener('submit', function (e) {
+      e.preventDefault(); showErr($('#agAddErr'));
+      post(U.textUrl, { sourceId: tf.sourceId.value, title: tf.title.value, text: tf.text.value }).then(function (d) {
+        if (!d.ok) { showErr($('#agAddErr'), d.error); return; }
+        toast('Note saved'); reload();
+      });
+    });
+    $('#agTextCancel').addEventListener('click', function () { tf.reset(); tf.sourceId.value = ''; this.hidden = true; $('#agTextSave').textContent = 'Save note'; });
+    // source actions
+    $$('[data-del]', root).forEach(function (b) {
+      b.addEventListener('click', function () {
+        if (!window.confirm('Remove this from the agent\'s knowledge?')) { return; }
+        post(U.deleteUrl, { sourceId: b.getAttribute('data-del') }).then(function (d) { if (!d.ok) { toast(d.error); return; } reload(); });
+      });
+    });
+    $$('[data-refresh]', root).forEach(function (b) {
+      b.addEventListener('click', function () {
+        post(U.refreshUrl, { sourceId: b.getAttribute('data-refresh') }).then(function (d) { if (!d.ok) { toast(d.error); return; } toast('Reading the website again…'); reload(); });
+      });
+    });
+    $$('[data-view]', root).forEach(function (b) {
+      b.addEventListener('click', function () {
+        get(U.viewUrl + '?sourceId=' + encodeURIComponent(b.getAttribute('data-view'))).then(function (d) {
+          if (!d.ok) { toast(d.error || 'Could not open it.'); return; }
+          if (d.type === 'TEXT') {
+            $$('.ag-tabs a', root).forEach(function (x) { if (x.getAttribute('data-tab') === 'text') { x.click(); } });
+            tf.sourceId.value = d.sourceId; tf.title.value = d.title || ''; tf.text.value = d.text;
+            $('#agTextCancel').hidden = false; $('#agTextSave').textContent = 'Update note';
+            tf.scrollIntoView({ behavior: 'smooth', block: 'center' }); tf.text.focus();
+            return;
+          }
+          $('#agViewTitle').textContent = d.title || d.url || 'Source';
+          $('#agViewMeta').textContent = 'This is the text the AI agent reads' + (d.pages > 1 ? ' (' + d.pages + ' pages)' : '') + '. ' + Math.round(d.chars / 100) / 10 + 'k characters.';
+          $('#agViewText').textContent = d.text + (d.truncated ? '\n\n…' : '');
+          openModal($('#agViewModal'));
+        });
+      });
+    });
+    // poll while web pages are being read
+    if ($$('#agSources li[data-status=PROCESSING]').length) {
+      var poll = setInterval(function () {
+        get(U.listUrl).then(function (d) {
+          if (d.ok && !d.sources.some(function (s) { return s.status === 'PROCESSING'; })) { clearInterval(poll); window.location.reload(); }
+        });
+      }, 3000);
+    }
+    // test chat
+    var chat = $('#agChat'), form = $('#agTestForm'), hist = [];
+    function bubble(cls, html) {
+      var hint = chat.querySelector('.ag-hint'); if (hint) { hint.remove(); }
+      var d = document.createElement('div'); d.className = 'ag-b ' + cls; d.innerHTML = html; chat.appendChild(d); chat.scrollTop = chat.scrollHeight; return d;
+    }
+    function fmt(t) { return esc(t).replace(/\*([^*\n]+)\*/g, '<b>$1</b>').replace(/_([^_\n]+)_/g, '<i>$1</i>').replace(/\n/g, '<br>'); }
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var q = form.message.value.trim(); if (!q) { return; }
+      form.message.value = '';
+      bubble('me', fmt(q));
+      var wait = bubble('bot ag-typing', '<span></span><span></span><span></span>');
+      var btn = form.querySelector('button'); btn.disabled = true;
+      post(U.testUrl, { message: q, history: JSON.stringify(hist) }).then(function (d) {
+        btn.disabled = false; wait.remove();
+        if (d.error) { bubble('sys cx-danger', '⚠️ ' + esc(d.error)); return; }
+        var extra = '';
+        if (d.action === 'handoff') { extra = '<div class="ag-tag ag-handoff">🙋 Handed to your team' + (d.reason ? ': ' + esc(d.reason) : '') + '</div>'; }
+        else if (d.action === 'menu') { extra = '<div class="ag-tag">📋 Opens your main menu flow</div>'; }
+        if (d.sources && d.sources.length && d.action === 'answer') { extra += '<div class="ag-tag ag-src">From: ' + d.sources.slice(0, 3).map(esc).join(', ') + '</div>'; }
+        if (d.noKnowledge) { extra += '<div class="ag-tag">No knowledge added yet</div>'; }
+        bubble('bot', (d.reply ? fmt(d.reply) : '<i class="cx-muted">(no text)</i>') + extra);
+        hist.push(['user', q]); if (d.reply) { hist.push(['assistant', d.reply]); }
+        if (hist.length > 12) { hist = hist.slice(-12); }
+      });
+    });
+    $('#agTestClear').addEventListener('click', function () { hist = []; chat.innerHTML = ''; });
+  }
+
   // ============================================================ Settings: saved replies
   var qrs = $('#cxQrSettings');
   if (qrs) {

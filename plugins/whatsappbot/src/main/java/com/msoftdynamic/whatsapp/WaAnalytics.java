@@ -34,13 +34,16 @@ public final class WaAnalytics {
 
     private WaAnalytics() { }
 
-    /** Who sent an outbound message: BOT, AGENT, BROADCAST, API or SYSTEM. */
+    /** Who sent an outbound message: BOT, AI, AGENT, BROADCAST, API or SYSTEM. */
     public static String senderType(String sentBy) {
         if (sentBy == null || sentBy.isEmpty() || "SYSTEM".equals(sentBy)) {
             return "SYSTEM";
         }
         if ("BOT".equals(sentBy)) {
             return "BOT";
+        }
+        if ("AI".equals(sentBy)) {
+            return "AI";
         }
         if (sentBy.startsWith("BROADCAST")) {
             return "BROADCAST";
@@ -64,7 +67,7 @@ public final class WaAnalytics {
         }
         long[] hours = new long[24];
         Map<String, Long> outBy = new LinkedHashMap<>();
-        for (String k : List.of("BOT", "AGENT", "BROADCAST", "API")) {
+        for (String k : List.of("BOT", "AI", "AGENT", "BROADCAST", "API")) {
             outBy.put(k, 0L);
         }
         long in = 0;

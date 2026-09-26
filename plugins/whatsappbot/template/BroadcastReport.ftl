@@ -1,5 +1,5 @@
 <#-- One broadcast: funnel (sent -> delivered -> read -> replied), actions and recipients -->
-<link rel="stylesheet" href="/theme/crm.css?v=3"/>
+<link rel="stylesheet" href="/theme/crm.css?v=4"/>
 <div class="cx" id="bcReport" data-live="<#if (campaignLive!false)>Y<#else>N</#if>">
 <#if !campaign??>
   <div class="cx-card cx-empty"><p>Broadcast not found.</p><a class="cx-btn" href="<@ofbizUrl>Broadcast</@ofbizUrl>">← All broadcasts</a></div>
@@ -72,4 +72,4 @@
   </div>
 </#if>
 </div>
-<script src="/js/crm.js?v=3"></script>
+<script src="/js/crm.js?v=4"></script>

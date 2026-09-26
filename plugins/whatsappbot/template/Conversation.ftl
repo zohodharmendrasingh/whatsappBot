@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="/theme/crm.css?v=3"/>
+<link rel="stylesheet" href="/theme/crm.css?v=4"/>
 <#if contact??>
 <#assign chatSt = contact.chatStatus!"OPEN">
 <#macro keep><input type="hidden" name="contactId" value="${contact.contactId}"/><input type="hidden" name="tab" value="${inboxTab!"all"}"/><input type="hidden" name="st" value="${inboxSt!"active"}"/></#macro>
@@ -52,7 +52,7 @@
       <div class="wa-msg <#if m.direction == 'IN'>wa-in<#else>wa-out</#if>">
         <div class="wa-body">${(m.body!"")?replace("\n", "<br/>")}</div>
         <div class="wa-meta">${(m.createdDate?string("dd-MMM HH:mm"))!}
-          <#if m.direction == 'OUT'> · <#if (m.sentBy!"")?starts_with("BROADCAST")>broadcast<#else>${m.sentBy!}</#if> · <span class="wa-st-${m.deliveryStatus!}">${m.deliveryStatus!}</span></#if>
+          <#if m.direction == 'OUT'> · <#if (m.sentBy!"")?starts_with("BROADCAST")>broadcast<#elseif (m.sentBy!"") == "AI">✨ AI agent<#else>${m.sentBy!}</#if> · <span class="wa-st-${m.deliveryStatus!}">${m.deliveryStatus!}</span></#if>
         </div>
         <#if m.errorText?has_content><div class="wa-err">${m.errorText}</div></#if>
       </div>
@@ -70,5 +70,5 @@
 </details>
 <ul id="cxQuickReplies" hidden data-first="${contactFirstName!""}" data-manage="<@ofbizUrl>Settings</@ofbizUrl>#replies"><#list quickReplies![] as r><li data-sc="${r.shortcut}">${r.body}</li></#list></ul>
 <script>(function(){var c=document.getElementById('waChat'); if(c){c.scrollTop=c.scrollHeight;}})();</script>
-<script src="/js/crm.js?v=3"></script>
+<script src="/js/crm.js?v=4"></script>
 </#if>

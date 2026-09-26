@@ -1,5 +1,5 @@
 <#-- Settings: saved replies used in the inbox (type / in the reply box) -->
-<link rel="stylesheet" href="/theme/crm.css?v=3"/>
+<link rel="stylesheet" href="/theme/crm.css?v=4"/>
 <div class="cx" id="cxQrSettings" data-save-url="<@ofbizUrl>quickReplySave</@ofbizUrl>" data-delete-url="<@ofbizUrl>quickReplyDelete</@ofbizUrl>">
   <a id="replies"></a>
   <p class="cx-muted">Answers your team sends often. In the inbox, type <b>/</b> and the name (e.g. <code>/price</code>) to insert one. <code>{{name}}</code> becomes the customer's first name.</p>
@@ -19,4 +19,4 @@
   </form>
   <p class="cx-err" id="cxQrErr" hidden></p>
 </div>
-<script src="/js/crm.js?v=3"></script>
+<script src="/js/crm.js?v=4"></script>

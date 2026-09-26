@@ -209,6 +209,12 @@
         <attribute name="campaignId" type="String" mode="IN" optional="false"/>
     </service>
 
+    <service name="waKbReadUrl" engine="java" auth="false" export="false" use-transaction="false" max-retry="0"
+            location="com.msoftdynamic.whatsapp.WaKnowledge" invoke="readUrlService">
+        <description>Read a web page (and pages of the same site) into the AI agent's knowledge. Internal only.</description>
+        <attribute name="sourceId" type="String" mode="IN" optional="false"/>
+    </service>
+
     <!-- ===================== Templates ===================== -->
     <service name="waSyncTemplates" engine="java" auth="true" use-transaction="false"
             location="com.msoftdynamic.whatsapp.WaServices" invoke="syncTemplates">

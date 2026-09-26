@@ -46,6 +46,53 @@
         <relation type="one" fk-name="WATAI_TNT" rel-entity-name="WaTenant"><key-map field-name="tenantId"/></relation>
     </entity>
 
+    <entity entity-name="WaAgent" package-name="com.msoftdynamic.whatsapp.saas" title="AI agent settings of a workspace (answers from its knowledge)">
+        <field name="tenantId" type="id"/>
+        <field name="enabled" type="indicator"/>
+        <field name="instructions" type="very-long"><description>What the business is and how the agent should talk</description></field>
+        <field name="handoffMessage" type="very-long"/>
+        <field name="answerInMenus" type="indicator"><description>Y = also answer questions typed while a button/list menu waits</description></field>
+        <field name="maxPerDay" type="numeric"/>
+        <field name="lastError" type="very-long"/>
+        <field name="lastErrorDate" type="date-time"/>
+        <field name="updatedBy" type="id-vlong"/>
+        <field name="updatedDate" type="date-time"/>
+        <prim-key field="tenantId"/>
+        <relation type="one" fk-name="WAAGT_TNT" rel-entity-name="WaTenant"><key-map field-name="tenantId"/></relation>
+    </entity>
+
+    <entity entity-name="WaKbSource" package-name="com.msoftdynamic.whatsapp.saas" title="Knowledge source of the AI agent (file, web page, text)">
+        <field name="sourceId" type="id"/>
+        <field name="tenantId" type="id"/>
+        <field name="sourceType" type="short-varchar"><description>FILE, URL, TEXT</description></field>
+        <field name="title" type="name"/>
+        <field name="url" type="very-long"/>
+        <field name="crawlPages" type="numeric"><description>URL: how many pages of the same site to read</description></field>
+        <field name="statusId" type="short-varchar"><description>PROCESSING, READY, ERROR</description></field>
+        <field name="charCount" type="numeric"/>
+        <field name="chunkCount" type="numeric"/>
+        <field name="pageCount" type="numeric"/>
+        <field name="errorText" type="very-long"/>
+        <field name="createdBy" type="id-vlong"/>
+        <field name="createdDate" type="date-time"/>
+        <field name="syncedDate" type="date-time"/>
+        <prim-key field="sourceId"/>
+        <relation type="one" fk-name="WAKBS_TNT" rel-entity-name="WaTenant"><key-map field-name="tenantId"/></relation>
+        <index name="WAKBS_TNT"><index-field name="tenantId"/></index>
+    </entity>
+
+    <entity entity-name="WaKbChunk" package-name="com.msoftdynamic.whatsapp.saas" title="Piece of a knowledge source">
+        <field name="sourceId" type="id"/>
+        <field name="seqNum" type="numeric"/>
+        <field name="tenantId" type="id"/>
+        <field name="heading" type="long-varchar"/>
+        <field name="content" type="very-long"/>
+        <prim-key field="sourceId"/>
+        <prim-key field="seqNum"/>
+        <relation type="one" fk-name="WAKBC_SRC" rel-entity-name="WaKbSource"><key-map field-name="sourceId"/></relation>
+        <index name="WAKBC_TNT"><index-field name="tenantId"/></index>
+    </entity>
+
     <entity entity-name="WaZohoConnection" package-name="com.msoftdynamic.whatsapp.saas" title="Workspace's connection to its own Zoho account (CRM, Books, Inventory, People)">
         <field name="tenantId" type="id"/>
         <field name="statusId" type="short-varchar"><description>CONNECTED / ERROR</description></field>

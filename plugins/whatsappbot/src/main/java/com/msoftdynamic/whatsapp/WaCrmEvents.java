@@ -576,6 +576,16 @@ public final class WaCrmEvents {
         touch(delegator, c.getString("contactId"));
     }
 
+    /** A one-line event in the chat timeline (only the team sees it). */
+    public static void addSystemNote(Delegator delegator, String tenantId, String contactId, String by, String text) {
+        try {
+            delegator.create("WaNote", UtilMisc.toMap("noteId", delegator.getNextSeqId("WaNote"), "tenantId", tenantId,
+                    "contactId", contactId, "noteText", "\u2022 " + cut(text, 1000), "createdBy", by, "createdDate", UtilDateTime.nowTimestamp()));
+        } catch (GenericEntityException e) {
+            Debug.logWarning(e, MODULE);
+        }
+    }
+
     /** Bump the contact's stamp so live inbox views refresh. */
     private static void touch(Delegator delegator, String contactId) throws GenericEntityException {
         delegator.storeByCondition("WaContact", UtilMisc.toMap("lastUpdatedStamp", UtilDateTime.nowTimestamp()),

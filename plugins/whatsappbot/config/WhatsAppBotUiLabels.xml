@@ -25,6 +25,7 @@
     <property key="WaBroadcast"><value xml:lang="en">Broadcasts</value></property>
     <property key="WaContacts"><value xml:lang="en">Contacts</value></property>
     <property key="WaAnalytics"><value xml:lang="en">Analytics</value></property>
+    <property key="WaAiAgent"><value xml:lang="en">AI Agent</value></property>
     <property key="WaApiIntegrations"><value xml:lang="en">API &amp; Integrations</value></property>
     <property key="WaCustomers"><value xml:lang="en">Customers</value></property>
     <property key="WaPlansPricing"><value xml:lang="en">Plans &amp; Pricing</value></property>

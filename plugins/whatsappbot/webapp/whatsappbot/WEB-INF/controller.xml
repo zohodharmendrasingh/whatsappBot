@@ -117,6 +117,18 @@
     <request-map uri="campaignAction" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaCrmEvents" invoke="campaignAction" global-transaction="false"/>
         <response name="success" type="request-redirect" value="BroadcastReport"><redirect-parameter name="campaignId"/></response><response name="error" type="view" value="BroadcastReport"/></request-map>
 
+    <!-- ===== AI agent ===== -->
+    <request-map uri="AiAgent"><security https="true" auth="true"/><response name="success" type="view" value="AiAgent"/></request-map>
+    <request-map uri="agentSave" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaAgentEvents" invoke="agentSave"/><response name="none" type="none"/></request-map>
+    <request-map uri="kbUpload" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaAgentEvents" invoke="kbUpload"/><response name="none" type="none"/></request-map>
+    <request-map uri="kbAddUrl" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaAgentEvents" invoke="kbAddUrl" global-transaction="false"/><response name="none" type="none"/></request-map>
+    <request-map uri="kbAddText" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaAgentEvents" invoke="kbAddText"/><response name="none" type="none"/></request-map>
+    <request-map uri="kbDelete" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaAgentEvents" invoke="kbDelete"/><response name="none" type="none"/></request-map>
+    <request-map uri="kbRefresh" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaAgentEvents" invoke="kbRefresh" global-transaction="false"/><response name="none" type="none"/></request-map>
+    <request-map uri="kbView"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaAgentEvents" invoke="kbView"/><response name="none" type="none"/></request-map>
+    <request-map uri="kbList"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaAgentEvents" invoke="kbList"/><response name="none" type="none"/></request-map>
+    <request-map uri="agentTest" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaAgentEvents" invoke="agentTest" global-transaction="false"/><response name="none" type="none"/></request-map>
+
     <!-- ===== Public website (no login) ===== -->
     <request-map uri="home"><security https="true" auth="false"/><response name="success" type="view" value="Home"/></request-map>
     <request-map uri="privacy"><security https="true" auth="false"/><response name="success" type="view" value="Privacy"/></request-map>
@@ -182,6 +194,7 @@
     <view-map name="Contacts" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Contacts"/>
     <view-map name="BroadcastReport" type="screen" page="component://whatsappbot/widget/WaScreens.xml#BroadcastReport"/>
     <view-map name="Analytics" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Analytics"/>
+    <view-map name="AiAgent" type="screen" page="component://whatsappbot/widget/WaScreens.xml#AiAgent"/>
     <view-map name="Home" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Home" auth="false"/>
     <view-map name="Privacy" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Privacy" auth="false"/>
     <view-map name="Terms" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Terms" auth="false"/>

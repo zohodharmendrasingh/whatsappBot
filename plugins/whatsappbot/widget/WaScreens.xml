@@ -332,6 +332,27 @@
             </widgets>
         </section>
     </screen>
+    <screen name="AiAgent">
+        <section>
+            <actions>
+                <set field="titleProperty" value="WaAiAgent"/>
+                <set field="headerItem" value="AiAgent"/>
+                <script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/WaTenantContext.groovy"/>
+<script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/AgentData.groovy"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="WaDecorator" location="component://whatsappbot/widget/CommonScreens.xml">
+                    <decorator-section name="body">
+<section>
+                            <condition><not><if-empty field="currentTenantId"/></not></condition>
+                            <widgets><platform-specific><html><html-template location="component://whatsappbot/template/AiAgent.ftl"/></html></platform-specific></widgets>
+                            <fail-widgets><label style="h3">Select a tenant in the top bar to add records.</label></fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
     <screen name="Analytics">
         <section>
             <actions>

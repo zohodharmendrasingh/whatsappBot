@@ -1,5 +1,5 @@
 <#-- Broadcasts: create a campaign (audience by tags, send now or later) + list with results -->
-<link rel="stylesheet" href="/theme/crm.css?v=3"/>
+<link rel="stylesheet" href="/theme/crm.css?v=4"/>
 <div class="cx">
 <#if !bcChannels?has_content>
   <div class="cx-card cx-empty-big"><div class="cx-empty-ico">📣</div><h2>Connect a WhatsApp number first</h2>
@@ -95,4 +95,4 @@
   </div>
 </#if>
 </div>
-<script src="/js/crm.js?v=3"></script>
+<script src="/js/crm.js?v=4"></script>

@@ -261,27 +261,60 @@ public final class WaFlowAi {
     }
 
     private static String call(String userText, Key k, String systemExtra) throws AiException {
-        String system = SYSTEM + systemExtra;
+        List<String[]> turns = new java.util.ArrayList<>();
+        turns.add(new String[] {"user", userText});
+        return chat(k, SYSTEM + systemExtra, turns, WaUtil.propInt("ai.max.tokens", 8000), true,
+                WaUtil.propInt("ai.timeout.seconds", 120), null);
+    }
+
+    /**
+     * One chat completion with the workspace's key.
+     * @param turns conversation as [role, text] with role user / assistant, oldest first
+     * @param json ask OpenAI for a JSON object (Claude follows the system prompt)
+     * @param modelOverride model to use when the workspace did not pick one (null = flow builder default)
+     */
+    static String chat(Key k, String system, List<String[]> turns, int maxTokens, boolean jsonMode, int timeout, String modelOverride)
+            throws AiException {
         String provider = k.provider;
         String apiKey = k.apiKey;
-        String model = UtilValidate.isNotEmpty(k.model) ? k.model : null;
-        int timeout = WaUtil.propInt("ai.timeout.seconds", 120);
+        String model = UtilValidate.isNotEmpty(k.model) ? k.model : modelOverride;
+        // merge consecutive turns of the same role; the first turn must be the customer's
+        List<String[]> msgs = new java.util.ArrayList<>();
+        for (String[] t : turns) {
+            String role = "assistant".equals(t[0]) ? "assistant" : "user";
+            if (msgs.isEmpty() && "assistant".equals(role)) {
+                continue;
+            }
+            if (!msgs.isEmpty() && msgs.get(msgs.size() - 1)[0].equals(role)) {
+                msgs.get(msgs.size() - 1)[1] = msgs.get(msgs.size() - 1)[1] + "\n" + t[1];
+            } else {
+                msgs.add(new String[] {role, t[1]});
+            }
+        }
         ObjectNode body = WaUtil.JSON.createObjectNode();
         HttpRequest.Builder rb;
         if ("openai".equals(provider)) {
             String base = baseUrl(provider);
             body.put("model", model != null ? model : WaUtil.prop("ai.model.openai", "gpt-4.1"));
-            body.putObject("response_format").put("type", "json_object");
-            ArrayNode msgs = body.putArray("messages");
-            msgs.addObject().put("role", "system").put("content", system);
-            msgs.addObject().put("role", "user").put("content", userText);
+            if (jsonMode) {
+                body.putObject("response_format").put("type", "json_object");
+            }
+            body.put("max_completion_tokens", maxTokens);
+            ArrayNode arr = body.putArray("messages");
+            arr.addObject().put("role", "system").put("content", system);
+            for (String[] m : msgs) {
+                arr.addObject().put("role", m[0]).put("content", m[1]);
+            }
             rb = HttpRequest.newBuilder(URI.create(base + "/v1/chat/completions")).header("Authorization", "Bearer " + apiKey);
         } else {
             String base = baseUrl(provider);
             body.put("model", model != null ? model : WaUtil.prop("ai.model", "claude-sonnet-5"));
-            body.put("max_tokens", WaUtil.propInt("ai.max.tokens", 8000));
+            body.put("max_tokens", maxTokens);
             body.put("system", system);
-            body.putArray("messages").addObject().put("role", "user").put("content", userText);
+            ArrayNode arr = body.putArray("messages");
+            for (String[] m : msgs) {
+                arr.addObject().put("role", m[0]).put("content", m[1]);
+            }
             rb = HttpRequest.newBuilder(URI.create(base + "/v1/messages"))
                     .header("x-api-key", apiKey).header("anthropic-version", "2023-06-01");
         }

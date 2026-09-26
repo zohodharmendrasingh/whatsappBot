@@ -1,5 +1,5 @@
 <#-- Analytics dashboard -->
-<link rel="stylesheet" href="/theme/crm.css?v=3"/>
+<link rel="stylesheet" href="/theme/crm.css?v=4"/>
 <#if !analyticsTzKnown>
 <script>(function(){try{var z=Intl.DateTimeFormat().resolvedOptions().timeZone;if(z){var u=new URL(location.href);u.searchParams.set('tz',z);location.replace(u.toString());}}catch(e){}})();</script>
 </#if>
@@ -15,7 +15,7 @@
     <div class="an-kpi"><span>Messages received</span><b>${a.messagesIn?string(",##0")}</b><small>${a.messagesOut?string(",##0")} sent<#if (a.messagesFailed > 0)> &middot; ${a.messagesFailed} failed</#if></small></div>
     <div class="an-kpi"><span>First reply (all)</span><b>${a.firstReplyTxt}</b><small>median time to first answer</small></div>
     <div class="an-kpi"><span>First reply by team</span><b>${a.firstReplyAgentTxt}</b><small><#if a.agentReplyCount gt 0>median of ${a.agentReplyCount} &middot; avg ${a.firstReplyAgentAvgTxt}<#else>no team replies yet</#if></small></div>
-    <div class="an-kpi"><span>Handled by bot only</span><b>${a.botOnlyPct}%</b><small>${a.botOnlyChats?string(",##0")} of ${a.conversations?string(",##0")} chats, no agent needed</small></div>
+    <div class="an-kpi"><span>Handled without the team</span><b>${a.botOnlyPct}%</b><small>${a.botOnlyChats?string(",##0")} of ${a.conversations?string(",##0")} chats, bot or AI agent only</small></div>
     <a class="an-kpi<#if (a.waitingChats > 0)> warn</#if>" href="<@ofbizUrl>Inbox?tab=all&amp;st=active</@ofbizUrl>"><span>Waiting for a reply</span><b>${a.waitingChats}</b><small>customer wrote last &rarr;</small></a>
   </div>
 
@@ -42,12 +42,12 @@
       <div class="cx-card-head"><h3>Who sends the replies</h3></div>
       <#assign ob = a.outBy tot = [a.messagesOut, 1]?max>
       <div class="an-stack">
-        <#list [["BOT","Bot","an-s-bot"],["AGENT","Team","an-s-agent"],["BROADCAST","Broadcasts","an-s-bc"],["API","API","an-s-api"]] as k>
+        <#list [["BOT","Bot flows","an-s-bot"],["AI","AI agent","an-s-ai"],["AGENT","Team","an-s-agent"],["BROADCAST","Broadcasts","an-s-bc"],["API","API","an-s-api"]] as k>
           <#if (ob[k[0]] > 0)><span class="${k[2]}" style="width:${pct(ob[k[0]], tot)}%" title="${k[1]}: ${ob[k[0]]}"></span></#if>
         </#list>
       </div>
       <ul class="an-list">
-        <#list [["BOT","Bot","an-s-bot"],["AGENT","Team","an-s-agent"],["BROADCAST","Broadcasts","an-s-bc"],["API","API / integrations","an-s-api"]] as k>
+        <#list [["BOT","Bot flows","an-s-bot"],["AI","AI agent","an-s-ai"],["AGENT","Team","an-s-agent"],["BROADCAST","Broadcasts","an-s-bc"],["API","API / integrations","an-s-api"]] as k>
           <li><i class="${k[2]}"></i>${k[1]}<b>${ob[k[0]]?string(",##0")}</b><small>${pct(ob[k[0]], tot)}%</small></li>
         </#list>
       </ul>

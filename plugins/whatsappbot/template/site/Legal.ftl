@@ -42,7 +42,7 @@
       <p>For conversation data, the business using ${b} decides what is collected from its end customers and is the data controller; we process it on the business's behalf. End customers who want to access or delete their messages should contact the business they messaged, or write to us and we will pass the request on.</p>
 
       <h2>5. Sharing</h2>
-      <p>We share data only with service providers needed to run ${b}: Meta (WhatsApp messaging), PayPal (payments), and our hosting and email providers, each bound by confidentiality and security obligations. We may disclose data if required by law.</p>
+      <p>We share data only with service providers needed to run ${b}: Meta (WhatsApp messaging), PayPal (payments), and our hosting and email providers, each bound by confidentiality and security obligations. If you turn on the AI features (bot builder or AI agent), the text needed for them, such as customer messages and the knowledge you add, is sent to the AI provider whose key you connect (Anthropic or OpenAI) under your own account with that provider. We may disclose data if required by law.</p>
 
       <h2>6. Retention</h2>
       <p>We keep account and conversation data while your account is active. Raw webhook logs are deleted automatically after a short period. When an account is closed we delete or anonymise its data within 30 days, except records we must keep for tax and accounting.</p>

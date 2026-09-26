@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="/theme/crm.css?v=3"/>
+<link rel="stylesheet" href="/theme/crm.css?v=4"/>
 <div class="ms-inbox-list">
   <form method="get" action="<@ofbizUrl>Inbox</@ofbizUrl>" class="ms-inbox-search cx-inbox-search">
     <input type="hidden" name="tab" value="${inboxTab}"/>

@@ -1,5 +1,5 @@
 <#-- Contacts: search / filter, tags, custom fields, consent, CSV import & export, bulk actions -->
-<link rel="stylesheet" href="/theme/crm.css?v=3"/>
+<link rel="stylesheet" href="/theme/crm.css?v=4"/>
 <#macro qs page=contactsPage tag=filterTag>?q=${filterQ?url('UTF-8')}&amp;tag=${tag?url('UTF-8')}&amp;opt=${filterOpt}&amp;channelId=${filterChannel?url('UTF-8')}&amp;page=${page}</#macro>
 <div class="cx" id="cxContacts" data-owner="<#if isOwner>Y<#else>N</#if>"
      data-save-url="<@ofbizUrl>contactSave</@ofbizUrl>" data-data-url="<@ofbizUrl>contactData</@ofbizUrl>"
@@ -187,4 +187,4 @@
   </template>
   <div class="cx-toast" id="cxToast"></div>
 </div>
-<script src="/js/crm.js?v=3"></script>
+<script src="/js/crm.js?v=4"></script>

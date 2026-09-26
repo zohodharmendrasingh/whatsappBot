@@ -86,6 +86,16 @@ public final class BotEngine {
             }
         }
 
+        // --- AI agent answers anything that is not a flow keyword (greetings still open the main menu) ---
+        if (findFlowByKeyword(lower) == null && WaAgentAi.active(delegator, channel.getString("tenantId"))) {
+            GenericValue def = defaultFlow();
+            if (def == null || !WaAgentAi.isGreeting(lower)) {
+                agentTurn(input, null, def);
+                save();
+                return;
+            }
+        }
+
         // --- start a flow by keyword or default ---
         GenericValue flow = findFlow(lower);
         if (flow == null) {
@@ -118,6 +128,13 @@ public final class BotEngine {
             if (findFlowByKeyword(input.toLowerCase(Locale.ROOT)) != null) {
                 clearState();
                 return false;
+            }
+            // a question typed while the menu waits: the AI agent answers it and the menu stays open
+            GenericValue agentCfg = WaAgentAi.settings(delegator, channel.getString("tenantId"));
+            if (agentCfg != null && !"N".equals(agentCfg.getString("answerInMenus")) && input.length() > 2
+                    && WaAgentAi.active(delegator, channel.getString("tenantId"))) {
+                agentTurn(input, node, defaultFlow());
+                return true;
             }
             send(WaMessenger.text(waId(), WaUtil.prop("bot.invalid.choice.text", "Please choose one of the options.")), "[invalid choice]");
             run(flowId, node.getString("nodeId"));
@@ -248,6 +265,85 @@ public final class BotEngine {
             endRun(curFlow, "COMPLETED");
         }
         clearState();
+    }
+
+    // ------------------------------------------------------------------ AI agent
+    private GenericValue defaultFlow() throws GenericEntityException {
+        String def = channel.getString("defaultFlowId");
+        if (UtilValidate.isNotEmpty(def)) {
+            GenericValue f = EntityQuery.use(delegator).from("WaFlow")
+                    .where("flowId", def, "tenantId", channel.getString("tenantId"), "isActive", "Y").queryFirst();
+            if (f != null) {
+                return f;
+            }
+        }
+        return EntityQuery.use(delegator).from("WaFlow")
+                .where("tenantId", channel.getString("tenantId"), "isDefault", "Y", "isActive", "Y").orderBy("flowId").queryFirst();
+    }
+
+    /**
+     * Let the AI agent answer. menuNode = the button/list step that is waiting (or null); def = main menu flow (or null).
+     * If the AI can't be used, the main menu runs, otherwise the chat goes to the team.
+     */
+    private void agentTurn(String input, GenericValue menuNode, GenericValue def) throws GenericEntityException {
+        String tenantId = channel.getString("tenantId");
+        String menuText = null;
+        if (menuNode != null) {
+            StringBuilder mt = new StringBuilder(String.valueOf(render(menuNode.getString("messageText"))));
+            for (GenericValue o : options(menuNode)) {
+                mt.append("\n- ").append(o.getString("optionLabel"));
+            }
+            menuText = mt.toString();
+        }
+        GenericValue tenant = EntityQuery.use(delegator).from("WaTenant").where("tenantId", tenantId).cache().queryOne();
+        String business = tenant == null ? null : tenant.getString("tenantName");
+        WaAgentAi.Answer a = WaAgentAi.answer(delegator, tenantId, business, contact,
+                WaAgentAi.history(delegator, contact, null), input, menuText, def != null);
+        GenericValue cfg = WaAgentAi.settings(delegator, tenantId);
+        String handoffText = cfg == null || UtilValidate.isEmpty(cfg.getString("handoffMessage")) ? WaAgentAi.DEFAULT_HANDOFF
+                : render(cfg.getString("handoffMessage"));
+        if (a.error != null) {
+            Debug.logWarning("AI agent could not answer for " + tenantId + ": " + a.error, MODULE);
+            if (menuNode != null) {
+                run(menuNode.getString("flowId"), menuNode.getString("nodeId"));
+            } else if (def != null) {
+                startRun(def.getString("flowId"));
+                run(def.getString("flowId"), def.getString("startNodeId"));
+            } else {
+                handoff(handoffText, "AI agent could not answer: " + a.error);
+            }
+            return;
+        }
+        switch (a.action) {
+        case "menu":
+            if (UtilValidate.isNotEmpty(a.reply)) {
+                sendAs(WaMessenger.text(waId(), a.reply), a.reply, "AI");
+            }
+            if (menuNode != null) {
+                run(menuNode.getString("flowId"), menuNode.getString("nodeId"));
+            } else if (def != null) {
+                clearState();
+                startRun(def.getString("flowId"));
+                run(def.getString("flowId"), def.getString("startNodeId"));
+            }
+            break;
+        case "handoff":
+            handoff(UtilValidate.isNotEmpty(a.reply) ? a.reply : handoffText,
+                    "AI agent handed over" + (UtilValidate.isNotEmpty(a.reason) ? ": " + a.reason : ""));
+            break;
+        default:
+            sendAs(WaMessenger.text(waId(), a.reply), a.reply, "AI");
+        }
+    }
+
+    private void handoff(String text, String note) {
+        if (UtilValidate.isNotEmpty(text)) {
+            sendAs(WaMessenger.text(waId(), text), text, "AI");
+        }
+        contact.set("botPaused", "Y");
+        contact.set("chatStatus", "OPEN");
+        clearState();
+        WaCrmEvents.addSystemNote(delegator, channel.getString("tenantId"), contact.getString("contactId"), "AI", note);
     }
 
     // ------------------------------------------------------------------ flow runs (analytics)
@@ -381,6 +477,13 @@ public final class BotEngine {
 
     private String waId() {
         return contact.getString("waId");
+    }
+
+    private void sendAs(ObjectNode payload, String logText, String sentBy) {
+        WaMessenger.SendResult r = WaMessenger.send(delegator, channel, contact, payload, logText, sentBy, locale);
+        if (!r.isOk()) {
+            Debug.logWarning("AI reply to " + waId() + " failed: " + r.getError(), MODULE);
+        }
     }
 
     private void send(ObjectNode payload, String logText) {
