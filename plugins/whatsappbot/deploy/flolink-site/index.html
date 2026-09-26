@@ -7,6 +7,7 @@
 <meta name="description" content="Zoho Certified Developers for Zoho CRM, Books, Inventory, Projects, Sprints, People, Recruit, Expense, Sign, WorkDrive, Flow, Creator and Catalyst: customisation, integrations, migration, Marketplace extensions and support. Plus FloChat, FlowLinker and BillEase. By Msoft Dynamic Technologies."/>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f2747'/%3E%3Cpath d='M9 22V10h10M9 16h7' stroke='%2322c55e' stroke-width='3.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='22.5' cy='21.5' r='2.6' fill='%2322c55e'/%3E%3C/svg%3E"/>
 <meta property="og:title" content="FloLink – software for businesses that run on WhatsApp and Zoho"/>
+<link rel="canonical" href="https://flolink.ai/"/>
 <link rel="me" href="https://www.youtube.com/@Msoftdynamic"/>
 <meta property="og:description" content="FloChat, FlowLinker and BillEase. One team, three products."/>
 <style>
@@ -113,6 +114,11 @@ footer a:hover{color:var(--ink)}
 .step h3{margin:14px 0 6px;color:var(--ink);font-size:17px}
 .step p{margin:0;font-size:14.5px;color:var(--muted)}
 .hero .chip{cursor:default}
+.related{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.related a{display:block;background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;text-decoration:none;color:var(--ink);font-weight:700}
+.related a span{display:block;color:var(--green);font-weight:600;font-size:14px;margin-top:4px}
+.related a:hover{border-color:#86efac}
+@media (max-width:700px){.related{grid-template-columns:1fr}}
 /* our work */
 .work{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
 .case{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px;display:flex;flex-direction:column;gap:12px;transition:transform .2s,box-shadow .2s}
@@ -164,6 +170,7 @@ footer a:hover{color:var(--ink)}
     </a>
     <nav>
       <a href="#services">Zoho services</a>
+      <a href="/integrations/">Integrations</a>
       <a href="#work">Our work</a>
       <a href="#products">Products</a>
       <a href="#process">How we work</a>
@@ -210,6 +217,8 @@ footer a:hover{color:var(--ink)}
       <div class="svc-card" style="--c:#9333ea"><div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/><path d="M18 15l3 3-3 3"/></svg></div><h3>Data migration</h3><p>Move data from spreadsheets, XML/CSV files and other systems into Zoho, validated and mapped field by field.</p></div>
       <div class="svc-card" style="--c:#475569"><div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div><h3>Support &amp; maintenance</h3><p>Ongoing fixes, changes and training after go-live, so your Zoho setup keeps up with your business.</p></div>
     </div>
+    <div class="head" style="margin:56px auto 20px"><h2 style="font-size:26px">Popular Zoho integrations</h2></div>
+    <div class="related"><a href="/integrations/zoho-books-shopify/">Zoho Books + Shopify<span>Learn more →</span></a><a href="/integrations/zoho-books-woocommerce/">Zoho Books + WooCommerce<span>Learn more →</span></a><a href="/integrations/zoho-books-wordpress/">Zoho Books + WordPress<span>Learn more →</span></a><a href="/integrations/zoho-crm-quickbooks/">Zoho CRM + QuickBooks<span>Learn more →</span></a><a href="/integrations/zoho-books-shipstation/">Zoho Books + ShipStation<span>Learn more →</span></a><a href="/integrations/zoho-ups/">Zoho + UPS<span>Learn more →</span></a></div>
     <div class="ctas" style="margin-top:34px">
       <a class="btn btn-primary" href="mailto:info@msoftdynamic.com?subject=Zoho%20project%20enquiry">Discuss your Zoho project</a>
       <a class="btn btn-ghost" href="https://msoftdynamic.com">Visit msoftdynamic.com <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
@@ -445,6 +454,7 @@ zoho.crm.createRecord(<span class="s">"Sales_Orders"</span>, so,
     </div>
     <div class="cols">
       <div><h4>Products</h4><a href="https://flochat.flolink.ai">FloChat</a><a href="https://app.flolink.ai/app/">FlowLinker</a><a href="https://app.msoftdynamic.com/app/">BillEase</a></div>
+      <div><h4>Integrations</h4><a href="/integrations/zoho-books-shopify/">Zoho Books + Shopify</a><a href="/integrations/zoho-books-woocommerce/">Zoho Books + WooCommerce</a><a href="/integrations/zoho-books-wordpress/">Zoho Books + WordPress</a><a href="/integrations/zoho-crm-quickbooks/">Zoho CRM + QuickBooks</a><a href="/integrations/zoho-books-shipstation/">Zoho Books + ShipStation</a><a href="/integrations/zoho-ups/">Zoho + UPS</a></div>
       <div><h4>Zoho services</h4><a href="#services">CRM customisation</a><a href="#services">Books &amp; Inventory</a><a href="#services">Creator &amp; Catalyst</a><a href="#services">People, Recruit &amp; Expense</a><a href="#services">Integrations</a></div>
       <div><h4>Company</h4><a href="https://msoftdynamic.com">msoftdynamic.com</a><a href="mailto:info@msoftdynamic.com">info@msoftdynamic.com</a><a href="https://www.youtube.com/@Msoftdynamic" target="_blank" rel="noopener">YouTube</a></div>
       <div><h4>Legal</h4><a href="https://flochat.flolink.ai/control/privacy">Privacy</a><a href="https://flochat.flolink.ai/control/terms">Terms</a></div>

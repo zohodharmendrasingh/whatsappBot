@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://flolink.ai/sitemap.xml

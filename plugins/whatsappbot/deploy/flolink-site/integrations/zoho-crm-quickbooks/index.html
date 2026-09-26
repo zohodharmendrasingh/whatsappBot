@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Zoho CRM & QuickBooks Online Integration | Sync Vendors, Customers and Invoices</title>
+<meta name="description" content="Keep Zoho CRM and QuickBooks Online in sync: vendors, customers and invoices created or updated automatically with Deluge and the QuickBooks API. Built by Zoho Certified Developers."/>
+<link rel="canonical" href="https://flolink.ai/integrations/zoho-crm-quickbooks/"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f2747'/%3E%3Cpath d='M9 22V10h10M9 16h7' stroke='%2322c55e' stroke-width='3.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='22.5' cy='21.5' r='2.6' fill='%2322c55e'/%3E%3C/svg%3E"/>
+<meta property="og:type" content="website"/>
+<meta property="og:title" content="Zoho CRM &amp; QuickBooks Online Integration | Sync Vendors, Customers and Invoices"/>
+<meta property="og:description" content="Keep Zoho CRM and QuickBooks Online in sync: vendors, customers and invoices created or updated automatically with Deluge and the QuickBooks API. Built by Zoho Certified Developers."/>
+<meta property="og:url" content="https://flolink.ai/integrations/zoho-crm-quickbooks/"/>
+<link rel="stylesheet" href="/assets/site.css"/>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "Service", "name": "Zoho CRM & QuickBooks Online Integration", "serviceType": "Zoho integration", "description": "Keep Zoho CRM and QuickBooks Online in sync: vendors, customers and invoices created or updated automatically with Deluge and the QuickBooks API. Built by Zoho Certified Developers.", "provider": {"@type": "Organization", "name": "Msoft Dynamic Technologies", "url": "https://flolink.ai", "email": "info@msoftdynamic.com"}, "areaServed": ["US", "IN"], "url": "https://flolink.ai/integrations/zoho-crm-quickbooks/"}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does it work with QuickBooks Desktop?", "acceptedAnswer": {"@type": "Answer", "text": "This integration is for QuickBooks Online. Talk to us if you use QuickBooks Desktop."}}, {"@type": "Question", "name": "Can it sync both ways?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Most teams start with CRM to QuickBooks, and we can add payment or status updates flowing back to CRM."}}, {"@type": "Question", "name": "What about existing records?", "acceptedAnswer": {"@type": "Answer", "text": "We run a one-time match so records that already exist in both systems are linked, not duplicated."}}]}]</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="/" aria-label="FloLink home"><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#0f2747"/><path d="M9 22V10h10M9 16h7" stroke="#22c55e" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="22.5" cy="21.5" r="2.6" fill="#22c55e"/></svg><span>Flo<b>Link</b></span></a>
+    <nav>
+      <a href="/#services">Zoho services</a>
+      <a href="/integrations/">Integrations</a>
+      <a href="/#work">Our work</a>
+      <a href="/#products">Products</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+    <span class="spacer"></span>
+    <a class="btn btn-primary" href="mailto:info@msoftdynamic.com?subject=Zoho%20integration%20consultation">Free consultation</a>
+  </div>
+</header>
+<main>
+<section class="ihero">
+  <div class="wrap grid">
+    <div>
+      <div class="crumbs"><a href="/">Home</a> › <a href="/integrations/">Integrations</a> › Zoho CRM + QuickBooks</div>
+      <span class="kicker">Integration service · Zoho Certified Developers</span>
+      <h1>Zoho CRM <em>+</em> QuickBooks Online integration</h1>
+      <p>Keep Zoho CRM and QuickBooks Online in step. Vendors, customers and invoices you manage in CRM are created or updated in QuickBooks, with the QuickBooks IDs saved back to CRM.</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="mailto:info@msoftdynamic.com?subject=Zoho%20integration%20consultation">Book a free 20-minute call</a>
+        <a class="btn btn-outline-light" href="#how">See how it works</a>
+      </div>
+    </div>
+    <img class="shot" src="/img/int-qbo.webp" alt="Zoho CRM and QuickBooks Online integration, demo data" width="1200" height="750"/>
+  </div>
+</section>
+
+<section>
+  <div class="wrap two">
+    <div class="box pain"><h2>The problem</h2><ul><li><svg><use href="#i-x"/></svg><span>Accounts team rekeys CRM records into QuickBooks</span></li><li><svg><use href="#i-x"/></svg><span>Vendor and customer details differ between systems</span></li><li><svg><use href="#i-x"/></svg><span>No way to see QuickBooks status from inside CRM</span></li><li><svg><use href="#i-x"/></svg><span>Duplicate records when the same name is typed twice</span></li></ul></div>
+    <div class="box gain"><h2>What we build</h2><ul><li><svg><use href="#i-check"/></svg><span>Vendors and customers created or updated in QuickBooks from CRM</span></li><li><svg><use href="#i-check"/></svg><span>Invoices pushed to QuickBooks when a deal closes</span></li><li><svg><use href="#i-check"/></svg><span>QuickBooks IDs stored in CRM to prevent duplicates</span></li><li><svg><use href="#i-check"/></svg><span>Sync status and errors visible on the CRM record</span></li><li><svg><use href="#i-check"/></svg><span>Secure OAuth connection to QuickBooks Online</span></li></ul></div>
+  </div>
+</section>
+
+<section id="how" class="alt">
+  <div class="wrap">
+    <div class="head"><span class="eyebrow">How it works</span><h2>From QuickBooks Online to Zoho in four steps</h2></div>
+    <div class="steps"><div class="step"><b>1</b><h3>Record saved</h3><p>A vendor, customer or invoice is saved in Zoho CRM.</p></div><div class="step"><b>2</b><h3>Match check</h3><p>Deluge looks up the record in QuickBooks by ID or display name.</p></div><div class="step"><b>3</b><h3>Create or update</h3><p>The record is created or updated through the QuickBooks API.</p></div><div class="step"><b>4</b><h3>ID saved back</h3><p>The QuickBooks ID and sync status are written back to CRM.</p></div></div>
+    <div class="tags" style="justify-content:center;margin-top:26px"><span>QuickBooks Online API</span><span>OAuth 2.0</span><span>Deluge</span><span>Zoho CRM</span></div>
+    <p class="note">Screens and examples use demo data.</p>
+  </div>
+</section>
+
+<section class="faq">
+  <div class="wrap" style="max-width:820px">
+    <div class="head"><span class="eyebrow">FAQ</span><h2>Common questions</h2></div>
+    <details><summary>Does it work with QuickBooks Desktop?</summary><p>This integration is for QuickBooks Online. Talk to us if you use QuickBooks Desktop.</p></details><details><summary>Can it sync both ways?</summary><p>Yes. Most teams start with CRM to QuickBooks, and we can add payment or status updates flowing back to CRM.</p></details><details><summary>What about existing records?</summary><p>We run a one-time match so records that already exist in both systems are linked, not duplicated.</p></details>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="cta">
+      <h2>Get your Zoho CRM + QuickBooks integration built</h2>
+      <p>Tell us how you work today. We’ll suggest the simplest setup on a free 20-minute call.</p>
+      <div class="ctas"><a class="btn btn-primary" href="mailto:info@msoftdynamic.com?subject=Zoho%20integration%20consultation">Book a free call</a><a class="btn btn-outline-light" href="/#work">See our work</a></div>
+    </div>
+    <div class="head" style="margin:64px auto 22px"><h2 style="font-size:26px">More Zoho integrations</h2></div>
+    <div class="related"><a href="/integrations/zoho-books-shopify/">Zoho Books + Shopify<span>Every Shopify order lands in Zoho as a complete sales order or invoice, with the customer,…</span></a><a href="/integrations/zoho-books-woocommerce/">Zoho Books + WooCommerce<span>WooCommerce orders flow into Zoho Books as sales orders or invoices, customers are created…</span></a><a href="/integrations/zoho-books-wordpress/">Zoho Books + WordPress<span>Forms, bookings and payments on your WordPress site create customers and invoices in Zoho …</span></a></div>
+  </div>
+</section>
+</main>
+<footer>
+  <div class="wrap">
+    <div>
+      <a class="logo" href="/" style="font-size:18px"><span>Flo<b>Link</b></span></a>
+      <p style="margin:10px 0 0;max-width:320px">Zoho services and business software by Msoft Dynamic Technologies (OPC) Private Limited, Gwalior, Madhya Pradesh, India.</p>
+      <p style="margin:8px 0 0">&copy; 2026 Msoft Dynamic Technologies</p>
+    </div>
+    <div class="cols">
+      <div><h4>Integrations</h4><a href="/integrations/zoho-books-shopify/">Zoho Books + Shopify</a><a href="/integrations/zoho-books-woocommerce/">Zoho Books + WooCommerce</a><a href="/integrations/zoho-books-wordpress/">Zoho Books + WordPress</a><a href="/integrations/zoho-crm-quickbooks/">Zoho CRM + QuickBooks</a><a href="/integrations/zoho-books-shipstation/">Zoho Books + ShipStation</a><a href="/integrations/zoho-ups/">Zoho + UPS</a></div>
+      <div><h4>Company</h4><a href="/">Home</a><a href="https://msoftdynamic.com">msoftdynamic.com</a><a href="mailto:info@msoftdynamic.com">info@msoftdynamic.com</a><a href="https://www.youtube.com/@Msoftdynamic" target="_blank" rel="noopener">YouTube</a></div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
