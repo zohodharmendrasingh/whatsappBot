@@ -94,6 +94,14 @@ footer .cols{display:flex;gap:48px;flex-wrap:wrap}
 footer h4{margin:0 0 10px;color:var(--ink);font-size:14px}
 footer a{display:block;text-decoration:none;margin:6px 0}
 footer a:hover{color:var(--ink)}
+.shot{display:block;width:100%;height:auto;aspect-ratio:1200/750;object-fit:cover;object-position:top left;border-radius:12px;border:1px solid var(--line);background:#f8fafc}
+.shot{cursor:zoom-in}
+.lb{position:fixed;inset:0;background:rgba(11,29,54,.88);display:none;align-items:center;justify-content:center;padding:24px;z-index:50;cursor:zoom-out}
+.lb.on{display:flex}
+.lb img{max-width:min(1200px,100%);max-height:90vh;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.card .shot{margin:-6px 0 4px}
+.case .shot{margin-bottom:4px}
+.feature .shot{margin-top:18px;box-shadow:0 14px 30px rgba(15,39,71,.12)}
 /* our work */
 .work{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
 .case{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px;display:flex;flex-direction:column;gap:12px;transition:transform .2s,box-shadow .2s}
@@ -183,6 +191,7 @@ footer a:hover{color:var(--ink)}
     </div>
     <div class="products">
       <article class="card" style="--c:#16a34a">
+        <img class="shot" src="img/flochat.webp" alt="FloChat dashboard with demo data" loading="lazy" width="1200" height="750"/>
         <span class="badge">14-day free trial</span>
         <div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.5L3 21l2-5.5A8.5 8.5 0 1 1 21 11.5z"/><path d="M8.5 10.5h7M8.5 13.5h4.5"/></svg></div>
         <div><h3 class="pname">FloChat</h3></div>
@@ -199,6 +208,7 @@ footer a:hover{color:var(--ink)}
       </article>
 
       <article class="card" style="--c:#2563eb">
+        <img class="shot" src="img/flowlinker.webp" alt="FlowLinker dashboard with demo data" loading="lazy" width="1200" height="750"/>
         <span class="badge">Free</span>
         <div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1"/></svg></div>
         <div><h3 class="pname">FlowLinker</h3></div>
@@ -215,6 +225,7 @@ footer a:hover{color:var(--ink)}
       </article>
 
       <article class="card" style="--c:#d97706">
+        <img class="shot" src="img/billease.webp" alt="BillEase billing screen with demo data" loading="lazy" width="1200" height="750"/>
         <div class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></div>
         <div><h3 class="pname">BillEase</h3></div>
         <div class="ptag">Billing &amp; POS</div>
@@ -288,6 +299,7 @@ footer a:hover{color:var(--ink)}
           <h3 style="font-size:24px;margin:8px 0 10px">Shopify orders become Zoho CRM sales orders, automatically</h3>
           <p>Every new Shopify order is picked up by Zoho Flow and turned into a complete sales order in Zoho CRM: shipping address, order number and every line item matched to CRM products by SKU. Existing CRM workflows then run as usual.</p>
           <div class="tags" style="margin-top:14px"><span>Shopify</span><span>Zoho Flow</span><span>Deluge</span><span>Zoho CRM</span></div>
+          <img class="shot" src="img/case-shopify.webp" alt="Shopify order turned into a Zoho CRM sales order (demo)" loading="lazy" width="1200" height="750"/>
         </div>
         <div class="flow">
           <div class="fstep"><b>1</b><div>Order created in Shopify<small>Zoho Flow trigger on the store connection</small></div></div>
@@ -306,6 +318,7 @@ zoho.crm.createRecord(<span class="s">"Sales_Orders"</span>, so,
         </div>
       </article>
       <article class="case">
+        <img class="shot" src="img/case-xml.webp" alt="XML sales order import for Zoho Books (demo screen)" loading="lazy" width="1200" height="750"/>
         <span class="ind">Distribution · Demo case</span>
         <h3>XML sales order import for Zoho Books</h3>
         <p>A web tool on Zoho Catalyst that turns XML order files into Zoho Books sales orders.</p>
@@ -313,6 +326,7 @@ zoho.crm.createRecord(<span class="s">"Sales_Orders"</span>, so,
         <div class="tags"><span>Zoho Catalyst</span><span>Node.js</span><span>Zoho Books API</span><span>OAuth</span></div>
       </article>
       <article class="case">
+        <img class="shot" src="img/case-pos.webp" alt="Point of sale built on Zoho Creator (demo screen)" loading="lazy" width="1200" height="750"/>
         <span class="ind">Fitness retail · Demo case</span>
         <h3>Point of sale built on Zoho Creator</h3>
         <p>A counter POS for a demo sports-nutrition store, connected to Zoho Books for invoices and payments.</p>
@@ -320,6 +334,7 @@ zoho.crm.createRecord(<span class="s">"Sales_Orders"</span>, so,
         <div class="tags"><span>Zoho Creator</span><span>Zoho Books</span><span>Deluge</span></div>
       </article>
       <article class="case">
+        <img class="shot" src="img/case-portal.webp" alt="Customer portal on Zoho CRM (demo screen)" loading="lazy" width="1200" height="750"/>
         <span class="ind">B2B services · Demo case</span>
         <h3>Customer portal on Zoho CRM</h3>
         <p>A self-service portal where customers see their account, quotes and invoices without emailing the team.</p>
@@ -327,6 +342,7 @@ zoho.crm.createRecord(<span class="s">"Sales_Orders"</span>, so,
         <div class="tags"><span>Zoho CRM</span><span>Zoho Books</span><span>Portals</span></div>
       </article>
       <article class="case">
+        <img class="shot" src="img/case-ups.webp" alt="UPS shipping labels from CRM and Books (demo screen)" loading="lazy" width="1200" height="750"/>
         <span class="ind">Wholesale · Demo case</span>
         <h3>UPS shipping labels from CRM and Books</h3>
         <p>Print UPS shipping labels straight from Zoho CRM and Zoho Books records.</p>
@@ -334,6 +350,7 @@ zoho.crm.createRecord(<span class="s">"Sales_Orders"</span>, so,
         <div class="tags"><span>UPS API</span><span>Zoho CRM</span><span>Zoho Books</span></div>
       </article>
       <article class="case">
+        <img class="shot" src="img/case-pdf.webp" alt="PDF document parser for leads (demo screen)" loading="lazy" width="1200" height="750"/>
         <span class="ind">Sales operations · Demo case</span>
         <h3>PDF document parser for leads</h3>
         <p>A Zoho Creator app that parses, splits and manages PDFs for Zoho CRM leads.</p>
@@ -341,6 +358,7 @@ zoho.crm.createRecord(<span class="s">"Sales_Orders"</span>, so,
         <div class="tags"><span>Zoho Creator</span><span>Zoho CRM</span><span>PDF.co API</span></div>
       </article>
       <article class="case">
+        <img class="shot" src="img/case-survey.webp" alt="Survey app with a custom widget (demo screen)" loading="lazy" width="1200" height="750"/>
         <span class="ind">Research · Demo case</span>
         <h3>Survey app with a custom widget</h3>
         <p>A survey application in Zoho Creator with a custom-built widget for a smoother answering experience.</p>
@@ -398,6 +416,13 @@ zoho.crm.createRecord(<span class="s">"Sales_Orders"</span>, so,
     </div>
   </div>
 </footer>
-<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+<div class="lb" id="lb" role="dialog" aria-label="Screenshot"><img alt=""/></div>
+<script>
+document.getElementById('yr').textContent=new Date().getFullYear();
+(function(){var lb=document.getElementById('lb'),im=lb.querySelector('img');
+document.querySelectorAll('img.shot').forEach(function(i){i.addEventListener('click',function(){im.src=i.src;im.alt=i.alt;lb.classList.add('on');});});
+lb.addEventListener('click',function(){lb.classList.remove('on');});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')lb.classList.remove('on');});})();
+</script>
 </body>
 </html>
