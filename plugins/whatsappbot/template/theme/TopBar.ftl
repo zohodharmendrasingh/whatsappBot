@@ -11,6 +11,7 @@
 <#case "settings"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/><#break>
 <#case "key"><circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.7 12.3 9.8-9.8M17 6l3 3M14.5 8.5l2 2"/><#break>
 <#case "chart"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/><#break>
+<#case "users"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.2A6.5 6.5 0 0 1 21.5 20"/><#break>
 <#case "building"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 7h1M14 7h1M9 11h1M14 11h1M9 15h1M14 15h1M10 21v-3h4v3"/><#break>
 <#case "tag"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/><#break>
 <#case "card"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 10h19M6.5 15h4"/><#break>
@@ -34,9 +35,11 @@
       <div class="ms-nav-section">Workspace</div>
       <@nav "main" "Dashboard" "home" "main"/>
       <@nav "Inbox" "Inbox" "inbox" "Inbox,Conversation" "${unreadConversations!0}"/>
+      <@nav "Contacts" "Contacts" "users" "Contacts"/>
       <@nav "FindFlow" "Bot Flows" "flow" "FindFlow,FlowBuilder,EditFlow,EditFlowNode"/>
+      <@nav "Broadcast" "Broadcasts" "broadcast" "Broadcast,BroadcastReport"/>
       <@nav "Templates" "Templates" "template" "Templates"/>
-      <@nav "Broadcast" "Broadcasts" "broadcast" "Broadcast"/>
+      <@nav "Analytics" "Analytics" "chart" "Analytics"/>
       <@nav "Channels" "WhatsApp Numbers" "phone" "Channels,EditChannel"/>
       <div class="ms-nav-section">Settings</div>
       <@nav "Settings" "Team &amp; Profile" "settings" "Settings"/>

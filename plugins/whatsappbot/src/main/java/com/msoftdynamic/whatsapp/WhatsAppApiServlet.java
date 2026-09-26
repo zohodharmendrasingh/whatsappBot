@@ -107,7 +107,7 @@ public class WhatsAppApiServlet extends HttpServlet {
             write(resp, 400, error("'to' must be a full international number, e.g. 919876543210"));
             return;
         }
-        GenericValue contact = WaMessenger.findOrCreateContact(delegator, channel, to, null);
+        GenericValue contact = WaMessenger.findOrCreateContact(delegator, channel, to, null, "API");
         Map<String, Object> in = new HashMap<>();
         in.put("text", body.path("text").asText(null));
         in.put("mediaUrl", body.path("mediaUrl").asText(null));

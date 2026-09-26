@@ -138,6 +138,12 @@ public final class WaMessenger {
      */
     public static SendResult send(Delegator delegator, GenericValue channel, GenericValue contact, ObjectNode payload,
                                   String logText, String sentBy, Locale locale) {
+        return send(delegator, channel, contact, payload, logText, sentBy, locale, null);
+    }
+
+    /** @param extra optional WaMessage fields to store with the message (campaignId, flowId) */
+    public static SendResult send(Delegator delegator, GenericValue channel, GenericValue contact, ObjectNode payload,
+                                  String logText, String sentBy, Locale locale, java.util.Map<String, Object> extra) {
         String tenantId = channel.getString("tenantId");
         String messageId = delegator.getNextSeqId("WaMessage");
         String type = payload.path("type").asText("text");
@@ -176,6 +182,11 @@ public final class WaMessenger {
             msg.set("deliveryStatus", error == null ? "accepted" : "failed");
             msg.set("errorText", error);
             msg.set("createdDate", now);
+            if (extra != null) {
+                for (java.util.Map.Entry<String, Object> e : extra.entrySet()) {
+                    msg.set(e.getKey(), e.getValue());
+                }
+            }
             msg.create();
             contact.set("lastMessageDate", now); // keep caller's in-memory copy consistent
             GenericValue fresh = EntityQuery.use(delegator).from("WaContact").where("contactId", contact.getString("contactId")).queryOne();
@@ -207,6 +218,12 @@ public final class WaMessenger {
     // ------------------------------------------------------------------ contacts
     public static GenericValue findOrCreateContact(Delegator delegator, GenericValue channel, String waId, String profileName)
             throws GenericEntityException {
+        return findOrCreateContact(delegator, channel, waId, profileName, "MANUAL");
+    }
+
+    /** @param source how a new contact came in (CHAT, API, BROADCAST, IMPORT, MANUAL), stored as its consent source */
+    public static GenericValue findOrCreateContact(Delegator delegator, GenericValue channel, String waId, String profileName,
+                                                   String source) throws GenericEntityException {
         GenericValue c = EntityQuery.use(delegator).from("WaContact")
                 .where("channelId", channel.getString("channelId"), "waId", waId).queryFirst();
         if (c == null) {
@@ -217,6 +234,9 @@ public final class WaMessenger {
             c.set("waId", waId);
             c.set("profileName", profileName);
             c.set("optInStatus", "Y");
+            c.set("optInDate", UtilDateTime.nowTimestamp());
+            c.set("optSource", source);
+            c.set("chatStatus", "OPEN");
             c.set("botPaused", "N");
             c.set("unreadCount", 0L);
             c.set("createdDate", UtilDateTime.nowTimestamp());

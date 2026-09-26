@@ -23,6 +23,8 @@
     <property key="WaSettings"><value xml:lang="en">Team &amp; Profile</value></property>
     <property key="WaAdminHome"><value xml:lang="en">Platform overview</value></property>
     <property key="WaBroadcast"><value xml:lang="en">Broadcasts</value></property>
+    <property key="WaContacts"><value xml:lang="en">Contacts</value></property>
+    <property key="WaAnalytics"><value xml:lang="en">Analytics</value></property>
     <property key="WaApiIntegrations"><value xml:lang="en">API &amp; Integrations</value></property>
     <property key="WaCustomers"><value xml:lang="en">Customers</value></property>
     <property key="WaPlansPricing"><value xml:lang="en">Plans &amp; Pricing</value></property>

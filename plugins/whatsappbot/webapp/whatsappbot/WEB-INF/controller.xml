@@ -92,6 +92,31 @@
 
 
 
+    <!-- ===== Contacts, team inbox tools, broadcast campaigns, analytics ===== -->
+    <request-map uri="Contacts"><security https="true" auth="true"/><response name="success" type="view" value="Contacts"/></request-map>
+    <request-map uri="BroadcastReport"><security https="true" auth="true"/><response name="success" type="view" value="BroadcastReport"/></request-map>
+    <request-map uri="Analytics"><security https="true" auth="true"/><response name="success" type="view" value="Analytics"/></request-map>
+    <request-map uri="contactData"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaCrmEvents" invoke="contactData"/><response name="none" type="none"/></request-map>
+    <request-map uri="contactSave" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaCrmEvents" invoke="contactSave"/><response name="none" type="none"/></request-map>
+    <request-map uri="contactsBulk" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaCrmEvents" invoke="contactsBulk"/><response name="none" type="none"/></request-map>
+    <request-map uri="contactsImport" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaCrmEvents" invoke="contactsImport"/><response name="none" type="none"/></request-map>
+    <request-map uri="contactsExport"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaCrmEvents" invoke="contactsExport"/><response name="none" type="none"/></request-map>
+    <request-map uri="contactFieldAdd" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaCrmEvents" invoke="contactFieldAdd"/><response name="none" type="none"/></request-map>
+    <request-map uri="contactFieldRemove" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaCrmEvents" invoke="contactFieldRemove"/><response name="none" type="none"/></request-map>
+    <request-map uri="chatAssign" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaCrmEvents" invoke="chatAssign"/>
+        <response name="success" type="request-redirect" value="Inbox"><redirect-parameter name="contactId"/><redirect-parameter name="tab"/><redirect-parameter name="st"/></response><response name="error" type="view" value="Inbox"/></request-map>
+    <request-map uri="chatStatus" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaCrmEvents" invoke="chatStatus"/>
+        <response name="success" type="request-redirect" value="Inbox"><redirect-parameter name="contactId"/><redirect-parameter name="tab"/><redirect-parameter name="st"/></response><response name="error" type="view" value="Inbox"/></request-map>
+    <request-map uri="chatNote" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaCrmEvents" invoke="chatNote"/>
+        <response name="success" type="request-redirect" value="Inbox"><redirect-parameter name="contactId"/><redirect-parameter name="tab"/><redirect-parameter name="st"/></response><response name="error" type="view" value="Inbox"/></request-map>
+    <request-map uri="quickReplySave" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaCrmEvents" invoke="quickReplySave"/><response name="none" type="none"/></request-map>
+    <request-map uri="quickReplyDelete" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaCrmEvents" invoke="quickReplyDelete"/><response name="none" type="none"/></request-map>
+    <request-map uri="campaignEstimate"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaCrmEvents" invoke="campaignEstimate"/><response name="none" type="none"/></request-map>
+    <request-map uri="campaignCreate" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaCrmEvents" invoke="campaignCreate" global-transaction="false"/><response name="none" type="none"/></request-map>
+    <request-map uri="campaignExport"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaCrmEvents" invoke="campaignExport"/><response name="none" type="none"/></request-map>
+    <request-map uri="campaignAction" method="post"><security https="true" auth="true"/><event type="java" path="com.msoftdynamic.whatsapp.WaCrmEvents" invoke="campaignAction" global-transaction="false"/>
+        <response name="success" type="request-redirect" value="BroadcastReport"><redirect-parameter name="campaignId"/></response><response name="error" type="view" value="BroadcastReport"/></request-map>
+
     <!-- ===== Public website (no login) ===== -->
     <request-map uri="home"><security https="true" auth="false"/><response name="success" type="view" value="Home"/></request-map>
     <request-map uri="privacy"><security https="true" auth="false"/><response name="success" type="view" value="Privacy"/></request-map>
@@ -154,6 +179,9 @@
     <view-map name="AdminHome" type="screen" page="component://whatsappbot/widget/WaScreens.xml#AdminHome"/>
     <view-map name="Settings" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Settings"/>
     <view-map name="Billing" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Billing"/>
+    <view-map name="Contacts" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Contacts"/>
+    <view-map name="BroadcastReport" type="screen" page="component://whatsappbot/widget/WaScreens.xml#BroadcastReport"/>
+    <view-map name="Analytics" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Analytics"/>
     <view-map name="Home" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Home" auth="false"/>
     <view-map name="Privacy" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Privacy" auth="false"/>
     <view-map name="Terms" type="screen" page="component://whatsappbot/widget/WaScreens.xml#Terms" auth="false"/>

@@ -91,14 +91,14 @@
                 <set field="titleProperty" value="WaSettings"/>
                 <set field="headerItem" value="Settings"/>
                 <script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/WaTenantContext.groovy"/>
-<script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/AiSettings.groovy"/><script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/ZohoSettings.groovy"/>
+<script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/AiSettings.groovy"/><script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/ZohoSettings.groovy"/><script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/SettingsReplies.groovy"/>
             </actions>
             <widgets>
                 <decorator-screen name="WaDecorator" location="component://whatsappbot/widget/CommonScreens.xml">
                     <decorator-section name="body">
 <section>
                             <condition><not><if-empty field="currentTenantId"/></not></condition>
-                            <widgets><platform-specific><html><html-template location="component://whatsappbot/template/SettingsPlan.ftl"/></html></platform-specific><screenlet title="Business profile"><include-form name="TenantProfile" location="component://whatsappbot/widget/WaForms.xml"/></screenlet><screenlet title="AI assistant (Claude)"><platform-specific><html><html-template location="component://whatsappbot/template/AiSettings.ftl"/></html></platform-specific></screenlet><screenlet title="Zoho (CRM, Books, Inventory, People)"><platform-specific><html><html-template location="component://whatsappbot/template/ZohoSettings.ftl"/></html></platform-specific></screenlet><screenlet title="Team members"><include-grid name="TeamMembers" location="component://whatsappbot/widget/WaForms.xml"/><include-form name="AddTeamMember" location="component://whatsappbot/widget/WaForms.xml"/></screenlet></widgets>
+                            <widgets><platform-specific><html><html-template location="component://whatsappbot/template/SettingsPlan.ftl"/></html></platform-specific><screenlet title="Business profile"><include-form name="TenantProfile" location="component://whatsappbot/widget/WaForms.xml"/></screenlet><screenlet title="AI assistant (Claude)"><platform-specific><html><html-template location="component://whatsappbot/template/AiSettings.ftl"/></html></platform-specific></screenlet><screenlet title="Zoho (CRM, Books, Inventory, People)"><platform-specific><html><html-template location="component://whatsappbot/template/ZohoSettings.ftl"/></html></platform-specific></screenlet><screenlet title="Saved replies"><platform-specific><html><html-template location="component://whatsappbot/template/QuickReplies.ftl"/></html></platform-specific></screenlet><screenlet title="Team members"><include-grid name="TeamMembers" location="component://whatsappbot/widget/WaForms.xml"/><include-form name="AddTeamMember" location="component://whatsappbot/widget/WaForms.xml"/></screenlet></widgets>
                             <fail-widgets><label style="h3">Select a tenant in the top bar to add records.</label></fail-widgets>
                         </section>
                     </decorator-section>
@@ -112,18 +112,14 @@
                 <set field="titleProperty" value="WaInbox"/>
                 <set field="headerItem" value="Conversation"/>
                 <script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/WaTenantContext.groovy"/>
-                <entity-one entity-name="WaContact" value-field="contact"/>
-                <entity-condition entity-name="WaMessage" list="messages">
-                    <condition-expr field-name="contactId" from-field="parameters.contactId"/>
-                    <order-by field-name="createdDate"/>
-                </entity-condition>
+<script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/InboxData.groovy"/>
             </actions>
             <widgets>
                 <decorator-screen name="WaDecorator" location="component://whatsappbot/widget/CommonScreens.xml">
                     <decorator-section name="body">
 <section>
                             <condition><or><if-compare field="isWaAdmin" operator="equals" value="Y"/><if-compare-field field="contact.tenantId" operator="equals" to-field="currentTenantId"/></or></condition>
-                            <widgets><platform-specific><html><html-template location="component://whatsappbot/template/Conversation.ftl"/></html></platform-specific><screenlet title="Reply"><include-form name="ReplyForm" location="component://whatsappbot/widget/WaForms.xml"/></screenlet><screenlet title="Send approved template (outside 24h window)" id="waBox8" collapsible="true"><include-form name="TemplateReplyForm" location="component://whatsappbot/widget/WaForms.xml"/></screenlet><screenlet title="Contact details" id="waBox9" collapsible="true"><include-form name="ContactHeader" location="component://whatsappbot/widget/WaForms.xml"/></screenlet></widgets>
+                            <widgets><platform-specific><html><html-template location="component://whatsappbot/template/Conversation.ftl"/></html></platform-specific><screenlet title="Reply"><include-form name="ReplyForm" location="component://whatsappbot/widget/WaForms.xml"/></screenlet><screenlet title="Send approved template (outside 24h window)" id="waBox9" collapsible="true"><include-form name="TemplateReplyForm" location="component://whatsappbot/widget/WaForms.xml"/></screenlet><screenlet title="Contact details" id="waBox10" collapsible="true"><include-form name="ContactHeader" location="component://whatsappbot/widget/WaForms.xml"/></screenlet></widgets>
                             <fail-widgets><label style="h3">${uiLabelMap.WaPermissionError}</label></fail-widgets>
                         </section>
                     </decorator-section>
@@ -226,7 +222,7 @@
                     <decorator-section name="body">
 <screenlet title="${uiLabelMap.WaChannels}"><include-grid name="ListChannels" location="component://whatsappbot/widget/WaForms.xml"/></screenlet><section>
                             <condition><not><if-empty field="currentTenantId"/></not></condition>
-                            <widgets><screenlet title="${uiLabelMap.WaConnectWhatsApp}"><platform-specific><html><html-template location="component://whatsappbot/template/EmbeddedSignup.ftl"/></html></platform-specific></screenlet><screenlet title="Add number manually (token from Meta Business Manager)" id="waBox18" collapsible="true"><include-form name="EditChannel" location="component://whatsappbot/widget/WaForms.xml"/></screenlet></widgets>
+                            <widgets><screenlet title="${uiLabelMap.WaConnectWhatsApp}"><platform-specific><html><html-template location="component://whatsappbot/template/EmbeddedSignup.ftl"/></html></platform-specific></screenlet><screenlet title="Add number manually (token from Meta Business Manager)" id="waBox19" collapsible="true"><include-form name="EditChannel" location="component://whatsappbot/widget/WaForms.xml"/></screenlet></widgets>
                             <fail-widgets><label style="h3">Select a tenant in the top bar to add records.</label></fail-widgets>
                         </section><platform-specific><html><html-template location="component://whatsappbot/template/WebhookHelp.ftl"/></html></platform-specific>
                     </decorator-section>
@@ -279,12 +275,79 @@
                 <set field="titleProperty" value="WaBroadcast"/>
                 <set field="headerItem" value="Broadcast"/>
                 <script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/WaTenantContext.groovy"/>
-
+<script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/BroadcastData.groovy"/>
             </actions>
             <widgets>
                 <decorator-screen name="WaDecorator" location="component://whatsappbot/widget/CommonScreens.xml">
                     <decorator-section name="body">
-<screenlet title="Send an approved template to many customers"><include-form name="BroadcastForm" location="component://whatsappbot/widget/WaForms.xml"/></screenlet>
+<section>
+                            <condition><not><if-empty field="currentTenantId"/></not></condition>
+                            <widgets><platform-specific><html><html-template location="component://whatsappbot/template/Broadcast.ftl"/></html></platform-specific></widgets>
+                            <fail-widgets><label style="h3">Select a tenant in the top bar to add records.</label></fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="BroadcastReport">
+        <section>
+            <actions>
+                <set field="titleProperty" value="WaBroadcast"/>
+                <set field="headerItem" value="BroadcastReport"/>
+                <script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/WaTenantContext.groovy"/>
+<script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/BroadcastData.groovy"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="WaDecorator" location="component://whatsappbot/widget/CommonScreens.xml">
+                    <decorator-section name="body">
+<section>
+                            <condition><not><if-empty field="currentTenantId"/></not></condition>
+                            <widgets><platform-specific><html><html-template location="component://whatsappbot/template/BroadcastReport.ftl"/></html></platform-specific></widgets>
+                            <fail-widgets><label style="h3">Select a tenant in the top bar to add records.</label></fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="Contacts">
+        <section>
+            <actions>
+                <set field="titleProperty" value="WaContacts"/>
+                <set field="headerItem" value="Contacts"/>
+                <script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/WaTenantContext.groovy"/>
+<script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/ContactsData.groovy"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="WaDecorator" location="component://whatsappbot/widget/CommonScreens.xml">
+                    <decorator-section name="body">
+<section>
+                            <condition><not><if-empty field="currentTenantId"/></not></condition>
+                            <widgets><platform-specific><html><html-template location="component://whatsappbot/template/Contacts.ftl"/></html></platform-specific></widgets>
+                            <fail-widgets><label style="h3">Select a tenant in the top bar to add records.</label></fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="Analytics">
+        <section>
+            <actions>
+                <set field="titleProperty" value="WaAnalytics"/>
+                <set field="headerItem" value="Analytics"/>
+                <script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/WaTenantContext.groovy"/>
+<script location="component://whatsappbot/src/main/groovy/com/msoftdynamic/whatsapp/AnalyticsData.groovy"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="WaDecorator" location="component://whatsappbot/widget/CommonScreens.xml">
+                    <decorator-section name="body">
+<section>
+                            <condition><not><if-empty field="currentTenantId"/></not></condition>
+                            <widgets><platform-specific><html><html-template location="component://whatsappbot/template/Analytics.ftl"/></html></platform-specific></widgets>
+                            <fail-widgets><label style="h3">Select a tenant in the top bar to add records.</label></fail-widgets>
+                        </section>
                     </decorator-section>
                 </decorator-screen>
             </widgets>

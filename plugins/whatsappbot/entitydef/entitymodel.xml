@@ -168,10 +168,62 @@
         <field name="lastMessageDate" type="date-time"/>
         <field name="unreadCount" type="numeric"/>
         <field name="createdDate" type="date-time"/>
+        <field name="email" type="email"/>
+        <field name="customFields" type="very-long"><description>JSON object of the workspace's custom contact fields</description></field>
+        <field name="optInDate" type="date-time"/>
+        <field name="optOutDate" type="date-time"/>
+        <field name="optSource" type="short-varchar"><description>How consent was last changed: CHAT, KEYWORD, IMPORT, MANUAL, API</description></field>
+        <field name="assignedTo" type="id-vlong"><description>Team member (userLoginId) handling this chat</description></field>
+        <field name="chatStatus" type="short-varchar"><description>OPEN, PENDING, SOLVED</description></field>
         <prim-key field="contactId"/>
         <relation type="one" fk-name="WACNT_TNT" rel-entity-name="WaTenant"><key-map field-name="tenantId"/></relation>
         <relation type="one" fk-name="WACNT_CHN" rel-entity-name="WaChannel"><key-map field-name="channelId"/></relation>
         <index name="WACNT_CHWA" unique="true"><index-field name="channelId"/><index-field name="waId"/></index>
+        <index name="WACNT_TNTLM"><index-field name="tenantId"/><index-field name="lastMessageDate"/></index>
+    </entity>
+
+    <entity entity-name="WaContactTag" package-name="com.msoftdynamic.whatsapp.chat" title="Tag on a contact">
+        <field name="contactId" type="id"/>
+        <field name="tag" type="short-varchar"><description>Lower case</description></field>
+        <field name="tenantId" type="id"/>
+        <field name="createdDate" type="date-time"/>
+        <prim-key field="contactId"/>
+        <prim-key field="tag"/>
+        <relation type="one" fk-name="WACTAG_CNT" rel-entity-name="WaContact"><key-map field-name="contactId"/></relation>
+        <index name="WACTAG_TNT"><index-field name="tenantId"/><index-field name="tag"/></index>
+    </entity>
+
+    <entity entity-name="WaContactField" package-name="com.msoftdynamic.whatsapp.chat" title="Custom contact field of a workspace">
+        <field name="tenantId" type="id"/>
+        <field name="fieldKey" type="short-varchar"><description>Lower case a-z0-9_; usable as {{key}} in flows and broadcasts</description></field>
+        <field name="label" type="name"/>
+        <field name="sequenceNum" type="numeric"/>
+        <prim-key field="tenantId"/>
+        <prim-key field="fieldKey"/>
+        <relation type="one" fk-name="WACFLD_TNT" rel-entity-name="WaTenant"><key-map field-name="tenantId"/></relation>
+    </entity>
+
+    <entity entity-name="WaNote" package-name="com.msoftdynamic.whatsapp.chat" title="Internal team note on a chat (never sent to the customer)">
+        <field name="noteId" type="id"/>
+        <field name="tenantId" type="id"/>
+        <field name="contactId" type="id"/>
+        <field name="noteText" type="very-long"/>
+        <field name="createdBy" type="id-vlong"/>
+        <field name="createdDate" type="date-time"/>
+        <prim-key field="noteId"/>
+        <relation type="one" fk-name="WANOTE_CNT" rel-entity-name="WaContact"><key-map field-name="contactId"/></relation>
+        <index name="WANOTE_CNTDT"><index-field name="contactId"/><index-field name="createdDate"/></index>
+    </entity>
+
+    <entity entity-name="WaQuickReply" package-name="com.msoftdynamic.whatsapp.chat" title="Saved reply for agents">
+        <field name="quickReplyId" type="id"/>
+        <field name="tenantId" type="id"/>
+        <field name="shortcut" type="short-varchar"><description>Typed after / in the reply box</description></field>
+        <field name="body" type="very-long"/>
+        <field name="createdBy" type="id-vlong"/>
+        <field name="createdDate" type="date-time"/>
+        <prim-key field="quickReplyId"/>
+        <relation type="one" fk-name="WAQR_TNT" rel-entity-name="WaTenant"><key-map field-name="tenantId"/></relation>
     </entity>
 
     <entity entity-name="WaMessage" package-name="com.msoftdynamic.whatsapp.chat" title="Inbound / outbound message">
@@ -188,6 +240,8 @@
         <field name="deliveryStatus" type="short-varchar"><description>accepted, sent, delivered, read, failed</description></field>
         <field name="errorText" type="very-long"/>
         <field name="createdDate" type="date-time"/>
+        <field name="campaignId" type="id"><description>Broadcast this message belongs to</description></field>
+        <field name="flowId" type="id"><description>Flow that sent this bot message</description></field>
         <prim-key field="messageId"/>
         <relation type="one" fk-name="WAMSG_TNT" rel-entity-name="WaTenant"><key-map field-name="tenantId"/></relation>
         <relation type="one" fk-name="WAMSG_CNT" rel-entity-name="WaContact"><key-map field-name="contactId"/></relation>
@@ -261,6 +315,64 @@
         <prim-key field="templateId"/>
         <relation type="one" fk-name="WATPL_TNT" rel-entity-name="WaTenant"><key-map field-name="tenantId"/></relation>
         <relation type="one" fk-name="WATPL_CHN" rel-entity-name="WaChannel"><key-map field-name="channelId"/></relation>
+    </entity>
+
+    <entity entity-name="WaCampaign" package-name="com.msoftdynamic.whatsapp.template" title="Broadcast campaign">
+        <field name="campaignId" type="id"/>
+        <field name="tenantId" type="id"/>
+        <field name="channelId" type="id"/>
+        <field name="campaignName" type="name"/>
+        <field name="templateId" type="id"/>
+        <field name="templateName" type="short-varchar"/>
+        <field name="languageCode" type="very-short"/>
+        <field name="bodyParams" type="very-long"><description>Pipe separated {{1}}|{{2}} values; may use {{name}} and custom fields</description></field>
+        <field name="audienceType" type="short-varchar"><description>TAGS, ALL, NUMBERS</description></field>
+        <field name="audienceTags" type="long-varchar"><description>Comma separated tags (any of)</description></field>
+        <field name="excludeTags" type="long-varchar"/>
+        <field name="numbers" type="very-long"/>
+        <field name="statusId" type="short-varchar"><description>SCHEDULED, SENDING, DONE, CANCELLED, FAILED</description></field>
+        <field name="scheduledDate" type="date-time"/>
+        <field name="startedDate" type="date-time"/>
+        <field name="completedDate" type="date-time"/>
+        <field name="totalCount" type="numeric"/>
+        <field name="errorText" type="very-long"/>
+        <field name="createdBy" type="id-vlong"/>
+        <field name="createdDate" type="date-time"/>
+        <prim-key field="campaignId"/>
+        <relation type="one" fk-name="WACMP_TNT" rel-entity-name="WaTenant"><key-map field-name="tenantId"/></relation>
+        <relation type="one" fk-name="WACMP_CHN" rel-entity-name="WaChannel"><key-map field-name="channelId"/></relation>
+        <index name="WACMP_TNTDT"><index-field name="tenantId"/><index-field name="createdDate"/></index>
+    </entity>
+
+    <entity entity-name="WaCampaignRecipient" package-name="com.msoftdynamic.whatsapp.template" title="One recipient of a broadcast and what happened">
+        <field name="campaignId" type="id"/>
+        <field name="contactId" type="id"/>
+        <field name="waId" type="tel-number"/>
+        <field name="messageId" type="id"/>
+        <field name="statusId" type="short-varchar"><description>PENDING, SKIPPED, SENT, DELIVERED, READ, FAILED</description></field>
+        <field name="errorText" type="very-long"/>
+        <field name="sentDate" type="date-time"/>
+        <field name="deliveredDate" type="date-time"/>
+        <field name="readDate" type="date-time"/>
+        <field name="repliedDate" type="date-time"/>
+        <prim-key field="campaignId"/>
+        <prim-key field="contactId"/>
+        <relation type="one" fk-name="WACMPR_CMP" rel-entity-name="WaCampaign"><key-map field-name="campaignId"/></relation>
+        <relation type="one" fk-name="WACMPR_CNT" rel-entity-name="WaContact"><key-map field-name="contactId"/></relation>
+        <index name="WACMPR_CNTSD"><index-field name="contactId"/><index-field name="sentDate"/></index>
+    </entity>
+
+    <entity entity-name="WaFlowRun" package-name="com.msoftdynamic.whatsapp.bot" title="One run of a flow for a contact (analytics)">
+        <field name="runId" type="id"/>
+        <field name="tenantId" type="id"/>
+        <field name="flowId" type="id"/>
+        <field name="contactId" type="id"/>
+        <field name="outcome" type="short-varchar"><description>STARTED, COMPLETED, HANDOFF</description></field>
+        <field name="startedDate" type="date-time"/>
+        <field name="endedDate" type="date-time"/>
+        <prim-key field="runId"/>
+        <index name="WAFRUN_TNTDT"><index-field name="tenantId"/><index-field name="startedDate"/></index>
+        <index name="WAFRUN_CNT"><index-field name="contactId"/><index-field name="startedDate"/></index>
     </entity>
 
     <entity entity-name="WaWebhookLog" package-name="com.msoftdynamic.whatsapp.channel" title="Raw webhook payloads">

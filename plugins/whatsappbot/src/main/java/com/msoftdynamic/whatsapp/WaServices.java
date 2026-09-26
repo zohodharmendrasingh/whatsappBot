@@ -457,6 +457,9 @@ public final class WaServices {
             if ("Y".equals(context.get("pauseBot"))) {
                 setPaused(delegator, contact.getString("contactId"), "Y");
             }
+            if (userLogin != null && UtilValidate.isEmpty(context.get("sentBy"))) {
+                WaCrmEvents.assignIfUnassigned(delegator, contact.getString("contactId"), userLogin.getString("userLoginId"));
+            }
             return result;
         } catch (GenericEntityException e) {
             Debug.logError(e, MODULE);
@@ -552,7 +555,12 @@ public final class WaServices {
     }
 
     public static Map<String, Object> pauseBot(DispatchContext dctx, Map<String, ? extends Object> context) {
-        return setPaused(dctx.getDelegator(), (String) context.get("contactId"), "Y");
+        Map<String, Object> r = setPaused(dctx.getDelegator(), (String) context.get("contactId"), "Y");
+        GenericValue ul = (GenericValue) context.get("userLogin");
+        if (ServiceUtil.isSuccess(r) && ul != null) {
+            WaCrmEvents.assignIfUnassigned(dctx.getDelegator(), (String) context.get("contactId"), ul.getString("userLoginId"));
+        }
+        return r;
     }
 
     private static Map<String, Object> setPaused(Delegator delegator, String contactId, String flag) {
@@ -603,7 +611,7 @@ public final class WaServices {
                 }
             }
             for (String n : numbers) {
-                GenericValue contact = WaMessenger.findOrCreateContact(delegator, channel, n, null);
+                GenericValue contact = WaMessenger.findOrCreateContact(delegator, channel, n, null, "BROADCAST");
                 Map<String, Object> in = new HashMap<>();
                 in.put("templateId", context.get("templateId"));
                 in.put("templateName", context.get("templateName"));
@@ -810,7 +818,7 @@ public final class WaServices {
         }
 
         String from = m.path("from").asText();
-        GenericValue contact = WaMessenger.findOrCreateContact(delegator, channel, from, profileName);
+        GenericValue contact = WaMessenger.findOrCreateContact(delegator, channel, from, profileName, "CHAT");
         Timestamp now = UtilDateTime.nowTimestamp();
 
         GenericValue msg = delegator.makeValue("WaMessage");
@@ -836,7 +844,11 @@ public final class WaServices {
             fresh.set("lastMessageDate", now);
             Long unread = fresh.getLong("unreadCount");
             fresh.set("unreadCount", (unread == null ? 0L : unread) + 1L);
+            if (!"OPEN".equals(fresh.getString("chatStatus"))) {
+                fresh.set("chatStatus", "OPEN"); // the customer wrote again: back to open
+            }
             fresh.store();
+            WaCampaigns.markReplied(delegator, fresh.getString("contactId"), now);
             new BotEngine(delegator, channel, fresh, locale).handle(text, replyId);
         }
     }
@@ -870,6 +882,9 @@ public final class WaServices {
                             + e.path("error_data").path("details").asText(""));
                 }
                 msg.store();
+                if (UtilValidate.isNotEmpty(msg.getString("campaignId"))) {
+                    WaCampaigns.onStatus(delegator, msg, status, msg.getString("errorText"));
+                }
             }
         } catch (GenericEntityException e) {
             Debug.logError(e, MODULE);

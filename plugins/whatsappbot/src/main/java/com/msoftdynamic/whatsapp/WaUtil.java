@@ -242,20 +242,71 @@ public final class WaUtil {
     }
 
     /** Replace {{name}}, {{phone}} and {{anyVariable}} placeholders. */
+    /** Split "a|{{name|friend}}|c" on the | separators that are not inside {{ }}. */
+    public static List<String> splitParams(String s) {
+        List<String> out = new ArrayList<>();
+        if (s == null) {
+            return out;
+        }
+        StringBuilder cur = new StringBuilder();
+        int depth = 0;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '{' && i + 1 < s.length() && s.charAt(i + 1) == '{') {
+                depth++;
+                cur.append("{{");
+                i++;
+            } else if (c == '}' && i + 1 < s.length() && s.charAt(i + 1) == '}' && depth > 0) {
+                depth--;
+                cur.append("}}");
+                i++;
+            } else if (c == '|' && depth == 0) {
+                out.add(cur.toString());
+                cur.setLength(0);
+            } else {
+                cur.append(c);
+            }
+        }
+        out.add(cur.toString());
+        return out;
+    }
+
+    private static final java.util.regex.Pattern PLACEHOLDER =
+            java.util.regex.Pattern.compile("\\{\\{\\s*([A-Za-z0-9_]+)\\s*(?:\\|([^{}]*))?}}");
+
+    /**
+     * Fill {{key}} placeholders from flow variables, the contact (name, phone, whatsapp, email) and its custom fields.
+     * {{key|fallback}} uses the fallback when the value is missing. Single pass, so values are never re-expanded.
+     */
     public static String render(String text, GenericValue contact, Map<String, Object> vars) {
         if (text == null || !text.contains("{{")) {
             return text;
         }
         Map<String, Object> all = new LinkedHashMap<>(vars == null ? Collections.emptyMap() : vars);
         String name = contact.getString("profileName");
-        all.putIfAbsent("name", UtilValidate.isEmpty(name) ? "there" : name);
+        if (UtilValidate.isNotEmpty(name)) {
+            all.putIfAbsent("name", name);
+        }
         all.putIfAbsent("phone", contact.getString("waId"));
         all.putIfAbsent("whatsapp", "+" + contact.getString("waId"));
-        String out = text;
-        for (Map.Entry<String, Object> e : all.entrySet()) {
-            out = out.replace("{{" + e.getKey() + "}}", String.valueOf(e.getValue()));
+        for (Map.Entry<String, Object> e : WaContacts.placeholderValues(contact).entrySet()) {
+            all.putIfAbsent(e.getKey(), e.getValue());
         }
-        return out.replaceAll("\\{\\{[A-Za-z0-9_]+}}", "");
+        java.util.regex.Matcher m = PLACEHOLDER.matcher(text);
+        StringBuilder out = new StringBuilder();
+        while (m.find()) {
+            Object v = all.get(m.group(1));
+            if (v == null) {
+                v = all.get(m.group(1).toLowerCase(Locale.ROOT));
+            }
+            String val = v == null ? "" : String.valueOf(v).trim();
+            if (val.isEmpty()) {
+                val = m.group(2) != null ? m.group(2).trim() : ("name".equalsIgnoreCase(m.group(1)) ? "there" : "");
+            }
+            m.appendReplacement(out, java.util.regex.Matcher.quoteReplacement(val));
+        }
+        m.appendTail(out);
+        return out.toString();
     }
 
     // ------------------------------------------------------------------ crypto

@@ -50,7 +50,7 @@ public final class BotEngine {
 
         // --- opt-out / opt-in (compliance) ---
         if (WaUtil.propList("bot.optout.keywords").contains(lower)) {
-            contact.set("optInStatus", "N");
+            WaContacts.setConsent(contact, false, "KEYWORD");
             clearState();
             save();
             send(WaMessenger.text(waId(), "You have been unsubscribed. Reply START to subscribe again."), "[opt-out confirmation]");
@@ -60,7 +60,7 @@ public final class BotEngine {
             if (!WaUtil.propList("bot.optin.keywords").contains(lower)) {
                 return;
             }
-            contact.set("optInStatus", "Y");
+            WaContacts.setConsent(contact, true, "KEYWORD");
         }
 
         // --- human agent has the chat ---
@@ -92,6 +92,7 @@ public final class BotEngine {
             save();
             return;
         }
+        startRun(flow.getString("flowId"));
         run(flow.getString("flowId"), flow.getString("startNodeId"));
         save();
     }
@@ -106,6 +107,7 @@ public final class BotEngine {
                 vars.put("lastChoice", opt.getString("optionLabel"));
                 String target = opt.getString("targetNodeId");
                 if (UtilValidate.isEmpty(target)) {
+                    endRun(flowId, "COMPLETED");
                     clearState();
                 } else {
                     run(flowId, target);
@@ -131,6 +133,7 @@ public final class BotEngine {
             vars.put(UtilValidate.isEmpty(var) ? node.getString("nodeId") : var, input);
             String next = node.getString("nextNodeId");
             if (UtilValidate.isEmpty(next)) {
+                endRun(flowId, "COMPLETED");
                 clearState();
             } else {
                 run(flowId, next);
@@ -171,6 +174,7 @@ public final class BotEngine {
         String curFlow = flowId;
         String cur = nodeId;
         for (int step = 0; step < maxSteps && UtilValidate.isNotEmpty(cur); step++) {
+            sendingFlow = curFlow;
             GenericValue node = node(curFlow, cur);
             if (node == null) {
                 Debug.logWarning("Flow " + curFlow + " has no node " + cur, MODULE);
@@ -202,6 +206,8 @@ public final class BotEngine {
                     send(WaMessenger.text(waId(), text), text);
                 }
                 contact.set("botPaused", "Y");
+                contact.set("chatStatus", "OPEN");
+                endRun(curFlow, "HANDOFF");
                 clearState();
                 return;
             case "WA_NODE_ZOHO":
@@ -211,6 +217,7 @@ public final class BotEngine {
                 vars.putAll(zr.vars);
                 cur = zr.ok ? node.getString("nextNodeId") : node.getString("failNodeId");
                 if (UtilValidate.isEmpty(cur)) {
+                    endRun(curFlow, "COMPLETED");
                     clearState();
                     return;
                 }
@@ -222,19 +229,54 @@ public final class BotEngine {
                     clearState();
                     return;
                 }
+                endRun(curFlow, "COMPLETED");
                 curFlow = target.getString("flowId");
                 cur = target.getString("startNodeId");
+                startRun(curFlow);
                 break;
             case "WA_NODE_END":
             default:
                 if (UtilValidate.isNotEmpty(text)) {
                     send(WaMessenger.text(waId(), text), text);
                 }
+                endRun(curFlow, "COMPLETED");
                 clearState();
                 return;
             }
         }
+        if (UtilValidate.isEmpty(cur)) {
+            endRun(curFlow, "COMPLETED");
+        }
         clearState();
+    }
+
+    // ------------------------------------------------------------------ flow runs (analytics)
+    private String sendingFlow;
+
+    private void startRun(String flowId) {
+        sendingFlow = flowId;
+        try {
+            delegator.create("WaFlowRun", org.apache.ofbiz.base.util.UtilMisc.toMap("runId", delegator.getNextSeqId("WaFlowRun"),
+                    "tenantId", channel.getString("tenantId"), "flowId", flowId, "contactId", contact.getString("contactId"),
+                    "outcome", "STARTED", "startedDate", org.apache.ofbiz.base.util.UtilDateTime.nowTimestamp()));
+        } catch (GenericEntityException e) {
+            Debug.logWarning(e, "Could not record flow run", MODULE);
+        }
+    }
+
+    private void endRun(String flowId, String outcome) {
+        try {
+            GenericValue run = EntityQuery.use(delegator).from("WaFlowRun")
+                    .where("contactId", contact.getString("contactId"), "flowId", flowId, "outcome", "STARTED")
+                    .orderBy("-startedDate").queryFirst();
+            if (run != null) {
+                run.set("outcome", outcome);
+                run.set("endedDate", org.apache.ofbiz.base.util.UtilDateTime.nowTimestamp());
+                run.store();
+            }
+        } catch (GenericEntityException e) {
+            Debug.logWarning(e, "Could not record flow run end", MODULE);
+        }
     }
 
     private void sendChoice(GenericValue node, String text) throws GenericEntityException {
@@ -330,7 +372,8 @@ public final class BotEngine {
         fresh.store();
     }
 
-    private static final String[] BOT_FIELDS = {"currentFlowId", "currentNodeId", "sessionData", "optInStatus", "botPaused"};
+    private static final String[] BOT_FIELDS = {"currentFlowId", "currentNodeId", "sessionData", "optInStatus", "botPaused",
+        "optInDate", "optOutDate", "optSource", "chatStatus"};
 
     private String render(String s) {
         return WaUtil.render(s, contact, vars);
@@ -341,7 +384,9 @@ public final class BotEngine {
     }
 
     private void send(ObjectNode payload, String logText) {
-        WaMessenger.SendResult r = WaMessenger.send(delegator, channel, contact, payload, logText, "BOT", locale);
+        String flowId = sendingFlow != null ? sendingFlow : contact.getString("currentFlowId");
+        WaMessenger.SendResult r = WaMessenger.send(delegator, channel, contact, payload, logText, "BOT", locale,
+                flowId == null ? null : java.util.Map.of("flowId", flowId));
         if (!r.isOk()) {
             Debug.logWarning("Bot reply to " + waId() + " failed: " + r.getError(), MODULE);
         }
